@@ -1,0 +1,13 @@
+﻿# Configuración de ejemplo del cliente DASH
+
+mpd_url: "http://localhost:8000/dash/video.mpd"
+
+playback:
+  start_quality: 0
+  max_buffer_seconds: 30
+  min_buffer_seconds: 8
+
+logging:
+  enabled: true
+  level: "INFO"
+  output_dir: "logs"
