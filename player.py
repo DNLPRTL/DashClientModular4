@@ -38,7 +38,7 @@ class Player:
     TP_WINDOW = 5  # para min/std
 
     def __init__(self, parser, media_engine, mpd_url, downloader, controller,
-                 log_path=None, initial_level=0):
+                 log_path=None, initial_level=0, use_initial_controller_decision=True):
         self.parser = parser
         self.media_engine = media_engine
         self.downloader = downloader
@@ -47,6 +47,10 @@ class Player:
         self.cur_index = 0
         self.log_path = log_path
         self.mpd_url = mpd_url
+        self.run_dir = None
+        self.dataset_csv_path = None
+        self.training_csv_path = None
+        self.use_initial_controller_decision = bool(use_initial_controller_decision)
 
         # estado general
         self.downloaded_bytes = 0
@@ -337,8 +341,11 @@ class Player:
 
         self._fb_keys = list(fb0.keys())
         self.controller.setPlayerFeedback(fb0)
-        rate0 = self.controller.calcControlAction()
-        self.cur_level = min(self.controller.quantizeRate(rate0), self.max_level)
+        if self.use_initial_controller_decision:
+            rate0 = self.controller.calcControlAction()
+            self.cur_level = min(self.controller.quantizeRate(rate0), self.max_level)
+        else:
+            self.cur_level = min(max(0, int(self.cur_level)), self.max_level)
         print(f"➡️  Nivel inicial: {self.cur_level} ({self.rates[self.cur_level]} B/s)")
 
         # warm-up: 1 segmento sin adaptación
@@ -363,6 +370,9 @@ class Player:
             dataset_csv_path = os.path.join(run_dir, base_name)
             name_wo_ext = base_name[:-4] if base_name.lower().endswith(".csv") else base_name
             training_csv_path = os.path.join(run_dir, f"{name_wo_ext}_training.csv")
+            self.run_dir = run_dir
+            self.dataset_csv_path = dataset_csv_path
+            self.training_csv_path = training_csv_path
 
             # CSV completo (dataset)
             f = open(dataset_csv_path, 'w', newline='')

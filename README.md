@@ -1,24 +1,43 @@
-﻿# DashClientModular4
+# DashClientModular4
 
-Cliente DASH modular para el TFG.
+Modular DASH client for a TFG project. Phase 1 is focused on hardening the base client into an ABR-neutral, reproducible benchmarking skeleton before adding real ABR algorithms.
 
-## Objetivo
+## Current Run Path
 
-Crear un reproductor DASH robusto, limpio y preparado para comparar controladores ABR clásicos y basados en IA/RL.
+The official benchmark/dev path is config-driven and non-interactive:
 
-## Estructura principal
+```powershell
+Copy-Item config\client.example.yaml config\client.local.yaml
+# Edit config\client.local.yaml and set mpd_url.
+python main.py --config config\client.local.yaml
+```
 
-- core/controller: controladores ABR.
-- core/media_engine: motor de reproducción.
-- core/parser: parser MPD y lógica DASH.
-- core/utils: utilidades comunes.
-- config: configuración del cliente.
-- docs: arquitectura, investigación y runbooks.
-- scripts: scripts de setup, smoke tests y evaluación.
-- tests: pruebas automáticas.
+`config/client.local.yaml` is ignored by git and must hold local MPD URLs or machine-specific settings. The example config defaults to:
 
-## Decisión importante
+- `media_engine.name: "fake"`
+- `controller.name: "max_quality"`
+- `playback.initial_controller_decision: false`
+- `playback.headless: true`
+- `output.root_dir: "logs"`
 
-Los vídeos DASH, segmentos y ficheros pesados no deben meterse en este repositorio.
+Manual demo prompts are still available with:
 
-El contenido DASH vive fuera del repo.
+```powershell
+python main.py --interactive
+```
+
+See [docs/runbooks/run_client.md](docs/runbooks/run_client.md) for exact usage.
+
+## Main Structure
+
+- `core/controller`: controller interface and registry.
+- `core/media_engine`: fake and GStreamer playback engines.
+- `core/parser`: MPD parser and DASH parsing helpers.
+- `core/downloader.py`: segment downloader.
+- `config`: example client configuration.
+- `docs`: architecture notes and runbooks.
+- `tests`: import and config tests.
+
+## Important Rule
+
+DASH videos, segments, and other heavy media files must not be committed to this repository. DASH content lives outside the repo and is referenced through local ignored config.

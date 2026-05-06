@@ -1,13 +1,39 @@
-﻿# Configuración de ejemplo del cliente DASH
+# Example config for the non-interactive DASH client runner.
+# Copy this file to config/client.local.yaml and set mpd_url before running.
 
-mpd_url: "http://localhost:8000/dash/video.mpd"
+mpd_url: ""
+
+media_engine:
+  name: "fake"
+  min_queue_time: 1.0
+  decode_video: false
+  sink_name: null
+
+controller:
+  name: "max_quality"
+  params:
+    debug: false
 
 playback:
-  start_quality: 0
-  max_buffer_seconds: 30
-  min_buffer_seconds: 8
+  initial_quality: 0
+  initial_controller_decision: false
+  headless: true
+  max_buffer_seconds: 60.0
+  drain_buffer_sleep_seconds: 0.5
+  preroll_seconds: 10.0
+
+downloader:
+  max_retries: 3
+  verbose: false
+
+output:
+  root_dir: "logs"
+  dataset_filename: "dataset.csv"
 
 logging:
   enabled: true
   level: "INFO"
-  output_dir: "logs"
+
+analysis:
+  enabled: false
+  output_root: "analysis_output"

@@ -5,6 +5,7 @@ import unittest
 REQUIRED_IMPORTS = [
     "main",
     "player",
+    "core.client_config",
     "core.parser.dash",
     "core.downloader",
     "core.media_engine.fake",

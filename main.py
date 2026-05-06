@@ -1,163 +1,286 @@
-import os
-import logging
-import threading
-import subprocess
-from datetime import datetime
+from __future__ import annotations
 
-from core.parser.dash import DashParser
+import argparse
+import json
+import logging
+import subprocess
+import sys
+import threading
+from datetime import datetime
+from pathlib import Path
+
+from core.client_config import (
+    ClientConfig,
+    ConfigError,
+    load_client_config,
+    validate_config_for_run,
+)
+from core.controller.registry import available_controllers, create_controller
 from core.downloader import SegmentDownloader
 from core.media_engine.fake import FakeMediaEngine
+from core.parser.dash import DashParser
+from player import Player
+
 try:
     from core.media_engine.gst_media_engine import GST_AVAILABLE, GstMediaEngine
 except Exception:
     GstMediaEngine = None
     GST_AVAILABLE = False
 
-from core.controller.registry import available_controllers
 
-from player import Player
-from progress_bar import ProgressBarWindow
-
-# ——— Modo headless: True = sin GUI, False = con ProgressBarWindow ———
-HEADLESS = False
-
-def main():
-    # ——— Configurar logging ———
-    os.makedirs("logs", exist_ok=True)
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s [%(levelname)s] %(message)s",
-        handlers=[
-            logging.StreamHandler(),
-            logging.FileHandler("logs/main.log", encoding="utf-8")
-        ]
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description="Config-driven DASH client runner.")
+    parser.add_argument(
+        "--config",
+        "-c",
+        default=None,
+        help="Path to a YAML config. Defaults to config/client.local.yaml when present.",
     )
-    logging.info("=== CLIENTE DASH MODULAR ===")
+    parser.add_argument(
+        "--interactive",
+        action="store_true",
+        help="Run the manual demo prompts instead of the benchmark/dev config path.",
+    )
+    args = parser.parse_args(argv)
 
-    # ——— Selección del motor ———
-    print("Motores de reproducción:")
-    print("1. Fake (interno, sin GStreamer)")
-    print("2. GStreamer (real)")
-    engine_opt = input("Elige motor (1/2): ").strip()
-
-    media_engine_cls = FakeMediaEngine
-    media_engine_kwargs = {"min_queue_time": 1.0}
-    engine_name = "FakeMediaEngine"
-
-    if engine_opt == "2":
-        if GST_AVAILABLE:
-            media_engine_cls = GstMediaEngine
-            # Ajusta si quieres ver vídeo real: decode_video=True usa autovideosink
-            media_engine_kwargs = {"min_queue_time": 1.0, "decode_video": True}
-            engine_name = "GstMediaEngine"
-        else:
-            logging.warning("GStreamer no disponible. Se usará FakeMediaEngine.")
-
-    # ——— Selección del controller ———
-    controller_specs = available_controllers()
-    if not controller_specs:
-        logging.error("No hay controladores disponibles. Saliendo.")
-        return
-    for i, spec in enumerate(controller_specs, start=1):
-        print(f"{i}. {spec.label}")
-
-    opcion = input("Introduce el número: ").strip()
     try:
-        controller = controller_specs[int(opcion) - 1].factory()
-    except (ValueError, IndexError):
-        logging.error("Opción no válida. Saliendo.")
-        return
+        if args.interactive:
+            config = _prompt_for_manual_config()
+        else:
+            config = load_client_config(args.config)
+        validate_config_for_run(config)
+        run_client(config)
+        return 0
+    except ConfigError as exc:
+        print(f"Configuration error: {exc}", file=sys.stderr)
+        return 2
+    except Exception:
+        logging.exception("Client run failed")
+        return 1
 
-    # ——— URL del MPD y ruta de log por algoritmo ———
-    #
-    #mpd_url = "http://172.16.0.251/dash/5/1sec/ToS-4k-1920_simple_1s.mpd"
-    #mpd_url = "http://172.16.0.251/dash/2/1sec/walk_1s.mpd"
-    #mpd_url =
-    #
-    #
-    mpd_url = "http://192.168.1.132/dash/Paseo_Almunecar_10min_60fps/4sec/Paseo_Almunecar_10min_60fps_simple_4s.mpd"
-    ctrl_name = controller.__class__.__name__
-    os.makedirs("logs", exist_ok=True)
-    log_path = os.path.join("logs", f"{ctrl_name}_metrics.csv")
-    logging.info(f"Usando controlador '{ctrl_name}', log en: {log_path}")
-    logging.info(f"Motor seleccionado: {engine_name}")
 
-    # ——— Instanciación de componentes ———
-    parser_dash = DashParser()
-    parser_dash.load(mpd_url)
-    media_engine = media_engine_cls(**media_engine_kwargs)
-    downloader = SegmentDownloader()
+def run_client(config: ClientConfig) -> None:
+    output_root = Path(config.output.root_dir)
+    output_root.mkdir(parents=True, exist_ok=True)
+    _configure_logging(config, output_root)
 
-    # ——— Cálculo de duración para la barra de progreso ———
-    initial_level = 0
-    period = parser_dash.get_periods()[0]
-    adap = period['adaptationSets'][0]
-    rep = adap['representations'][initial_level]
-    if 'segment_durations' in rep and rep['segment_durations']:
-        total_sec = sum(rep['segment_durations'])
-    else:
-        total_sec = len(rep['segments']) * rep.get('fragment_duration', 1.0)
-    dur_iso = parser_dash.global_info['mediaPresentationDuration']
-    total_mpd_sec = parser_dash.parse_duration(dur_iso)
-    # Usamos el mayor para no recortar si el MPD declara más (la ProgressBar ya corrige a real internamente)
-    total_sec = max(total_sec, total_mpd_sec)
+    logging.info("=== DASH CLIENT CONFIG RUNNER ===")
+    logging.info("Config source: %s", config.source_path or "<in-memory>")
+    logging.info("Controller: %s", config.controller.name)
+    logging.info("Media engine: %s", config.media_engine.name)
+    logging.info("Headless: %s", config.playback.headless)
 
-    get_cur_time = (
-        lambda: getattr(media_engine, 'current_time', None)
-                or getattr(media_engine, 'get_current_time', lambda: 0)()
+    try:
+        controller = create_controller(config.controller.name, config.controller.params)
+    except (TypeError, ValueError) as exc:
+        raise ConfigError(str(exc)) from exc
+    media_engine = _create_media_engine(config)
+    downloader = SegmentDownloader(
+        max_retries=config.downloader.max_retries,
+        verbose=config.downloader.verbose,
     )
+    parser_dash = DashParser()
 
-    # ——— Crear y lanzar el Player ———
+    log_path = output_root / config.output.dataset_filename
     player = Player(
         parser=parser_dash,
         media_engine=media_engine,
         downloader=downloader,
         controller=controller,
-        log_path=log_path,
-        mpd_url=mpd_url
+        log_path=str(log_path),
+        mpd_url=config.mpd_url,
+        initial_level=config.playback.initial_quality,
+        use_initial_controller_decision=config.playback.initial_controller_decision,
     )
+    _apply_runtime_config(player, config)
+
+    if config.playback.headless:
+        player.run()
+    else:
+        _run_with_progress_window(player, parser_dash, media_engine, config)
+
+    _write_resolved_config_if_possible(player, config)
+
+    if config.analysis.enabled:
+        _run_legacy_analysis(config, controller)
+
+
+def _configure_logging(config: ClientConfig, output_root: Path) -> None:
+    if not config.logging.enabled:
+        logging.disable(logging.CRITICAL)
+        return
+
+    level = getattr(logging, config.logging.level.upper(), logging.INFO)
+    logging.basicConfig(
+        level=level,
+        format="%(asctime)s [%(levelname)s] %(message)s",
+        handlers=[
+            logging.StreamHandler(),
+            logging.FileHandler(output_root / "main.log", encoding="utf-8"),
+        ],
+        force=True,
+    )
+
+
+def _create_media_engine(config: ClientConfig):
+    engine_name = config.media_engine.name
+    if engine_name == "fake":
+        return FakeMediaEngine(min_queue_time=config.media_engine.min_queue_time)
+
+    if engine_name == "gst":
+        if not GST_AVAILABLE or GstMediaEngine is None:
+            raise ConfigError(
+                "media_engine.name is 'gst', but GStreamer/PyGObject is not available. "
+                "Use media_engine.name: fake for import tests and headless benchmark development."
+            )
+        return GstMediaEngine(
+            min_queue_time=config.media_engine.min_queue_time,
+            decode_video=config.media_engine.decode_video,
+            sink_name=config.media_engine.sink_name,
+        )
+
+    raise ConfigError("media_engine.name must be either 'fake' or 'gst'.")
+
+
+def _apply_runtime_config(player: Player, config: ClientConfig) -> None:
+    player.BUFFER_THRESH = config.playback.max_buffer_seconds
+    player.DRAIN_BUFFER_SLEEP_TIME = config.playback.drain_buffer_sleep_seconds
+    player.PREROLL_SECONDS = config.playback.preroll_seconds
+
+
+def _run_with_progress_window(player: Player, parser_dash: DashParser, media_engine, config: ClientConfig) -> None:
+    parser_dash.load(config.mpd_url)
+    total_sec = _estimate_total_duration(parser_dash, config.playback.initial_quality)
+
+    def get_cur_time():
+        return getattr(media_engine, "current_time", None) or getattr(media_engine, "get_current_time", lambda: 0)()
 
     def run_player():
         try:
             player.run()
         except Exception:
-            logging.exception("Error en player.run")
+            logging.exception("Error in player.run")
 
-    # hilo NO daemon para poder hacer join()
     player_thread = threading.Thread(target=run_player, daemon=False)
     player_thread.start()
 
-    # ——— Mostrar GUI opcional donde se enlace con player ———
-    if not HEADLESS:
-        try:
-            progress_win = ProgressBarWindow(
-                media_engine=media_engine,
-                total_duration_sec=total_sec,
-                get_current_time=get_cur_time,
-                player=player
-            )
-            progress_win.root.mainloop()
-        except Exception:
-            logging.exception("Error en ProgressBarWindow")
-
-    # Espera a que termine player.run() antes de lanzar el análisis
-    player_thread.join()
-    logging.info("¡Fin de reproducción! Iniciando análisis automático.")
-
-    # ——— Crear carpeta única para esta ejecución de análisis ———
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    run_dir = os.path.join("analysis_output", f"{ctrl_name}_{timestamp}")
-    os.makedirs(run_dir, exist_ok=True)
-
-    # ——— Ejecutar analysis_metrics.py ———
     try:
-        subprocess.run(
-            ["python", "analysis_metrics.py", run_dir],
-            check=True
+        from progress_bar import ProgressBarWindow
+
+        progress_win = ProgressBarWindow(
+            media_engine=media_engine,
+            total_duration_sec=total_sec,
+            get_current_time=get_cur_time,
+            player=player,
         )
-        logging.info(f"Análisis finalizado, resultados en: {run_dir}")
+        progress_win.root.mainloop()
     except Exception:
-        logging.exception("Error al ejecutar analysis_metrics.py")
+        logging.exception("Error in ProgressBarWindow")
+
+    player_thread.join()
+
+
+def _estimate_total_duration(parser_dash: DashParser, initial_level: int) -> float:
+    period = parser_dash.get_periods()[0]
+    adap = period["adaptationSets"][0]
+    reps = adap["representations"]
+    level = min(max(0, initial_level), len(reps) - 1)
+    rep = reps[level]
+    if rep.get("segment_durations"):
+        total_sec = sum(rep["segment_durations"])
+    else:
+        total_sec = len(rep.get("segments", [])) * rep.get("fragment_duration", 1.0)
+
+    dur_iso = parser_dash.global_info.get("mediaPresentationDuration")
+    total_mpd_sec = parser_dash.parse_duration(dur_iso) if dur_iso else 0.0
+    return max(total_sec, total_mpd_sec)
+
+
+def _write_resolved_config_if_possible(player: Player, config: ClientConfig) -> None:
+    run_dir = getattr(player, "run_dir", None)
+    if not run_dir:
+        return
+    try:
+        path = Path(run_dir) / "config.resolved.json"
+        path.write_text(json.dumps(config.to_dict(), indent=2, sort_keys=True), encoding="utf-8")
+    except Exception:
+        logging.exception("Could not write resolved config")
+
+
+def _run_legacy_analysis(config: ClientConfig, controller) -> None:
+    ctrl_name = controller.__class__.__name__
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    run_dir = Path(config.analysis.output_root) / f"{ctrl_name}_{timestamp}"
+    run_dir.mkdir(parents=True, exist_ok=True)
+
+    subprocess.run(
+        [sys.executable, "analysis_metrics.py", str(run_dir)],
+        check=True,
+    )
+    logging.info("Analysis finished: %s", run_dir)
+
+
+def _prompt_for_manual_config() -> ClientConfig:
+    print("Manual demo mode")
+    print("Media engines:")
+    print("1. Fake (internal, no GStreamer)")
+    print("2. GStreamer (real)")
+    engine_opt = input("Choose engine (1/2): ").strip()
+    engine_name = "gst" if engine_opt == "2" else "fake"
+
+    specs = available_controllers()
+    if not specs:
+        raise ConfigError("No controllers are available.")
+
+    print("Controllers:")
+    for index, spec in enumerate(specs, start=1):
+        print(f"{index}. {spec.label} [{spec.key}]")
+
+    option = input("Choose controller number: ").strip()
+    try:
+        controller_name = specs[int(option) - 1].key
+    except (ValueError, IndexError) as exc:
+        raise ConfigError("Invalid controller selection.") from exc
+
+    mpd_url = input("MPD URL or local MPD path: ").strip()
+    headless_raw = input("Headless? (Y/n): ").strip().lower()
+    headless = headless_raw not in {"n", "no"}
+
+    return ClientConfig.from_dict(
+        {
+            "mpd_url": mpd_url,
+            "media_engine": {
+                "name": engine_name,
+                "min_queue_time": 1.0,
+                "decode_video": engine_name == "gst" and not headless,
+            },
+            "controller": {
+                "name": controller_name,
+                "params": {"debug": False},
+            },
+            "playback": {
+                "initial_quality": 0,
+                "initial_controller_decision": False,
+                "headless": headless,
+                "max_buffer_seconds": 60.0,
+                "drain_buffer_sleep_seconds": 0.5,
+                "preroll_seconds": 10.0,
+            },
+            "downloader": {
+                "max_retries": 3,
+                "verbose": False,
+            },
+            "output": {
+                "root_dir": "logs",
+                "dataset_filename": "dataset.csv",
+            },
+            "analysis": {
+                "enabled": False,
+            },
+        },
+        source_path="<interactive>",
+    )
+
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

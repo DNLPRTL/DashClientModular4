@@ -1,4 +1,4 @@
-# Phase 1 Status — Client Hardening
+# Phase 1 Status - Client Hardening
 
 ## Goal
 
@@ -6,14 +6,24 @@ Convert DashClientModular4 into an ABR-neutral, reproducible, benchmark-ready DA
 
 ## Completed
 
-### Block 1 — Importability
+### Block 1 - Importability
 
-- Removed eager imports of missing controllers from main.py.
+- Removed eager imports of missing controllers from `main.py`.
 - Added controller registry exposing only tracked controllers.
-- GstMediaEngine module can be imported without local GStreamer/PyGObject.
+- `GstMediaEngine` module can be imported without local GStreamer/PyGObject.
 - Added minimal import smoke tests.
 - No new ABR algorithms were implemented.
 - Player/benchmark logic was intentionally not changed.
+
+### Block 2 - Config Runner
+
+- Added a non-interactive config-driven runner path in `main.py`.
+- Added config loading and validation in `core/client_config.py`.
+- Kept manual interactive mode behind `--interactive`.
+- Removed hard-coded LAN MPD URLs from the default run path.
+- Kept `config/client.local.yaml` ignored by git.
+- Added tests for config loading and controller lookup from config.
+- No new ABR algorithms were implemented.
 
 ## Current Constraints
 
@@ -23,6 +33,6 @@ Convert DashClientModular4 into an ABR-neutral, reproducible, benchmark-ready DA
 
 ## Next Block
 
-Block 2 — Add config-driven runner path.
+Block 3 - Dependencies and environment.
 
-The client should be runnable from a YAML config instead of interactive input or hardcoded paths.
+The client should make Python dependencies, Linux/GStreamer runtime dependencies, and a basic environment check explicit before tightening run layout.
