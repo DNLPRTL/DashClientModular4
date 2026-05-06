@@ -8,22 +8,12 @@ from core.parser.dash import DashParser
 from core.downloader import SegmentDownloader
 from core.media_engine.fake import FakeMediaEngine
 try:
-    from core.media_engine.gst_media_engine import GstMediaEngine  # asegúrate de tener este fichero
-    GST_AVAILABLE = True
+    from core.media_engine.gst_media_engine import GST_AVAILABLE, GstMediaEngine
 except Exception:
     GstMediaEngine = None
     GST_AVAILABLE = False
 
-from core.controller.panda_controller import PANDAController
-from core.controller.max_quality_controller import MaxQualityController
-from core.controller.festive_controller import FESTIVEController
-from core.controller.bola_controller import BOLAController
-from core.controller.bba_controller import BBAController
-from core.controller.rl_ppo_controller import RLPPOController
-from core.controller.rl_ppo_controller_basic import RLPPOControllerBasic
-from core.controller.elastic_controller import ELASTICController
-from core.controller.sara_controller import SARAController
-from core.controller.mpc_controller import MPCController
+from core.controller.registry import available_controllers
 
 from player import Player
 from progress_bar import ProgressBarWindow
@@ -64,43 +54,17 @@ def main():
             logging.warning("GStreamer no disponible. Se usará FakeMediaEngine.")
 
     # ——— Selección del controller ———
-    print("1. Festive")
-    print("2. Bola")
-    print("3. Panda")
-    print("4. Fijo (máxima calidad)")
-    print("5. BBA")
-    print("6. RL-PPO (best model)")
-    print("7. Elastic")
-    print("8. SARA")
-    print("9. MPC")
-    print("10. RL-PPO Basic")
+    controller_specs = available_controllers()
+    if not controller_specs:
+        logging.error("No hay controladores disponibles. Saliendo.")
+        return
+    for i, spec in enumerate(controller_specs, start=1):
+        print(f"{i}. {spec.label}")
 
     opcion = input("Introduce el número: ").strip()
-
-    if opcion == "1":
-        controller = FESTIVEController()
-    elif opcion == "2":
-        controller = BOLAController()
-    elif opcion == "3":
-        controller = PANDAController()
-    elif opcion == "4":
-        controller = MaxQualityController()
-    elif opcion == "5":
-        controller = BBAController()
-    elif opcion == "6":
-        controller = RLPPOController(
-            model_path="~/Escritorio/Proyectos PC/abr_rl/models/best_model.zip",
-            panic_buffer_s=3.0, headroom=0.85, max_upstep=1, device="cpu"
-        )
-    elif opcion == "7":
-        controller = ELASTICController()
-    elif opcion == "8":
-        controller = SARAController()
-    elif opcion == "9":
-        controller = MPCController()
-    elif opcion == "10":
-        controller = RLPPOControllerBasic()
-    else:
+    try:
+        controller = controller_specs[int(opcion) - 1].factory()
+    except (ValueError, IndexError):
         logging.error("Opción no válida. Saliendo.")
         return
 

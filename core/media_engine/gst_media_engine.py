@@ -1,16 +1,29 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from __future__ import annotations
 
 import os
 import threading
 import time
 from typing import Optional, Callable, List
 
-import gi
-gi.require_version("Gst", "1.0")
-gi.require_version("GObject", "2.0")
-gi.require_version("GstApp", "1.0")
-from gi.repository import Gst, GObject, GLib, GstApp
+try:
+    import gi
+    gi.require_version("Gst", "1.0")
+    gi.require_version("GObject", "2.0")
+    gi.require_version("GstApp", "1.0")
+    from gi.repository import Gst, GObject, GLib, GstApp
+
+    GST_AVAILABLE = True
+    GST_IMPORT_ERROR = None
+except Exception as exc:
+    gi = None
+    Gst = None
+    GObject = None
+    GLib = None
+    GstApp = None
+    GST_AVAILABLE = False
+    GST_IMPORT_ERROR = exc
 
 # ------------------------------------
 # Logging simple y configurable
@@ -46,6 +59,11 @@ class GstMediaEngine:
     NEAR_END_REAL_QUEUE_NS = 10_000_000  # 10 ms
 
     def __init__(self, decode_video: bool = True, min_queue_time: float = 5.0, sink_name: Optional[str] = None):
+        if not GST_AVAILABLE:
+            raise RuntimeError(
+                "GStreamer/PyGObject is not available; use FakeMediaEngine or install the GStreamer runtime."
+            ) from GST_IMPORT_ERROR
+
         self.decode_video = decode_video
         self.min_queue_time = float(min_queue_time)
         self.sink_name = sink_name if sink_name else ("autovideosink" if decode_video else "fakesink")
