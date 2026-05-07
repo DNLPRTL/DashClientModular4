@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import csv
 import io
 import json
 import logging
@@ -174,10 +175,28 @@ class FakeClientSmokeTest(unittest.TestCase):
                 resolved = json.loads(resolved_config_path.read_text(encoding="utf-8"))
                 self.assertEqual(mpd_url, resolved["mpd_url"])
 
-                dataset_lines = dataset_path.read_text(encoding="utf-8").splitlines()
-                training_lines = training_path.read_text(encoding="utf-8").splitlines()
-                self.assertGreaterEqual(len(dataset_lines), 2)
-                self.assertGreaterEqual(len(training_lines), 2)
+                with dataset_path.open(newline="", encoding="utf-8") as dataset_file:
+                    dataset_rows = list(csv.reader(dataset_file))
+                with training_path.open(newline="", encoding="utf-8") as training_file:
+                    training_rows = list(csv.reader(training_file))
+
+                self.assertGreaterEqual(len(dataset_rows), 2)
+                self.assertGreaterEqual(len(training_rows), 2)
+
+                dataset_header = dataset_rows[0]
+                training_header = training_rows[0]
+                self.assertEqual(len(dataset_header), len(set(dataset_header)))
+                self.assertEqual(len(training_header), len(set(training_header)))
+                self.assertIn("segment_index", dataset_header)
+                self.assertIn("feedback_segment_index", dataset_header)
+                self.assertIn("feedback_queued_time", dataset_header)
+                self.assertIn("policy_name", dataset_header)
+                self.assertIn("stall_flag", dataset_header)
+
+                for row in dataset_rows[1:]:
+                    self.assertEqual(len(dataset_header), len(row))
+                for row in training_rows[1:]:
+                    self.assertEqual(len(training_header), len(row))
 
                 self.assertEqual(1, len(FakeSegmentDownloader.instances))
                 downloaded_urls = FakeSegmentDownloader.instances[0].downloaded_urls

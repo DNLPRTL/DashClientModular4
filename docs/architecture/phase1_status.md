@@ -53,12 +53,21 @@ Convert DashClientModular4 into an ABR-neutral, reproducible, benchmark-ready DA
 - Documented Phase 1 validation tiers across README, runbooks, and the Block 5 architecture note.
 - No ABR algorithms were added and no runtime/benchmark semantics were changed.
 
+### Block 6 - Dataset / Telemetry Schema Contract
+
+- Added `core/dataset_schema.py` with explicit dataset and training header builders.
+- Prefixed feedback-derived `dataset.csv` columns with `feedback_` to avoid collisions with top-level row columns such as `segment_index`.
+- Kept `dataset.csv` as the full telemetry CSV and `dataset_training.csv` as the minimal training-oriented CSV.
+- Added schema unit tests and extended the fake-engine smoke test to assert unique headers and row/header length alignment.
+- Units, row values, output filenames, output paths, ABR decisions, buffering, downloader behavior, parser behavior, QoE logic, and GStreamer timing were not changed.
+- Current generated datasets remain validation artifacts, not final benchmark results.
+
 ## Current Constraints
 
 - Do not implement BBA, BOLA, MPC, robustMPC, PPO, PANDA, FESTIVE, SARA, ELASTIC, RBC, WISH, or any real ABR controller yet.
 - Keep only trivial/fixed/max controllers needed for smoke tests.
 - Prioritize reproducibility, config-driven execution, headless benchmark mode, and clean run outputs.
 
-## Pending Technical Direction After Block 5
+## Pending Technical Direction After Block 6
 
-The next implementation block is not started in this commit. Analysis input/output alignment remains pending technical direction after Block 5.
+The next implementation block is not started in this commit. Baseline ABR algorithms, final QoE metrics, benchmark comparisons, and analysis input/output alignment remain pending technical direction after Block 6.

@@ -6,6 +6,8 @@ from math import sqrt
 import os
 from datetime import datetime
 
+from core.dataset_schema import build_dataset_header, build_training_header, validate_row_length
+
 # reloj monotónico
 perf_now = time.perf_counter
 
@@ -96,6 +98,7 @@ class Player:
         # CSV header map (se rellena al abrir CSV)
         self._header = None
         self._col_index = {}
+        self._training_header = None
 
         # NUEVO: ficheros CSV (full + entrenamiento)
         self._csv_file = None
@@ -389,23 +392,7 @@ class Player:
             self._csv_file = f
             self._csv_writer = csv.writer(f)
 
-            base_header = (
-                ['segment_index', 'timestamp']
-                + self._fb_keys
-                + ['is_init', 'retry_count',
-                   'segment_start_time', 'segment_end_time', 'wall_time_elapsed']
-            )
-
-            derived_cols = [
-                'tp_now', 'tp_ewma', 'tp_min_last5', 'tp_std_last5',
-                'buffer_over_seg', 'headroom',
-                'is_upswitch', 'is_downswitch', 'switch_magnitude',
-                'phase_raw', 'phase_smooth',
-                'policy_name', 'policy_target_rate', 'policy_chosen_level', 'policy_decision_ms',
-                'is_preroll', 'use_for_eval',
-            ]
-
-            header = base_header + derived_cols + ['stall_flag', 'stall_duration']
+            header = build_dataset_header(self._fb_keys)
             self._header = header
             self._col_index = {name: idx for idx, name in enumerate(header)}
             self._csv_writer.writerow(header)
@@ -414,8 +401,8 @@ class Player:
             ft = open(training_csv_path, 'w', newline='')
             self._csv_train_file = ft
             self._csv_train_writer = csv.writer(ft)
-            train_header = ['segment_index', 'is_init', 'use_for_eval',
-                            'last_fragment_size', 'last_download_time', 'fragment_duration']
+            train_header = build_training_header()
+            self._training_header = train_header
             self._csv_train_writer.writerow(train_header)
 
             print(f"🧾 Logs en: {run_dir}")
@@ -476,6 +463,7 @@ class Player:
                         self._policy_name, "", "", 0.0,  # policy (no aplica aún)
                         derived['is_preroll'], derived['use_for_eval']
                     ] + [0, 0.0]  # stall_* para INIT
+                    validate_row_length(row, self._header, schema_name="dataset.csv")
                     self._csv_writer.writerow(row)
                     self._csv_file.flush()
 
@@ -575,6 +563,7 @@ class Player:
                             if is_init:
                                 # INIT con datos reales (raro), cerramos la fila completa
                                 row += [0, 0.0]
+                                validate_row_length(row, self._header, schema_name="dataset.csv")
                                 self._csv_writer.writerow(row)
                                 self._csv_file.flush()
                             else:
@@ -721,6 +710,7 @@ class Player:
             si = {"flag": 0, "duration": 0.0}
 
         final_row = base_row + [int(si.get("flag", 0)), float(si.get("duration", 0.0))]
+        validate_row_length(final_row, self._header, schema_name="dataset.csv")
         self._csv_writer.writerow(final_row)
         self._csv_file.flush()
 
@@ -728,14 +718,16 @@ class Player:
         """NUEVO: escribe una fila en el CSV de entrenamiento."""
         if not self._csv_train_writer:
             return
-        self._csv_train_writer.writerow([
+        row = [
             int(seg_idx),
             int(is_init),
             int(use_for_eval),
             int(last_size) if last_size is not None else 0,
             float(last_time) if last_time is not None else 0.0,
             float(frag_dur) if frag_dur is not None else 0.0
-        ])
+        ]
+        validate_row_length(row, self._training_header, schema_name="dataset_training.csv")
+        self._csv_train_writer.writerow(row)
         self._csv_train_file.flush()
 
     # ------------------------- features derivadas -------------------------

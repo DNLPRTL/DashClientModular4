@@ -22,9 +22,21 @@ The run directory is the authoritative artifact for a validation run. Generated 
 - `run_manifest.json`: top-level run index with run id, timestamps, command-line args, config source, platform/Python/git metadata, controller, media engine, MPD URL, and relative output paths.
 - `config.resolved.json`: resolved config after defaults and local overrides were applied. It may contain local MPD URLs.
 - `environment.json`: Python/platform/package/tool availability snapshot.
-- `dataset.csv`: existing player dataset output. Schema and semantics are unchanged in Block 4.
-- `dataset_training.csv`: existing training CSV output. Schema and semantics are unchanged in Block 4.
+- `dataset.csv`: full telemetry CSV. Feedback-derived columns are prefixed with `feedback_` to avoid collisions with top-level row columns such as `segment_index`.
+- `dataset_training.csv`: minimal training-oriented CSV. Its filename and output path are unchanged.
 - `run.log`: run-specific Python log file. Console output still appears normally.
+
+## Dataset Schema Contract
+
+Block 6 makes the CSV headers explicit and test-protected:
+
+- `dataset.csv` and `dataset_training.csv` must have unique column names.
+- Every data row must have the same number of columns as its header.
+- Top-level `segment_index` remains unchanged.
+- Feedback-derived columns use the `feedback_` prefix, for example `feedback_segment_index` and `feedback_queued_time`.
+- Units and row values are not changed in Block 6.
+
+The generated CSVs are still validation artifacts, not final benchmark results. GStreamer runtime validation is still not benchmark-grade yet, and baseline ABR algorithms remain pending.
 
 ## Inspect A Run
 
@@ -32,7 +44,7 @@ Windows:
 
 ```powershell
 python -m unittest discover
-python -m py_compile main.py core\client_config.py core\controller\registry.py core\run_context.py player.py scripts\check_environment.py
+python -m py_compile main.py core\client_config.py core\controller\registry.py core\run_context.py core\dataset_schema.py player.py scripts\check_environment.py
 python scripts/check_environment.py --profile dev
 python scripts/check_environment.py --profile gst
 ```

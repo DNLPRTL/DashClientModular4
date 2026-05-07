@@ -36,6 +36,8 @@ logs/run_YYYYMMDD_HHMMSS/
 
 That directory contains the run manifest, resolved config, environment snapshot, run log, and the existing dataset CSVs. See [docs/runbooks/run_layout.md](docs/runbooks/run_layout.md).
 
+`dataset.csv` is the full telemetry CSV. Feedback-derived columns use a `feedback_` prefix, for example `feedback_segment_index`, so they do not collide with top-level row columns. `dataset_training.csv` remains the minimal training-oriented CSV. These files are still validation artifacts, not final benchmark results.
+
 ## Environment
 
 The supported minimum Python version is 3.8. The default development path does not require GStreamer.
@@ -79,6 +81,7 @@ python -m unittest discover
 - `core/parser`: MPD parser and DASH parsing helpers.
 - `core/downloader.py`: segment downloader.
 - `core/run_context.py`: run directory and metadata helper.
+- `core/dataset_schema.py`: dataset and training CSV schema helpers.
 - `config`: example client configuration.
 - `scripts/check_environment.py`: environment capability checks.
 - `docs`: architecture notes and runbooks.
