@@ -6,6 +6,7 @@ REQUIRED_IMPORTS = [
     "main",
     "player",
     "core.client_config",
+    "core.run_context",
     "core.parser.dash",
     "core.downloader",
     "core.media_engine.fake",

@@ -36,6 +36,14 @@ Convert DashClientModular4 into an ABR-neutral, reproducible, benchmark-ready DA
 - Added environment setup runbook and architecture note.
 - No benchmark semantics were changed.
 
+### Block 4 - Reproducible Run Layout
+
+- Added `core/run_context.py` to create authoritative run directories.
+- Each non-interactive run now writes `run_manifest.json`, `config.resolved.json`, `environment.json`, `run.log`, and the existing dataset CSVs in one `logs/run_*` directory.
+- Added run context tests.
+- Added run layout runbook and architecture note.
+- No benchmark/runtime semantics were changed.
+
 ## Current Constraints
 
 - Do not implement BBA, BOLA, MPC, robustMPC, PPO, PANDA, FESTIVE, SARA, ELASTIC, RBC, WISH, or any real ABR controller yet.
@@ -44,6 +52,6 @@ Convert DashClientModular4 into an ABR-neutral, reproducible, benchmark-ready DA
 
 ## Next Block
 
-Block 4 - Output layout and reproducibility metadata.
+Block 5 - Analysis input and output alignment.
 
-The client should make run directories, manifests, environment metadata, and analysis inputs explicit.
+The client should make analysis consume explicit run directories or manifests instead of stale global globs.

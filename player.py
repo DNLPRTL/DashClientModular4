@@ -38,7 +38,7 @@ class Player:
     TP_WINDOW = 5  # para min/std
 
     def __init__(self, parser, media_engine, mpd_url, downloader, controller,
-                 log_path=None, initial_level=0, use_initial_controller_decision=True):
+                 log_path=None, initial_level=0, use_initial_controller_decision=True, run_dir=None):
         self.parser = parser
         self.media_engine = media_engine
         self.downloader = downloader
@@ -47,7 +47,7 @@ class Player:
         self.cur_index = 0
         self.log_path = log_path
         self.mpd_url = mpd_url
-        self.run_dir = None
+        self.run_dir = run_dir
         self.dataset_csv_path = None
         self.training_csv_path = None
         self.use_initial_controller_decision = bool(use_initial_controller_decision)
@@ -354,18 +354,28 @@ class Player:
         # abrir CSVs (full + entrenamiento) en carpeta por ejecución
         if self.log_path:
             # Resolver carpeta base y nombre base
-            if os.path.isdir(self.log_path):
+            if self.run_dir:
+                run_dir = self.run_dir
+                os.makedirs(run_dir, exist_ok=True)
+                if os.path.isdir(self.log_path):
+                    base_name = "dataset.csv"
+                else:
+                    b = os.path.basename(self.log_path)
+                    base_name = b if (b and "." in b) else "dataset.csv"
+            elif os.path.isdir(self.log_path):
                 base_dir = self.log_path
                 base_name = "dataset.csv"
+                run_stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                run_dir = os.path.join(base_dir, f"run_{run_stamp}")
+                os.makedirs(run_dir, exist_ok=True)
             else:
                 d = os.path.dirname(self.log_path)
                 b = os.path.basename(self.log_path)
                 base_dir = d if d else "."
                 base_name = b if (b and "." in b) else "dataset.csv"
-
-            run_stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            run_dir = os.path.join(base_dir, f"run_{run_stamp}")
-            os.makedirs(run_dir, exist_ok=True)
+                run_stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                run_dir = os.path.join(base_dir, f"run_{run_stamp}")
+                os.makedirs(run_dir, exist_ok=True)
 
             dataset_csv_path = os.path.join(run_dir, base_name)
             name_wo_ext = base_name[:-4] if base_name.lower().endswith(".csv") else base_name

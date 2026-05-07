@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import argparse
-import json
 import logging
 import subprocess
 import sys
@@ -20,6 +19,7 @@ from core.controller.registry import available_controllers, create_controller
 from core.downloader import SegmentDownloader
 from core.media_engine.fake import FakeMediaEngine
 from core.parser.dash import DashParser
+from core.run_context import create_run_context
 from player import Player
 
 try:
@@ -30,6 +30,7 @@ except Exception:
 
 
 def main(argv: Optional[List[str]] = None) -> int:
+    command_args = list(argv) if argv is not None else sys.argv[1:]
     parser = argparse.ArgumentParser(description="Config-driven DASH client runner.")
     parser.add_argument(
         "--config",
@@ -50,7 +51,7 @@ def main(argv: Optional[List[str]] = None) -> int:
         else:
             config = load_client_config(args.config)
         validate_config_for_run(config)
-        run_client(config)
+        run_client(config, command_args=command_args)
         return 0
     except ConfigError as exc:
         print(f"Configuration error: {exc}", file=sys.stderr)
@@ -60,64 +61,74 @@ def main(argv: Optional[List[str]] = None) -> int:
         return 1
 
 
-def run_client(config: ClientConfig) -> None:
-    output_root = Path(config.output.root_dir)
-    output_root.mkdir(parents=True, exist_ok=True)
-    _configure_logging(config, output_root)
+def run_client(config: ClientConfig, command_args: Optional[List[str]] = None) -> None:
+    run_context = create_run_context(config, command_args=command_args)
+    _configure_logging(config, run_context.log_path)
+    run_context.write_resolved_config(config)
+    run_context.write_environment()
+    run_context.write_manifest(config, status="created")
 
     logging.info("=== DASH CLIENT CONFIG RUNNER ===")
     logging.info("Config source: %s", config.source_path or "<in-memory>")
+    logging.info("Run directory: %s", run_context.run_dir)
     logging.info("Controller: %s", config.controller.name)
     logging.info("Media engine: %s", config.media_engine.name)
     logging.info("Headless: %s", config.playback.headless)
 
     try:
-        controller = create_controller(config.controller.name, config.controller.params)
-    except (TypeError, ValueError) as exc:
-        raise ConfigError(str(exc)) from exc
-    media_engine = _create_media_engine(config)
-    downloader = SegmentDownloader(
-        max_retries=config.downloader.max_retries,
-        verbose=config.downloader.verbose,
-    )
-    parser_dash = DashParser()
+        try:
+            controller = create_controller(config.controller.name, config.controller.params)
+        except (TypeError, ValueError) as exc:
+            raise ConfigError(str(exc)) from exc
+        media_engine = _create_media_engine(config)
+        downloader = SegmentDownloader(
+            max_retries=config.downloader.max_retries,
+            verbose=config.downloader.verbose,
+        )
+        parser_dash = DashParser()
 
-    log_path = output_root / config.output.dataset_filename
-    player = Player(
-        parser=parser_dash,
-        media_engine=media_engine,
-        downloader=downloader,
-        controller=controller,
-        log_path=str(log_path),
-        mpd_url=config.mpd_url,
-        initial_level=config.playback.initial_quality,
-        use_initial_controller_decision=config.playback.initial_controller_decision,
-    )
-    _apply_runtime_config(player, config)
+        player = Player(
+            parser=parser_dash,
+            media_engine=media_engine,
+            downloader=downloader,
+            controller=controller,
+            log_path=str(run_context.dataset_path),
+            mpd_url=config.mpd_url,
+            initial_level=config.playback.initial_quality,
+            use_initial_controller_decision=config.playback.initial_controller_decision,
+            run_dir=str(run_context.run_dir),
+        )
+        _apply_runtime_config(player, config)
 
-    if config.playback.headless:
-        player.run()
-    else:
-        _run_with_progress_window(player, parser_dash, media_engine, config)
+        run_context.write_manifest(config, status="running")
+        if config.playback.headless:
+            player.run()
+        else:
+            _run_with_progress_window(player, parser_dash, media_engine, config)
 
-    _write_resolved_config_if_possible(player, config)
+        if config.analysis.enabled:
+            _run_legacy_analysis(config, controller)
 
-    if config.analysis.enabled:
-        _run_legacy_analysis(config, controller)
+        run_context.write_manifest(config, status="completed")
+    except Exception:
+        run_context.write_manifest(config, status="failed")
+        raise
 
 
-def _configure_logging(config: ClientConfig, output_root: Path) -> None:
+def _configure_logging(config: ClientConfig, log_path: Path) -> None:
     if not config.logging.enabled:
         logging.disable(logging.CRITICAL)
         return
 
+    logging.disable(logging.NOTSET)
+    log_path.parent.mkdir(parents=True, exist_ok=True)
     level = getattr(logging, config.logging.level.upper(), logging.INFO)
     logging.basicConfig(
         level=level,
         format="%(asctime)s [%(levelname)s] %(message)s",
         handlers=[
             logging.StreamHandler(),
-            logging.FileHandler(output_root / "main.log", encoding="utf-8"),
+            logging.FileHandler(log_path, encoding="utf-8"),
         ],
         force=True,
     )
@@ -195,17 +206,6 @@ def _estimate_total_duration(parser_dash: DashParser, initial_level: int) -> flo
     dur_iso = parser_dash.global_info.get("mediaPresentationDuration")
     total_mpd_sec = parser_dash.parse_duration(dur_iso) if dur_iso else 0.0
     return max(total_sec, total_mpd_sec)
-
-
-def _write_resolved_config_if_possible(player: Player, config: ClientConfig) -> None:
-    run_dir = getattr(player, "run_dir", None)
-    if not run_dir:
-        return
-    try:
-        path = Path(run_dir) / "config.resolved.json"
-        path.write_text(json.dumps(config.to_dict(), indent=2, sort_keys=True), encoding="utf-8")
-    except Exception:
-        logging.exception("Could not write resolved config")
 
 
 def _run_legacy_analysis(config: ClientConfig, controller) -> None:

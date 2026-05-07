@@ -96,13 +96,29 @@ output:
   dataset_filename: "dataset.csv"
 ```
 
-The current `Player` still creates a timestamped subdirectory under that root:
+Each non-interactive run creates one timestamped subdirectory under that root:
 
 ```text
 logs/run_YYYYMMDD_HHMMSS/
 ```
 
-That directory contains the dataset CSV, the training CSV, and `config.resolved.json` when the run reaches the logging setup point.
+That directory is the authoritative run artifact. It contains:
+
+- `run_manifest.json`
+- `config.resolved.json`
+- `environment.json`
+- `dataset.csv`
+- `dataset_training.csv`
+- `run.log`
+
+Generated run artifacts are validation output, not benchmark results yet, and must not be committed. See `docs/runbooks/run_layout.md`.
+
+On Ubuntu, inspect the latest runs with:
+
+```bash
+find logs -maxdepth 2 -type f | sort
+cat logs/run_*/run_manifest.json
+```
 
 ## 7. Tests
 

@@ -28,6 +28,14 @@ python main.py --interactive
 
 See [docs/runbooks/run_client.md](docs/runbooks/run_client.md) for exact usage.
 
+Each non-interactive execution writes a self-contained run directory under `logs/` by default:
+
+```text
+logs/run_YYYYMMDD_HHMMSS/
+```
+
+That directory contains the run manifest, resolved config, environment snapshot, run log, and the existing dataset CSVs. See [docs/runbooks/run_layout.md](docs/runbooks/run_layout.md).
+
 ## Environment
 
 The supported minimum Python version is 3.8. The default development path does not require GStreamer.
@@ -56,6 +64,7 @@ See [docs/runbooks/environment.md](docs/runbooks/environment.md) for the Windows
 - `core/media_engine`: fake and GStreamer playback engines.
 - `core/parser`: MPD parser and DASH parsing helpers.
 - `core/downloader.py`: segment downloader.
+- `core/run_context.py`: run directory and metadata helper.
 - `config`: example client configuration.
 - `scripts/check_environment.py`: environment capability checks.
 - `docs`: architecture notes and runbooks.
