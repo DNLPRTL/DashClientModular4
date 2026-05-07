@@ -44,14 +44,21 @@ Convert DashClientModular4 into an ABR-neutral, reproducible, benchmark-ready DA
 - Added run layout runbook and architecture note.
 - No benchmark/runtime semantics were changed.
 
+### Block 5 - Minimal Smoke Tests
+
+- Added an offline fake-engine smoke test through the official `main.main(argv)` config runner path.
+- The smoke test uses a temporary local MPD, `max_quality`, `FakeMediaEngine`, and a patched downloader at `main.SegmentDownloader`.
+- The smoke test blocks external HTTP and requires no GStreamer, media files, GUI, server, ML tooling, or `config/client.local.yaml`.
+- The test asserts the reproducible run layout writes manifest, resolved config, environment, log, dataset, and training CSV artifacts.
+- Documented Phase 1 validation tiers across README, runbooks, and the Block 5 architecture note.
+- No ABR algorithms were added and no runtime/benchmark semantics were changed.
+
 ## Current Constraints
 
 - Do not implement BBA, BOLA, MPC, robustMPC, PPO, PANDA, FESTIVE, SARA, ELASTIC, RBC, WISH, or any real ABR controller yet.
 - Keep only trivial/fixed/max controllers needed for smoke tests.
 - Prioritize reproducibility, config-driven execution, headless benchmark mode, and clean run outputs.
 
-## Next Block
+## Pending Technical Direction After Block 5
 
-Block 5 - Analysis input and output alignment.
-
-The client should make analysis consume explicit run directories or manifests instead of stale global globs.
+The next implementation block is not started in this commit. Analysis input/output alignment remains pending technical direction after Block 5.

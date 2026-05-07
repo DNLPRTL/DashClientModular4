@@ -120,13 +120,19 @@ find logs -maxdepth 2 -type f | sort
 cat logs/run_*/run_manifest.json
 ```
 
-## 7. Tests
+## 7. Validation And Test Tiers
 
-Run import and config tests:
+Run Tier 1 and Tier 2 tests:
 
 ```powershell
 python -m unittest discover
-python -m py_compile main.py core\client_config.py core\controller\registry.py player.py scripts\check_environment.py
+python -m py_compile main.py core\client_config.py core\controller\registry.py core\run_context.py player.py scripts\check_environment.py
+python scripts\check_environment.py --profile dev
+python scripts\check_environment.py --profile gst
 ```
 
-Missing GStreamer must not break these default checks. Use `python scripts/check_environment.py --profile gst` on the Ubuntu client VM to inspect GStreamer capability.
+Tier 1 covers pure import, config, environment, and run-context tests. It must pass on Windows without GStreamer.
+
+Tier 2 covers offline fake-engine smoke tests through the official config runner path. It must pass on Windows and Ubuntu without network, GStreamer, media files, GUI, server infrastructure, ML tooling, or `config/client.local.yaml`.
+
+Tier 3 is manual/operational Ubuntu runtime validation with a real MPD and optional GStreamer. It is not part of `unittest` discovery and is not a benchmark result yet.

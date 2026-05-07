@@ -32,8 +32,9 @@ Windows:
 
 ```powershell
 python -m unittest discover
-python -m py_compile main.py core\client_config.py core\controller\registry.py player.py scripts\check_environment.py
+python -m py_compile main.py core\client_config.py core\controller\registry.py core\run_context.py player.py scripts\check_environment.py
 python scripts/check_environment.py --profile dev
+python scripts/check_environment.py --profile gst
 ```
 
 Ubuntu client:
@@ -65,6 +66,12 @@ head -n 5 "$RUN_DIR/dataset.csv"
 - Ubuntu server VM: hosts MPDs and DASH segments over HTTP.
 
 GStreamer availability is an environment capability. It is not proof that the current `gst` path is benchmark-ready.
+
+## Test Tier Coverage
+
+- Tier 1 checks importability, config, environment profiles, and run-context helpers. It must pass on Windows without GStreamer.
+- Tier 2 checks this run layout through an offline fake-engine smoke run with a temporary local MPD and patched downloader. It must pass on Windows and Ubuntu without network, GStreamer, media files, GUI, server infrastructure, ML tooling, or `config/client.local.yaml`.
+- Tier 3 uses a real MPD and optional GStreamer on Ubuntu as a manual/operational runtime check. It is not a unit test and is not a benchmark result yet.
 
 ## Current Status Of Outputs
 

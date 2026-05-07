@@ -58,6 +58,20 @@ python scripts/check_environment.py --profile gst --strict
 
 See [docs/runbooks/environment.md](docs/runbooks/environment.md) for the Windows host, Ubuntu client VM, and Ubuntu server VM setup.
 
+## Test Tiers
+
+Phase 1 validation is split into three tiers:
+
+- Tier 1: pure import, config, environment, and run-context tests. These must pass on Windows without GStreamer.
+- Tier 2: offline fake-engine smoke tests. These must pass on Windows and Ubuntu without network, GStreamer, media files, GUI, server, ML tooling, or `config/client.local.yaml`.
+- Tier 3: Ubuntu runtime checks with a real MPD and optional GStreamer. These are manual/operational checks for now, not unit tests and not benchmark results.
+
+Run Tier 1 and Tier 2 with:
+
+```powershell
+python -m unittest discover
+```
+
 ## Main Structure
 
 - `core/controller`: controller interface and registry.
@@ -68,7 +82,7 @@ See [docs/runbooks/environment.md](docs/runbooks/environment.md) for the Windows
 - `config`: example client configuration.
 - `scripts/check_environment.py`: environment capability checks.
 - `docs`: architecture notes and runbooks.
-- `tests`: import, config, and environment tests.
+- `tests`: import, config, environment, run-context, and offline fake-client smoke tests.
 
 ## Important Rule
 

@@ -24,6 +24,32 @@ Phase 1 keeps the default development path pure Python and import-safe on Window
 - Hosts MPD files and DASH segments over HTTP.
 - Keeps media content outside this repository.
 
+## Validation Tiers
+
+### Tier 1 - Pure Unit Checks
+
+Tier 1 covers importability, config loading, environment profile behavior, and run-context metadata helpers.
+
+- Must pass on Windows without GStreamer.
+- Must not require network access, media files, GUI, server infrastructure, ML tooling, or `config/client.local.yaml`.
+- Covered by `tests/test_imports.py`, `tests/test_config.py`, `tests/test_environment_check.py`, and `tests/test_run_context.py`.
+
+### Tier 2 - Offline Fake-Engine Smoke Tests
+
+Tier 2 exercises the official config runner path with a synthetic local MPD, fake media engine, patched downloader, and temporary output root.
+
+- Must pass on Windows and Ubuntu.
+- Must not require network access, GStreamer, media files, GUI, server infrastructure, ML tooling, or `config/client.local.yaml`.
+- Covered by `tests/test_fake_client_smoke.py`.
+
+### Tier 3 - Ubuntu Runtime Checks
+
+Tier 3 uses a real MPD served outside the repository and optional GStreamer on the Ubuntu client VM.
+
+- Manual/operational for now.
+- Not unit tests.
+- Not benchmark results yet.
+
 ## Dependency Types
 
 ### Python Runtime Dependencies
@@ -71,8 +97,9 @@ python -m venv .venv
 python -m pip install --upgrade pip
 pip install -r requirements.txt
 python -m unittest discover
-python -m py_compile main.py core\client_config.py core\controller\registry.py player.py scripts\check_environment.py
+python -m py_compile main.py core\client_config.py core\controller\registry.py core\run_context.py player.py scripts\check_environment.py
 python scripts/check_environment.py --profile dev
+python scripts/check_environment.py --profile gst
 ```
 
 Expected result: all commands pass without GStreamer installed.
@@ -89,7 +116,7 @@ source .venv/bin/activate
 python -m pip install --upgrade pip
 pip install -r requirements.txt
 python -m unittest discover
-python -m py_compile main.py core/client_config.py core/controller/registry.py player.py scripts/check_environment.py
+python -m py_compile main.py core/client_config.py core/controller/registry.py core/run_context.py player.py scripts/check_environment.py
 python scripts/check_environment.py --profile dev
 python scripts/check_environment.py --profile gst
 python scripts/check_environment.py --profile gst --strict
