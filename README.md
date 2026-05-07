@@ -28,6 +28,28 @@ python main.py --interactive
 
 See [docs/runbooks/run_client.md](docs/runbooks/run_client.md) for exact usage.
 
+## Environment
+
+The supported minimum Python version is 3.8. The default development path does not require GStreamer.
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\activate
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+python -m unittest discover
+python scripts/check_environment.py --profile dev
+```
+
+Optional offline analysis dependencies live in `requirements-analysis.txt`. Optional GStreamer support is checked separately on Ubuntu with:
+
+```bash
+python scripts/check_environment.py --profile gst
+python scripts/check_environment.py --profile gst --strict
+```
+
+See [docs/runbooks/environment.md](docs/runbooks/environment.md) for the Windows host, Ubuntu client VM, and Ubuntu server VM setup.
+
 ## Main Structure
 
 - `core/controller`: controller interface and registry.
@@ -35,8 +57,9 @@ See [docs/runbooks/run_client.md](docs/runbooks/run_client.md) for exact usage.
 - `core/parser`: MPD parser and DASH parsing helpers.
 - `core/downloader.py`: segment downloader.
 - `config`: example client configuration.
+- `scripts/check_environment.py`: environment capability checks.
 - `docs`: architecture notes and runbooks.
-- `tests`: import and config tests.
+- `tests`: import, config, and environment tests.
 
 ## Important Rule
 

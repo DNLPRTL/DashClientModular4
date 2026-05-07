@@ -1,6 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass
-from typing import Callable, Mapping
+from typing import Callable, Mapping, Optional
 
 from .max_quality_controller import MaxQualityController
 
@@ -25,7 +25,7 @@ def available_controllers():
     return list(CONTROLLER_REGISTRY.values())
 
 
-def create_controller(key, params: Mapping[str, object] | None = None):
+def create_controller(key, params: Optional[Mapping[str, object]] = None):
     try:
         return CONTROLLER_REGISTRY[key].factory(**dict(params or {}))
     except KeyError as exc:

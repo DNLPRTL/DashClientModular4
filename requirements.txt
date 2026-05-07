@@ -1,0 +1,3 @@
+# Minimal Python dependency for the default config/fake-engine runner.
+# GStreamer/PyGObject are optional Linux system dependencies, not pip requirements.
+requests>=2.31,<2.33

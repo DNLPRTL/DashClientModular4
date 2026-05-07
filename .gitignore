@@ -7,5 +7,15 @@ venv/
 .vscode/
 logs/
 analysis_output/
+runs/
+tmp_runs/
 *.zip
+*.m4s
+*.mp4
+*.webm
+*.mkv
+*.mov
+*.ts
+media/
+dash_media/
 config/client.local.yaml

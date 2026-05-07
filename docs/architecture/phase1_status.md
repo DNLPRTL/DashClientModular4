@@ -25,6 +25,17 @@ Convert DashClientModular4 into an ABR-neutral, reproducible, benchmark-ready DA
 - Added tests for config loading and controller lookup from config.
 - No new ABR algorithms were implemented.
 
+### Block 3 - Dependencies And Environment
+
+- Added minimal runtime dependency declaration in `requirements.txt`.
+- Added optional analysis dependencies in `requirements-analysis.txt`.
+- Added `scripts/check_environment.py` with `dev`, `analysis`, `gst`, and `all` profiles.
+- Kept GStreamer/PyGObject optional and outside the Windows/default pip path.
+- Added environment checker tests that do not require real GStreamer.
+- Kept runner/config/registry imports compatible with Python 3.8.
+- Added environment setup runbook and architecture note.
+- No benchmark semantics were changed.
+
 ## Current Constraints
 
 - Do not implement BBA, BOLA, MPC, robustMPC, PPO, PANDA, FESTIVE, SARA, ELASTIC, RBC, WISH, or any real ABR controller yet.
@@ -33,6 +44,6 @@ Convert DashClientModular4 into an ABR-neutral, reproducible, benchmark-ready DA
 
 ## Next Block
 
-Block 3 - Dependencies and environment.
+Block 4 - Output layout and reproducibility metadata.
 
-The client should make Python dependencies, Linux/GStreamer runtime dependencies, and a basic environment check explicit before tightening run layout.
+The client should make run directories, manifests, environment metadata, and analysis inputs explicit.

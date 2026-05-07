@@ -1,0 +1,10 @@
+# Optional offline analysis dependencies for analysis_metrics.py.
+# Keep separate from the default runtime/test path.
+-r requirements.txt
+
+numpy>=1.23,<1.25; python_version < "3.9"
+numpy>=1.26,<3; python_version >= "3.9"
+pandas>=1.5,<2.1; python_version < "3.9"
+pandas>=2.2,<3; python_version >= "3.9"
+matplotlib>=3.6,<3.8; python_version < "3.9"
+matplotlib>=3.8,<4; python_version >= "3.9"

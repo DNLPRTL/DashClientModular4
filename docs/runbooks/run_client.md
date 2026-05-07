@@ -2,6 +2,12 @@
 
 This is the official Phase 1 benchmark/dev path. It is non-interactive and driven by YAML config.
 
+Before running the client on a fresh machine, follow `docs/runbooks/environment.md` and verify:
+
+```powershell
+python scripts/check_environment.py --profile dev
+```
+
 ## 1. Create Local Config
 
 From the repository root:
@@ -103,5 +109,8 @@ That directory contains the dataset CSV, the training CSV, and `config.resolved.
 Run import and config tests:
 
 ```powershell
-python -m unittest tests.test_imports tests.test_config
+python -m unittest discover
+python -m py_compile main.py core\client_config.py core\controller\registry.py player.py scripts\check_environment.py
 ```
+
+Missing GStreamer must not break these default checks. Use `python scripts/check_environment.py --profile gst` on the Ubuntu client VM to inspect GStreamer capability.

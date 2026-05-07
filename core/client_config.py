@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -20,13 +20,13 @@ class MediaEngineConfig:
     name: str = "fake"
     min_queue_time: float = 1.0
     decode_video: bool = False
-    sink_name: str | None = None
+    sink_name: Optional[str] = None
 
 
 @dataclass(frozen=True)
 class ControllerConfig:
     name: str = "max_quality"
-    params: dict[str, Any] = field(default_factory=dict)
+    params: Dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -73,10 +73,10 @@ class ClientConfig:
     output: OutputConfig = field(default_factory=OutputConfig)
     logging: LoggingConfig = field(default_factory=LoggingConfig)
     analysis: AnalysisConfig = field(default_factory=AnalysisConfig)
-    source_path: str | None = None
+    source_path: Optional[str] = None
 
     @classmethod
-    def from_dict(cls, raw: Mapping[str, Any], source_path: str | None = None) -> "ClientConfig":
+    def from_dict(cls, raw: Mapping[str, Any], source_path: Optional[str] = None) -> "ClientConfig":
         playback_raw = _mapping(raw.get("playback"))
         media_raw = _mapping(raw.get("media_engine", raw.get("engine")))
         controller_raw = raw.get("controller", {})
@@ -87,7 +87,7 @@ class ClientConfig:
 
         if isinstance(controller_raw, str):
             controller_name = controller_raw
-            controller_params: dict[str, Any] = {}
+            controller_params: Dict[str, Any] = {}
         else:
             controller_map = _mapping(controller_raw)
             controller_name = _as_str(controller_map.get("name", controller_map.get("key", "max_quality")))
@@ -150,7 +150,7 @@ class ClientConfig:
             source_path=source_path,
         )
 
-    def to_dict(self) -> dict[str, Any]:
+    def to_dict(self) -> Dict[str, Any]:
         return {
             "mpd_url": self.mpd_url,
             "media_engine": {
@@ -191,12 +191,12 @@ class ClientConfig:
 
 
 def load_client_config(
-    path: str | Path | None = None,
+    path: Optional[Union[str, Path]] = None,
     *,
-    defaults_path: str | Path | None = DEFAULT_EXAMPLE_CONFIG,
+    defaults_path: Optional[Union[str, Path]] = DEFAULT_EXAMPLE_CONFIG,
 ) -> ClientConfig:
     """Load the example config and overlay a local/user config when available."""
-    merged: dict[str, Any] = {}
+    merged: Dict[str, Any] = {}
 
     if defaults_path is not None:
         defaults = Path(defaults_path)
@@ -233,7 +233,7 @@ def validate_config_for_run(config: ClientConfig) -> None:
         raise ConfigError("downloader.max_retries must be >= 1.")
 
 
-def _select_config_path(path: str | Path | None) -> Path | None:
+def _select_config_path(path: Optional[Union[str, Path]]) -> Optional[Path]:
     if path is not None:
         return Path(path)
     if DEFAULT_LOCAL_CONFIG.exists():
@@ -241,7 +241,7 @@ def _select_config_path(path: str | Path | None) -> Path | None:
     return None
 
 
-def _load_yaml_file(path: Path) -> dict[str, Any]:
+def _load_yaml_file(path: Path) -> Dict[str, Any]:
     text = path.read_text(encoding="utf-8-sig")
     try:
         import yaml  # type: ignore
@@ -254,9 +254,9 @@ def _load_yaml_file(path: Path) -> dict[str, Any]:
         return _parse_simple_yaml(text, path)
 
 
-def _parse_simple_yaml(text: str, path: Path) -> dict[str, Any]:
-    root: dict[str, Any] = {}
-    stack: list[tuple[int, dict[str, Any]]] = [(-1, root)]
+def _parse_simple_yaml(text: str, path: Path) -> Dict[str, Any]:
+    root: Dict[str, Any] = {}
+    stack: List[Tuple[int, Dict[str, Any]]] = [(-1, root)]
 
     for line_no, raw_line in enumerate(text.splitlines(), start=1):
         if not raw_line.strip() or raw_line.lstrip().startswith("#"):
@@ -280,7 +280,7 @@ def _parse_simple_yaml(text: str, path: Path) -> dict[str, Any]:
         value = value.strip()
 
         if value == "":
-            child: dict[str, Any] = {}
+            child: Dict[str, Any] = {}
             parent[key] = child
             stack.append((indent, child))
         else:
@@ -310,7 +310,7 @@ def _parse_scalar(value: str) -> Any:
         return value
 
 
-def _deep_merge(base: Mapping[str, Any], override: Mapping[str, Any]) -> dict[str, Any]:
+def _deep_merge(base: Mapping[str, Any], override: Mapping[str, Any]) -> Dict[str, Any]:
     merged = dict(base)
     for key, value in override.items():
         if isinstance(value, Mapping) and isinstance(merged.get(key), Mapping):
@@ -330,7 +330,7 @@ def _as_str(value: Any) -> str:
     return str(value)
 
 
-def _as_optional_str(value: Any) -> str | None:
+def _as_optional_str(value: Any) -> Optional[str]:
     if value is None:
         return None
     text = str(value).strip()

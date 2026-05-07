@@ -8,6 +8,7 @@ import sys
 import threading
 from datetime import datetime
 from pathlib import Path
+from typing import List, Optional
 
 from core.client_config import (
     ClientConfig,
@@ -28,7 +29,7 @@ except Exception:
     GST_AVAILABLE = False
 
 
-def main(argv: list[str] | None = None) -> int:
+def main(argv: Optional[List[str]] = None) -> int:
     parser = argparse.ArgumentParser(description="Config-driven DASH client runner.")
     parser.add_argument(
         "--config",
