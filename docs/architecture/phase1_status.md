@@ -62,12 +62,21 @@ Convert DashClientModular4 into an ABR-neutral, reproducible, benchmark-ready DA
 - Units, row values, output filenames, output paths, ABR decisions, buffering, downloader behavior, parser behavior, QoE logic, and GStreamer timing were not changed.
 - Current generated datasets remain validation artifacts, not final benchmark results.
 
+### Block 7 - Controller API / ABR Decision Contract
+
+- Added `core/controller/contract.py` with the controller contract version, required feedback keys, feedback units, target-rate unit, feedback-key validation helpers, rate-ladder validation, and shared quantization helper.
+- Kept the current dict-based controller API for backward compatibility: `setPlayerFeedback(feedback_dict)`, `calcControlAction()`, `getControlAction()`, `quantizeRate(rate)`, and `getIdleDuration()`.
+- Documented that controller target rates are in bytes per second and quality levels are integer indices into the MPD bitrate ladder.
+- Updated `BaseController.quantizeRate()` to delegate to the shared quantizer while preserving fallback behavior when feedback or rates are missing.
+- Added controller contract tests covering feedback keys, units, rate validation, quantization semantics, `BaseController`, and `MaxQualityController`.
+- No new ABR algorithms were added and no runtime/player refactor, benchmark-neutrality work, dataset semantics change, QoE finalization, downloader change, parser change, or GStreamer timing change was introduced.
+
 ## Current Constraints
 
 - Do not implement BBA, BOLA, MPC, robustMPC, PPO, PANDA, FESTIVE, SARA, ELASTIC, RBC, WISH, or any real ABR controller yet.
 - Keep only trivial/fixed/max controllers needed for smoke tests.
 - Prioritize reproducibility, config-driven execution, headless benchmark mode, and clean run outputs.
 
-## Pending Technical Direction After Block 6
+## Pending Technical Direction After Block 7
 
-The next implementation block is not started in this commit. Baseline ABR algorithms, final QoE metrics, benchmark comparisons, and analysis input/output alignment remain pending technical direction after Block 6.
+The next implementation block is not started in this commit. Runtime responsibility separation, benchmark neutrality, baseline ABR algorithms, final QoE metrics, benchmark comparisons, and analysis input/output alignment remain pending technical direction after Block 7.

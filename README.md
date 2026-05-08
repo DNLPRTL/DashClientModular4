@@ -38,6 +38,8 @@ That directory contains the run manifest, resolved config, environment snapshot,
 
 `dataset.csv` is the full telemetry CSV. Feedback-derived columns use a `feedback_` prefix, for example `feedback_segment_index`, so they do not collide with top-level row columns. `dataset_training.csv` remains the minimal training-oriented CSV. These files are still validation artifacts, not final benchmark results.
 
+Controllers still use the legacy dict-based API. Feedback keys and units are documented in `core/controller/contract.py`; target rates are bytes per second, and quality levels are integer indices into the MPD bitrate ladder. This contract is test-protected, but baseline ABR algorithms and benchmark-grade runtime separation are still pending.
+
 ## Environment
 
 The supported minimum Python version is 3.8. The default development path does not require GStreamer.
@@ -77,6 +79,7 @@ python -m unittest discover
 ## Main Structure
 
 - `core/controller`: controller interface and registry.
+- `core/controller/contract.py`: controller feedback, units, target-rate, and quantization contract.
 - `core/media_engine`: fake and GStreamer playback engines.
 - `core/parser`: MPD parser and DASH parsing helpers.
 - `core/downloader.py`: segment downloader.

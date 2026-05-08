@@ -1,5 +1,8 @@
 # base_controller.py
 
+from .contract import quantize_rate_to_level
+
+
 class BaseController:
     """
     Clase base para cualquier controlador de adaptación de bitrate.
@@ -87,9 +90,4 @@ class BaseController:
         """
         if self.feedback is None or 'rates' not in self.feedback:
             return 0
-        rates = self.feedback['rates']
-        new_level = 0
-        for i, r in enumerate(rates):
-            if rate >= r:
-                new_level = i
-        return new_level
+        return quantize_rate_to_level(rate, self.feedback['rates'])

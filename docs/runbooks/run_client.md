@@ -37,6 +37,14 @@ controller:
 
 Do not select controllers that are not in `core/controller/registry.py`.
 
+The controller API is still the legacy dict-based contract:
+
+- `setPlayerFeedback(feedback_dict)` receives player feedback.
+- `calcControlAction()` returns a target rate in bytes per second.
+- `quantizeRate(rate)` maps that target rate to an integer quality level in the MPD bitrate ladder.
+
+Feedback keys and units are documented in `core/controller/contract.py`. This contract is a prerequisite for future comparable baselines; it is not a baseline implementation.
+
 ## 3. Select The Media Engine
 
 Use the fake engine for benchmark/dev runs and import-safe tests:
@@ -126,7 +134,7 @@ Run Tier 1 and Tier 2 tests:
 
 ```powershell
 python -m unittest discover
-python -m py_compile main.py core\client_config.py core\controller\registry.py core\run_context.py player.py scripts\check_environment.py
+python -m py_compile main.py core\client_config.py core\controller\registry.py core\controller\base.py core\controller\contract.py core\run_context.py core\dataset_schema.py player.py scripts\check_environment.py
 python scripts\check_environment.py --profile dev
 python scripts\check_environment.py --profile gst
 ```
