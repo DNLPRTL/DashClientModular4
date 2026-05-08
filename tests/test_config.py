@@ -21,8 +21,8 @@ class ConfigLoadingTest(unittest.TestCase):
 
         self.assertEqual("", config.mpd_url)
         self.assertEqual("fake", config.media_engine.name)
-        self.assertEqual("max_quality", config.controller.name)
-        self.assertEqual({"debug": False}, config.controller.params)
+        self.assertEqual("fixed_quality", config.controller.name)
+        self.assertEqual({"level": 0}, config.controller.params)
         self.assertTrue(config.playback.headless)
         self.assertEqual(0, config.playback.initial_quality)
         self.assertFalse(config.playback.initial_controller_decision)

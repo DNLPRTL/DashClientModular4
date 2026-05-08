@@ -104,9 +104,9 @@ class FakeClientSmokeTest(unittest.TestCase):
                         '  name: "fake"',
                         "  min_queue_time: 0.001",
                         "controller:",
-                        '  name: "max_quality"',
+                        '  name: "fixed_quality"',
                         "  params:",
-                        "    debug: false",
+                        "    level: 0",
                         "playback:",
                         "  initial_quality: 0",
                         "  initial_controller_decision: true",
@@ -166,7 +166,7 @@ class FakeClientSmokeTest(unittest.TestCase):
 
                 manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
                 self.assertEqual("completed", manifest["status"])
-                self.assertEqual("max_quality", manifest["controller"]["name"])
+                self.assertEqual("fixed_quality", manifest["controller"]["name"])
                 self.assertEqual("fake", manifest["media_engine"]["name"])
                 self.assertTrue(manifest["headless"])
                 self.assertEqual("dataset.csv", manifest["outputs"]["dataset"])

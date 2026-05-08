@@ -2,7 +2,9 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Callable, Mapping, Optional
 
+from .fixed_quality import FixedQualityController
 from .max_quality_controller import MaxQualityController
+from .scripted_quality import ScriptedQualityController
 
 
 @dataclass(frozen=True)
@@ -13,9 +15,19 @@ class ControllerSpec:
 
 
 CONTROLLER_REGISTRY = {
+    "fixed_quality": ControllerSpec(
+        key="fixed_quality",
+        label="Fixed quality (test/debug)",
+        factory=FixedQualityController,
+    ),
+    "scripted_quality": ControllerSpec(
+        key="scripted_quality",
+        label="Scripted quality (test/debug)",
+        factory=ScriptedQualityController,
+    ),
     "max_quality": ControllerSpec(
         key="max_quality",
-        label="Fijo (maxima calidad)",
+        label="Max quality (legacy/debug/stress)",
         factory=MaxQualityController,
     ),
 }

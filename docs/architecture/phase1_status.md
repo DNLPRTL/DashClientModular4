@@ -2,7 +2,7 @@
 
 ## Goal
 
-Convert DashClientModular4 into an ABR-neutral, reproducible, benchmark-ready DASH client skeleton before implementing real ABR controllers.
+Convert DashClientModular4 into an ABR-neutral, reproducible, benchmark-oriented DASH client skeleton before implementing real ABR controllers.
 
 ## Completed
 
@@ -47,7 +47,7 @@ Convert DashClientModular4 into an ABR-neutral, reproducible, benchmark-ready DA
 ### Block 5 - Minimal Smoke Tests
 
 - Added an offline fake-engine smoke test through the official `main.main(argv)` config runner path.
-- The smoke test uses a temporary local MPD, `max_quality`, `FakeMediaEngine`, and a patched downloader at `main.SegmentDownloader`.
+- The smoke test uses a temporary local MPD, `FakeMediaEngine`, and a patched downloader at `main.SegmentDownloader`.
 - The smoke test blocks external HTTP and requires no GStreamer, media files, GUI, server, ML tooling, or `config/client.local.yaml`.
 - The test asserts the reproducible run layout writes manifest, resolved config, environment, log, dataset, and training CSV artifacts.
 - Documented Phase 1 validation tiers across README, runbooks, and the Block 5 architecture note.
@@ -71,12 +71,25 @@ Convert DashClientModular4 into an ABR-neutral, reproducible, benchmark-ready DA
 - Added controller contract tests covering feedback keys, units, rate validation, quantization semantics, `BaseController`, and `MaxQualityController`.
 - No new ABR algorithms were added and no runtime/player refactor, benchmark-neutrality work, dataset semantics change, QoE finalization, downloader change, parser change, or GStreamer timing change was introduced.
 
+### Block 8 - Deterministic Test Controllers / Client Invariant Harness
+
+- Added `fixed_quality` and `scripted_quality` as deterministic test/debug controllers.
+- Documented that these controllers are not academic ABR baselines; they exist to verify client-path behavior without policy ambiguity.
+- Registered `fixed_quality`, `scripted_quality`, and the existing `max_quality` controller.
+- Kept `max_quality` available for backward compatibility as legacy/debug/stress behavior, not as a comparable baseline.
+- Updated official fake-engine smoke coverage and the example config to prefer `fixed_quality` level `0`.
+- Added deterministic controller tests for clamping, feedback `max_level`, missing feedback, scripted segment-index behavior, registry creation, and `max_quality` compatibility.
+- No academic, learned, AI, or adaptive ABR controller was added.
+- No runtime/player refactor, benchmark-neutrality work, dataset semantics change, QoE finalization, downloader change, parser change, buffering change, retry change, warm-up change, preroll change, pacing change, stall handling change, throughput-estimation change, media-engine behavior change, or GStreamer timing change was introduced.
+
 ## Current Constraints
 
 - Do not implement BBA, BOLA, MPC, robustMPC, PPO, PANDA, FESTIVE, SARA, ELASTIC, RBC, WISH, or any real ABR controller yet.
-- Keep only trivial/fixed/max controllers needed for smoke tests.
-- Prioritize reproducibility, config-driven execution, headless benchmark mode, and clean run outputs.
+- Keep only deterministic test/debug controllers plus legacy max-quality stress behavior until the base client is stable.
+- Prioritize reproducibility, config-driven execution, headless validation, and clean run outputs.
 
-## Pending Technical Direction After Block 7
+## Pending Technical Direction After Block 8
 
-The next implementation block is not started in this commit. Runtime responsibility separation, benchmark neutrality, baseline ABR algorithms, final QoE metrics, benchmark comparisons, and analysis input/output alignment remain pending technical direction after Block 7.
+The next implementation block is not started in this commit. Runtime responsibility separation, benchmark neutrality, baseline ABR algorithms, final QoE metrics, reward definitions, benchmark comparisons, and analysis input/output alignment remain pending technical direction after Block 8.
+
+GStreamer remains an integration/runtime path for now and is not benchmark-grade. Fake-engine and GStreamer behavior are not claimed to be equal.

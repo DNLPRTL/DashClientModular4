@@ -10,9 +10,9 @@ media_engine:
   sink_name: null
 
 controller:
-  name: "max_quality"
+  name: "fixed_quality"
   params:
-    debug: false
+    level: 0
 
 playback:
   initial_quality: 0

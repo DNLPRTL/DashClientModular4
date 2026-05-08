@@ -4,7 +4,7 @@ Modular DASH client for a TFG project. Phase 1 is focused on hardening the base 
 
 ## Current Run Path
 
-The official benchmark/dev path is config-driven and non-interactive:
+The official Phase 1 validation/dev path is config-driven and non-interactive:
 
 ```powershell
 Copy-Item config\client.example.yaml config\client.local.yaml
@@ -15,7 +15,7 @@ python main.py --config config\client.local.yaml
 `config/client.local.yaml` is ignored by git and must hold local MPD URLs or machine-specific settings. The example config defaults to:
 
 - `media_engine.name: "fake"`
-- `controller.name: "max_quality"`
+- `controller.name: "fixed_quality"`
 - `playback.initial_controller_decision: false`
 - `playback.headless: true`
 - `output.root_dir: "logs"`
@@ -38,7 +38,7 @@ That directory contains the run manifest, resolved config, environment snapshot,
 
 `dataset.csv` is the full telemetry CSV. Feedback-derived columns use a `feedback_` prefix, for example `feedback_segment_index`, so they do not collide with top-level row columns. `dataset_training.csv` remains the minimal training-oriented CSV. These files are still validation artifacts, not final benchmark results.
 
-Controllers still use the legacy dict-based API. Feedback keys and units are documented in `core/controller/contract.py`; target rates are bytes per second, and quality levels are integer indices into the MPD bitrate ladder. This contract is test-protected, but baseline ABR algorithms and benchmark-grade runtime separation are still pending.
+Controllers still use the legacy dict-based API. Feedback keys and units are documented in `core/controller/contract.py`; target rates are bytes per second, and quality levels are integer indices into the MPD bitrate ladder. `fixed_quality` and `scripted_quality` are deterministic test/debug controllers for verifying the client path without policy ambiguity; they are not academic ABR baselines. `max_quality` remains available as legacy/debug/stress behavior, not as a comparable baseline. Real baseline implementation, benchmark neutrality, final QoE/reward definitions, and benchmark-grade runtime separation are still pending.
 
 ## Environment
 
@@ -61,6 +61,8 @@ python scripts/check_environment.py --profile gst --strict
 ```
 
 See [docs/runbooks/environment.md](docs/runbooks/environment.md) for the Windows host, Ubuntu client VM, and Ubuntu server VM setup.
+
+GStreamer is an integration/runtime path for now and is not benchmark-grade. Fake-engine and GStreamer behavior are not claimed to be equal.
 
 ## Test Tiers
 

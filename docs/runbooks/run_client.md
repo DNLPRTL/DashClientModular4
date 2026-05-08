@@ -1,6 +1,6 @@
 # Run The DASH Client
 
-This is the official Phase 1 benchmark/dev path. It is non-interactive and driven by YAML config.
+This is the official Phase 1 validation/dev path. It is non-interactive and driven by YAML config.
 
 Before running the client on a fresh machine, follow `docs/runbooks/environment.md` and verify:
 
@@ -24,9 +24,32 @@ mpd_url: "http://your-server/path/video.mpd"
 
 `config/client.local.yaml` is ignored by git, so local URLs and machine-specific settings stay out of commits.
 
-## 2. Select The Existing Trivial Controller
+## 2. Select A Deterministic Test Controller
 
-For the current hardening phase, use the tracked registry controller:
+For official smoke and invariant checks in the current hardening phase, prefer `fixed_quality`:
+
+```yaml
+controller:
+  name: "fixed_quality"
+  params:
+    level: 0
+```
+
+`fixed_quality` always selects the configured ladder level, after clamping to the available ladder and feedback `max_level`.
+
+`scripted_quality` is also available for deterministic switching traces:
+
+```yaml
+controller:
+  name: "scripted_quality"
+  params:
+    levels: [0, 1, 0]
+    repeat_last: true
+```
+
+`fixed_quality` and `scripted_quality` are test/debug controllers. They are not academic ABR baselines; they exist to verify controller construction, feedback handoff, quantization, switching traces, run outputs, and CSV consistency without policy ambiguity.
+
+`max_quality` remains available for backward compatibility and legacy/debug/stress runs:
 
 ```yaml
 controller:
@@ -34,6 +57,8 @@ controller:
   params:
     debug: false
 ```
+
+Do not treat `max_quality` as a comparable baseline.
 
 Do not select controllers that are not in `core/controller/registry.py`.
 
@@ -43,11 +68,11 @@ The controller API is still the legacy dict-based contract:
 - `calcControlAction()` returns a target rate in bytes per second.
 - `quantizeRate(rate)` maps that target rate to an integer quality level in the MPD bitrate ladder.
 
-Feedback keys and units are documented in `core/controller/contract.py`. This contract is a prerequisite for future comparable baselines; it is not a baseline implementation.
+Feedback keys and units are documented in `core/controller/contract.py`. This contract is a prerequisite for future comparable baselines; it is not a baseline implementation. Real baseline implementation, runtime/player responsibility separation, and benchmark neutrality remain pending.
 
 ## 3. Select The Media Engine
 
-Use the fake engine for benchmark/dev runs and import-safe tests:
+Use the fake engine for deterministic dev runs and import-safe tests:
 
 ```yaml
 media_engine:
@@ -65,11 +90,11 @@ media_engine:
   sink_name: null
 ```
 
-Missing GStreamer does not break config loading or import tests. It only fails when a run explicitly requests `media_engine.name: "gst"`.
+Missing GStreamer does not break config loading or import tests. It only fails when a run explicitly requests `media_engine.name: "gst"`. GStreamer is integration/runtime only for now and is not benchmark-grade; fake-engine and GStreamer behavior are not claimed to be equal.
 
-## 4. Keep Benchmark Runs Headless
+## 4. Keep Validation Runs Headless
 
-The benchmark/dev default is:
+The validation/dev default is:
 
 ```yaml
 playback:
@@ -134,7 +159,7 @@ Run Tier 1 and Tier 2 tests:
 
 ```powershell
 python -m unittest discover
-python -m py_compile main.py core\client_config.py core\controller\registry.py core\controller\base.py core\controller\contract.py core\run_context.py core\dataset_schema.py player.py scripts\check_environment.py
+python -m py_compile main.py core\client_config.py core\controller\registry.py core\controller\base.py core\controller\contract.py core\controller\fixed_quality.py core\controller\scripted_quality.py core\run_context.py core\dataset_schema.py player.py scripts\check_environment.py
 python scripts\check_environment.py --profile dev
 python scripts\check_environment.py --profile gst
 ```
