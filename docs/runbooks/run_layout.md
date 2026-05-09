@@ -10,8 +10,8 @@ logs/
     run_manifest.json
     config.resolved.json
     environment.json
-    dataset.csv
-    dataset_training.csv
+    segment_telemetry.csv
+    evaluation_segments.csv
     run.log
 ```
 
@@ -19,18 +19,31 @@ The run directory is the authoritative artifact for a validation run. Generated 
 
 ## Files
 
-- `run_manifest.json`: top-level run index with run id, timestamps, command-line args, config source, platform/Python/git metadata, controller, media engine, MPD URL, and relative output paths.
+- `run_manifest.json`: top-level run index with run id, timestamps, command-line args, config source, platform/Python/git metadata, controller, media engine, MPD URL, relative output paths, and benchmark-neutrality metadata.
 - `config.resolved.json`: resolved config after defaults and local overrides were applied. It may contain local MPD URLs.
 - `environment.json`: Python/platform/package/tool availability snapshot.
-- `dataset.csv`: full telemetry CSV. Feedback-derived columns are prefixed with `feedback_` to avoid collisions with top-level row columns such as `segment_index`.
-- `dataset_training.csv`: minimal training-oriented CSV. Its filename and output path are unchanged.
+- `segment_telemetry.csv`: full per-segment/runtime telemetry CSV. Feedback-derived columns are prefixed with `feedback_` to avoid collisions with top-level row columns such as `segment_index`.
+- `evaluation_segments.csv`: compact evaluation-oriented segment records with `eval_phase` and `use_for_eval`. This is not a final IA training dataset.
 - `run.log`: run-specific Python log file. Console output still appears normally.
 
-## Dataset Schema Contract
+## Manifest Output Keys
 
-Block 6 makes the CSV headers explicit and test-protected:
+`run_manifest.json` advertises canonical outputs under these keys:
 
-- `dataset.csv` and `dataset_training.csv` must have unique column names.
+- `run_manifest`
+- `resolved_config`
+- `environment`
+- `segment_telemetry`
+- `evaluation_segments`
+- `run_log`
+
+It must not advertise `dataset` or `training` as canonical output keys. Legacy names `dataset.csv` and `dataset_training.csv` are deprecated and are not produced by new default runs.
+
+## CSV Schema Contract
+
+Block 11 keeps the row values and ordering stable while renaming the generated artifacts:
+
+- `segment_telemetry.csv` and `evaluation_segments.csv` must have unique column names.
 - Every data row must have the same number of columns as its header.
 - Top-level `segment_index` remains unchanged.
 - Feedback-derived columns use the `feedback_` prefix, for example `feedback_segment_index` and `feedback_queued_time`.
@@ -39,7 +52,7 @@ Block 6 makes the CSV headers explicit and test-protected:
 - Terminal drain stalls must not be counted as steady-state rebuffering.
 - Units and row values from earlier schema blocks remain stable except for explicit evaluation metadata added in Block 10.
 
-The generated CSVs are still validation artifacts, not final benchmark results. The fake engine is the controlled path for reproducible tests. GStreamer runtime validation is still not benchmark-grade yet, and baseline ABR algorithms remain pending.
+The generated CSVs are still validation/control artifacts, not final benchmark results. The fake engine is the controlled path for reproducible tests. GStreamer runtime validation is still not benchmark-grade yet, and baseline ABR algorithms remain pending.
 
 ## Inspect A Run
 
@@ -47,7 +60,7 @@ Windows:
 
 ```powershell
 python -m unittest discover
-python -m py_compile main.py core\client_config.py core\controller\registry.py core\controller\base.py core\controller\contract.py core\controller\fixed_quality.py core\controller\scripted_quality.py core\runtime_feedback.py core\benchmark_contract.py core\run_context.py core\dataset_schema.py player.py scripts\check_environment.py
+python -m py_compile main.py core\client_config.py core\controller\registry.py core\controller\base.py core\controller\contract.py core\controller\fixed_quality.py core\controller\scripted_quality.py core\runtime_feedback.py core\benchmark_contract.py core\output_artifacts.py core\run_context.py core\dataset_schema.py player.py scripts\check_environment.py
 python scripts/check_environment.py --profile dev
 python scripts/check_environment.py --profile gst
 ```
@@ -71,7 +84,8 @@ For a single run directory:
 RUN_DIR=$(find logs -maxdepth 1 -type d -name 'run_*' | sort | tail -n 1)
 cat "$RUN_DIR/run_manifest.json"
 cat "$RUN_DIR/environment.json"
-head -n 5 "$RUN_DIR/dataset.csv"
+head -n 5 "$RUN_DIR/segment_telemetry.csv"
+head -n 5 "$RUN_DIR/evaluation_segments.csv"
 ```
 
 ## Role Split
@@ -90,7 +104,9 @@ GStreamer availability is an environment capability. It is not proof that the cu
 
 ## Current Status Of Outputs
 
-Current datasets and logs are validation artifacts only. They are useful for inspecting whether the client ran and what it recorded, but they are not final benchmark results until Phase 1 acceptance, final QoE/reward methodology, and baseline controller implementation are complete.
+Current run CSVs and logs are validation/control artifacts only. They are useful for inspecting whether the client ran and what it recorded, but they are not final benchmark results until Phase 1 acceptance, final QoE/reward methodology, and baseline controller implementation are complete.
+
+Fake-engine outputs and GStreamer outputs must not be mixed as equivalent benchmark results.
 
 ## Git Hygiene
 
@@ -100,6 +116,6 @@ Do not commit:
 - `analysis_output/`
 - `config/client.local.yaml`
 - media files or DASH segments
-- generated datasets
+- generated run CSVs
 - virtual environments
 - machine-specific files

@@ -2,7 +2,7 @@
 
 Date: 2026-05-09
 
-This audit classifies current CSV telemetry for Phase 1 hardening. It does not define final QoE, final reward, academic baselines, or final benchmark methodology.
+This audit classifies current CSV telemetry for Phase 1 hardening. It covers `segment_telemetry.csv` and the compact `evaluation_segments.csv` output. It does not define final QoE, final reward, academic baselines, final IA training data, or final benchmark methodology.
 
 Classification labels:
 
@@ -63,4 +63,4 @@ Rows where `use_for_eval=false` are not benchmark rows. Terminal drain stalls mu
 | `stall_flag` | media-engine event aggregate | boolean_int | pending_semantics | No | Segment-level aggregate only; event-level stall class is pending. |
 | `stall_duration` | media-engine event aggregate | seconds | pending_semantics | No | Do not count terminal drain stalls as steady-state rebuffering. |
 
-`dataset_training.csv` carries a smaller subset: `segment_index`, `is_init`, `eval_phase`, `use_for_eval`, `last_fragment_size`, `last_download_time`, and `fragment_duration`. Its rows follow the same evaluation eligibility rule: `use_for_eval=false` means the row is not a benchmark row.
+`evaluation_segments.csv` carries a smaller subset: `segment_index`, `is_init`, `eval_phase`, `use_for_eval`, `last_fragment_size`, `last_download_time`, and `fragment_duration`. Its rows follow the same evaluation eligibility rule: `use_for_eval=false` means the row is not a benchmark row. It is an evaluation-oriented control artifact, not a final IA training dataset.

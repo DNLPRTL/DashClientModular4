@@ -32,7 +32,7 @@ Tier 1 covers importability, config loading, environment profile behavior, and r
 
 - Must pass on Windows without GStreamer.
 - Must not require network access, media files, GUI, server infrastructure, ML tooling, or `config/client.local.yaml`.
-- Covered by `tests/test_imports.py`, `tests/test_config.py`, `tests/test_environment_check.py`, and `tests/test_run_context.py`.
+- Covered by `tests/test_imports.py`, `tests/test_config.py`, `tests/test_environment_check.py`, `tests/test_run_context.py`, and `tests/test_output_artifacts.py`.
 
 ### Tier 2 - Offline Fake-Engine Smoke Tests
 
@@ -97,7 +97,7 @@ python -m venv .venv
 python -m pip install --upgrade pip
 pip install -r requirements.txt
 python -m unittest discover
-python -m py_compile main.py core\client_config.py core\controller\registry.py core\controller\base.py core\controller\contract.py core\controller\fixed_quality.py core\controller\scripted_quality.py core\runtime_feedback.py core\benchmark_contract.py core\run_context.py core\dataset_schema.py player.py scripts\check_environment.py
+python -m py_compile main.py core\client_config.py core\controller\registry.py core\controller\base.py core\controller\contract.py core\controller\fixed_quality.py core\controller\scripted_quality.py core\runtime_feedback.py core\benchmark_contract.py core\output_artifacts.py core\run_context.py core\dataset_schema.py player.py scripts\check_environment.py
 python scripts/check_environment.py --profile dev
 python scripts/check_environment.py --profile gst
 ```
@@ -116,7 +116,7 @@ source .venv/bin/activate
 python -m pip install --upgrade pip
 pip install -r requirements.txt
 python -m unittest discover
-python -m py_compile main.py core/client_config.py core/controller/registry.py core/controller/base.py core/controller/contract.py core/controller/fixed_quality.py core/controller/scripted_quality.py core/runtime_feedback.py core/benchmark_contract.py core/run_context.py core/dataset_schema.py player.py scripts/check_environment.py
+python -m py_compile main.py core/client_config.py core/controller/registry.py core/controller/base.py core/controller/contract.py core/controller/fixed_quality.py core/controller/scripted_quality.py core/runtime_feedback.py core/benchmark_contract.py core/output_artifacts.py core/run_context.py core/dataset_schema.py player.py scripts/check_environment.py
 python scripts/check_environment.py --profile dev
 python scripts/check_environment.py --profile gst
 python scripts/check_environment.py --profile gst --strict
@@ -153,6 +153,6 @@ Keep local and generated artifacts out of commits:
 - `logs/`
 - `analysis_output/`
 - local media directories and segment/video files
-- generated datasets and zip files
+- generated run CSVs and zip files
 
 Missing GStreamer must not break import/config tests.

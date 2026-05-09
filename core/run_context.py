@@ -14,6 +14,21 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 from core.client_config import ClientConfig
+from core.output_artifacts import (
+    ENVIRONMENT_FILENAME,
+    ENVIRONMENT_KEY,
+    EVALUATION_SEGMENTS_FILENAME,
+    EVALUATION_SEGMENTS_KEY,
+    LEGACY_OUTPUT_FILENAMES,
+    RESOLVED_CONFIG_FILENAME,
+    RESOLVED_CONFIG_KEY,
+    RUN_LOG_FILENAME,
+    RUN_LOG_KEY,
+    RUN_MANIFEST_FILENAME,
+    RUN_MANIFEST_KEY,
+    SEGMENT_TELEMETRY_FILENAME,
+    SEGMENT_TELEMETRY_KEY,
+)
 
 
 SCHEMA_VERSION = "1.0"
@@ -30,13 +45,23 @@ class RunContext:
     created_at_utc: str
     output_root: Path
     run_dir: Path
-    dataset_path: Path
-    training_path: Path
+    segment_telemetry_path: Path
+    evaluation_segments_path: Path
     manifest_path: Path
     resolved_config_path: Path
     environment_path: Path
     log_path: Path
     command_args: List[str]
+
+    @property
+    def dataset_path(self) -> Path:
+        """Deprecated compatibility alias for segment_telemetry_path."""
+        return self.segment_telemetry_path
+
+    @property
+    def training_path(self) -> Path:
+        """Deprecated compatibility alias for evaluation_segments_path."""
+        return self.evaluation_segments_path
 
     def write_resolved_config(self, config: ClientConfig) -> None:
         _write_json(self.resolved_config_path, config.to_dict())
@@ -58,8 +83,14 @@ def create_run_context(config: ClientConfig, command_args: Optional[Iterable[str
     output_root = Path(config.output.root_dir)
     run_id, run_dir = _create_unique_run_dir(output_root, now_local)
 
-    dataset_name = _dataset_filename(config.output.dataset_filename)
-    training_name = _training_filename(dataset_name)
+    segment_telemetry_name = _artifact_filename(
+        config.output.segment_telemetry_filename,
+        SEGMENT_TELEMETRY_FILENAME,
+    )
+    evaluation_segments_name = _artifact_filename(
+        config.output.evaluation_segments_filename,
+        EVALUATION_SEGMENTS_FILENAME,
+    )
 
     return RunContext(
         run_id=run_id,
@@ -67,12 +98,12 @@ def create_run_context(config: ClientConfig, command_args: Optional[Iterable[str
         created_at_utc=now_utc.isoformat().replace("+00:00", "Z"),
         output_root=output_root,
         run_dir=run_dir,
-        dataset_path=run_dir / dataset_name,
-        training_path=run_dir / training_name,
-        manifest_path=run_dir / "run_manifest.json",
-        resolved_config_path=run_dir / "config.resolved.json",
-        environment_path=run_dir / "environment.json",
-        log_path=run_dir / "run.log",
+        segment_telemetry_path=run_dir / segment_telemetry_name,
+        evaluation_segments_path=run_dir / evaluation_segments_name,
+        manifest_path=run_dir / RUN_MANIFEST_FILENAME,
+        resolved_config_path=run_dir / RESOLVED_CONFIG_FILENAME,
+        environment_path=run_dir / ENVIRONMENT_FILENAME,
+        log_path=run_dir / RUN_LOG_FILENAME,
         command_args=list(command_args or []),
     )
 
@@ -106,12 +137,20 @@ def build_run_manifest(context: RunContext, config: ClientConfig, status: str = 
         "headless": config.playback.headless,
         "mpd_url": config.mpd_url,
         "outputs": {
-            "manifest": _relative_to_run(context.manifest_path, context.run_dir),
-            "resolved_config": _relative_to_run(context.resolved_config_path, context.run_dir),
-            "environment": _relative_to_run(context.environment_path, context.run_dir),
-            "dataset": _relative_to_run(context.dataset_path, context.run_dir),
-            "training": _relative_to_run(context.training_path, context.run_dir),
-            "log": _relative_to_run(context.log_path, context.run_dir),
+            RUN_MANIFEST_KEY: _relative_to_run(context.manifest_path, context.run_dir),
+            RESOLVED_CONFIG_KEY: _relative_to_run(context.resolved_config_path, context.run_dir),
+            ENVIRONMENT_KEY: _relative_to_run(context.environment_path, context.run_dir),
+            SEGMENT_TELEMETRY_KEY: _relative_to_run(context.segment_telemetry_path, context.run_dir),
+            EVALUATION_SEGMENTS_KEY: _relative_to_run(context.evaluation_segments_path, context.run_dir),
+            RUN_LOG_KEY: _relative_to_run(context.log_path, context.run_dir),
+        },
+        "benchmark_neutrality": {
+            "outputs_are_benchmark_results": False,
+            "row_eval_gate": "use_for_eval",
+            "eval_phase_column": "eval_phase",
+            "terminal_drain_stall_is_rebuffering": False,
+            "final_qoe_reward_defined": False,
+            "final_training_dataset_defined": False,
         },
     }
 
@@ -151,17 +190,12 @@ def _create_unique_run_dir(output_root: Path, now_local: datetime) -> Tuple[str,
     raise RuntimeError("Could not create a unique run directory under {0}".format(output_root))
 
 
-def _dataset_filename(name: str) -> str:
+def _artifact_filename(name: str, default: str) -> str:
     text = str(name or "").strip()
-    if not text:
-        return "dataset.csv"
-    return Path(text).name
-
-
-def _training_filename(dataset_name: str) -> str:
-    if dataset_name.lower().endswith(".csv"):
-        return "{0}_training.csv".format(dataset_name[:-4])
-    return "{0}_training.csv".format(dataset_name)
+    artifact_name = Path(text).name
+    if not artifact_name or artifact_name.lower() in LEGACY_OUTPUT_FILENAMES:
+        return default
+    return artifact_name
 
 
 def _write_json(path: Path, data: Dict[str, Any]) -> None:

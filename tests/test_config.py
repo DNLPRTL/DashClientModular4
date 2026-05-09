@@ -27,6 +27,8 @@ class ConfigLoadingTest(unittest.TestCase):
         self.assertEqual(0, config.playback.initial_quality)
         self.assertFalse(config.playback.initial_controller_decision)
         self.assertEqual("logs", config.output.root_dir)
+        self.assertEqual("segment_telemetry.csv", config.output.segment_telemetry_filename)
+        self.assertEqual("evaluation_segments.csv", config.output.evaluation_segments_filename)
 
     def test_local_config_overlays_example_defaults(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -75,6 +77,34 @@ class ConfigLoadingTest(unittest.TestCase):
         self.assertEqual(2, config.playback.initial_quality)
         self.assertFalse(config.playback.headless)
         self.assertEqual("tmp_runs", config.output.root_dir)
+        self.assertEqual("segment_telemetry.csv", config.output.segment_telemetry_filename)
+        self.assertEqual("evaluation_segments.csv", config.output.evaluation_segments_filename)
+
+    def test_legacy_dataset_filename_does_not_preserve_old_default_name(self):
+        config = ClientConfig.from_dict(
+            {
+                "mpd_url": "http://example.invalid/video.mpd",
+                "output": {"root_dir": "logs", "dataset_filename": "dataset.csv"},
+            }
+        )
+
+        self.assertEqual("segment_telemetry.csv", config.output.segment_telemetry_filename)
+        self.assertEqual("evaluation_segments.csv", config.output.evaluation_segments_filename)
+        self.assertNotIn("dataset_filename", config.to_dict()["output"])
+
+    def test_canonical_output_fields_reject_legacy_filenames(self):
+        config = ClientConfig.from_dict(
+            {
+                "mpd_url": "http://example.invalid/video.mpd",
+                "output": {
+                    "segment_telemetry_filename": "old/dataset.csv",
+                    "evaluation_segments_filename": "old/dataset_training.csv",
+                },
+            }
+        )
+
+        self.assertEqual("segment_telemetry.csv", config.output.segment_telemetry_filename)
+        self.assertEqual("evaluation_segments.csv", config.output.evaluation_segments_filename)
 
     def test_run_validation_requires_mpd_url(self):
         config = ClientConfig.from_dict({"mpd_url": ""})

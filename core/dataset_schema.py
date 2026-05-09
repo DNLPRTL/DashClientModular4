@@ -3,16 +3,17 @@ from __future__ import annotations
 from collections import Counter
 from typing import Iterable, List, Sequence
 
+from core.output_artifacts import EVALUATION_SEGMENTS_FILENAME, SEGMENT_TELEMETRY_FILENAME
 
-DATASET_SCHEMA_VERSION = "1.1"
-TRAINING_SCHEMA_VERSION = "1.1"
+SEGMENT_TELEMETRY_SCHEMA_VERSION = "1.1"
+EVALUATION_SEGMENTS_SCHEMA_VERSION = "1.1"
 
-DATASET_ROW_COLUMNS = [
+SEGMENT_TELEMETRY_ROW_COLUMNS = [
     "segment_index",
     "timestamp",
 ]
 
-DATASET_SEGMENT_COLUMNS = [
+SEGMENT_TELEMETRY_SEGMENT_COLUMNS = [
     "is_init",
     "retry_count",
     "segment_start_time",
@@ -20,7 +21,7 @@ DATASET_SEGMENT_COLUMNS = [
     "wall_time_elapsed",
 ]
 
-DATASET_DERIVED_COLUMNS = [
+SEGMENT_TELEMETRY_DERIVED_COLUMNS = [
     "tp_now",
     "tp_ewma",
     "tp_min_last5",
@@ -41,12 +42,12 @@ DATASET_DERIVED_COLUMNS = [
     "use_for_eval",
 ]
 
-DATASET_STALL_COLUMNS = [
+SEGMENT_TELEMETRY_STALL_COLUMNS = [
     "stall_flag",
     "stall_duration",
 ]
 
-TRAINING_COLUMNS = [
+EVALUATION_SEGMENTS_COLUMNS = [
     "segment_index",
     "is_init",
     "eval_phase",
@@ -65,22 +66,35 @@ def feedback_column_names(feedback_keys: Iterable[object]) -> List[str]:
     return [feedback_column_name(key) for key in feedback_keys]
 
 
-def build_dataset_header(feedback_keys: Iterable[object]) -> List[str]:
+def build_segment_telemetry_header(feedback_keys: Iterable[object]) -> List[str]:
     header = (
-        list(DATASET_ROW_COLUMNS)
+        list(SEGMENT_TELEMETRY_ROW_COLUMNS)
         + feedback_column_names(feedback_keys)
-        + list(DATASET_SEGMENT_COLUMNS)
-        + list(DATASET_DERIVED_COLUMNS)
-        + list(DATASET_STALL_COLUMNS)
+        + list(SEGMENT_TELEMETRY_SEGMENT_COLUMNS)
+        + list(SEGMENT_TELEMETRY_DERIVED_COLUMNS)
+        + list(SEGMENT_TELEMETRY_STALL_COLUMNS)
     )
-    validate_unique_columns(header, schema_name="dataset.csv")
+    validate_unique_columns(header, schema_name=SEGMENT_TELEMETRY_FILENAME)
     return header
 
 
-def build_training_header() -> List[str]:
-    header = list(TRAINING_COLUMNS)
-    validate_unique_columns(header, schema_name="dataset_training.csv")
+def build_evaluation_segments_header() -> List[str]:
+    header = list(EVALUATION_SEGMENTS_COLUMNS)
+    validate_unique_columns(header, schema_name=EVALUATION_SEGMENTS_FILENAME)
     return header
+
+
+# Legacy names are retained as import aliases only. New code should use the
+# segment telemetry and evaluation segment terminology above.
+DATASET_SCHEMA_VERSION = SEGMENT_TELEMETRY_SCHEMA_VERSION
+TRAINING_SCHEMA_VERSION = EVALUATION_SEGMENTS_SCHEMA_VERSION
+DATASET_ROW_COLUMNS = SEGMENT_TELEMETRY_ROW_COLUMNS
+DATASET_SEGMENT_COLUMNS = SEGMENT_TELEMETRY_SEGMENT_COLUMNS
+DATASET_DERIVED_COLUMNS = SEGMENT_TELEMETRY_DERIVED_COLUMNS
+DATASET_STALL_COLUMNS = SEGMENT_TELEMETRY_STALL_COLUMNS
+TRAINING_COLUMNS = EVALUATION_SEGMENTS_COLUMNS
+build_dataset_header = build_segment_telemetry_header
+build_training_header = build_evaluation_segments_header
 
 
 def validate_unique_columns(columns: Sequence[str], schema_name: str = "CSV schema") -> None:

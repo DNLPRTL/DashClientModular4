@@ -7,7 +7,12 @@ import os
 from datetime import datetime
 
 from core.benchmark_contract import classify_segment_phase, should_use_segment_for_eval
-from core.dataset_schema import build_dataset_header, build_training_header, validate_row_length
+from core.dataset_schema import (
+    build_evaluation_segments_header,
+    build_segment_telemetry_header,
+    validate_row_length,
+)
+from core.output_artifacts import EVALUATION_SEGMENTS_FILENAME, SEGMENT_TELEMETRY_FILENAME
 from core.runtime_feedback import build_controller_feedback
 
 # reloj monotónico
@@ -42,7 +47,8 @@ class Player:
     TP_WINDOW = 5  # para min/std
 
     def __init__(self, parser, media_engine, mpd_url, downloader, controller,
-                 log_path=None, initial_level=0, use_initial_controller_decision=True, run_dir=None):
+                 log_path=None, initial_level=0, use_initial_controller_decision=True, run_dir=None,
+                 segment_telemetry_path=None, evaluation_segments_path=None):
         self.parser = parser
         self.media_engine = media_engine
         self.downloader = downloader
@@ -52,8 +58,8 @@ class Player:
         self.log_path = log_path
         self.mpd_url = mpd_url
         self.run_dir = run_dir
-        self.dataset_csv_path = None
-        self.training_csv_path = None
+        self.segment_telemetry_csv_path = segment_telemetry_path
+        self.evaluation_segments_csv_path = evaluation_segments_path
         self.use_initial_controller_decision = bool(use_initial_controller_decision)
 
         # estado general
@@ -100,13 +106,13 @@ class Player:
         # CSV header map (se rellena al abrir CSV)
         self._header = None
         self._col_index = {}
-        self._training_header = None
+        self._evaluation_segments_header = None
 
-        # NUEVO: ficheros CSV (full + entrenamiento)
+        # CSV files for full telemetry and evaluation-oriented segment rows.
         self._csv_file = None
         self._csv_writer = None
-        self._csv_train_file = None
-        self._csv_train_writer = None
+        self._csv_eval_file = None
+        self._csv_eval_writer = None
 
         # hooks
         if hasattr(self.media_engine, "on_event"):
@@ -356,60 +362,45 @@ class Player:
         # warm-up: 1 segmento sin adaptación
         self._warmup = True
 
-        # abrir CSVs (full + entrenamiento) en carpeta por ejecución
-        if self.log_path:
-            # Resolver carpeta base y nombre base
-            if self.run_dir:
-                run_dir = self.run_dir
-                os.makedirs(run_dir, exist_ok=True)
-                if os.path.isdir(self.log_path):
-                    base_name = "dataset.csv"
-                else:
-                    b = os.path.basename(self.log_path)
-                    base_name = b if (b and "." in b) else "dataset.csv"
-            elif os.path.isdir(self.log_path):
-                base_dir = self.log_path
-                base_name = "dataset.csv"
-                run_stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-                run_dir = os.path.join(base_dir, f"run_{run_stamp}")
-                os.makedirs(run_dir, exist_ok=True)
-            else:
-                d = os.path.dirname(self.log_path)
-                b = os.path.basename(self.log_path)
-                base_dir = d if d else "."
-                base_name = b if (b and "." in b) else "dataset.csv"
-                run_stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-                run_dir = os.path.join(base_dir, f"run_{run_stamp}")
-                os.makedirs(run_dir, exist_ok=True)
-
-            dataset_csv_path = os.path.join(run_dir, base_name)
-            name_wo_ext = base_name[:-4] if base_name.lower().endswith(".csv") else base_name
-            training_csv_path = os.path.join(run_dir, f"{name_wo_ext}_training.csv")
+        # Open run CSV artifacts without deriving names from run.log.
+        if self.log_path or self.segment_telemetry_csv_path or self.evaluation_segments_csv_path:
+            # Resolve the run directory once, then use explicit artifact names.
+            run_dir = self._resolve_run_dir()
+            segment_telemetry_csv_path = self.segment_telemetry_csv_path or os.path.join(
+                run_dir,
+                SEGMENT_TELEMETRY_FILENAME,
+            )
+            evaluation_segments_csv_path = self.evaluation_segments_csv_path or os.path.join(
+                run_dir,
+                EVALUATION_SEGMENTS_FILENAME,
+            )
             self.run_dir = run_dir
-            self.dataset_csv_path = dataset_csv_path
-            self.training_csv_path = training_csv_path
+            self.segment_telemetry_csv_path = segment_telemetry_csv_path
+            self.evaluation_segments_csv_path = evaluation_segments_csv_path
+            os.makedirs(os.path.dirname(segment_telemetry_csv_path) or ".", exist_ok=True)
+            os.makedirs(os.path.dirname(evaluation_segments_csv_path) or ".", exist_ok=True)
 
-            # CSV completo (dataset)
-            f = open(dataset_csv_path, 'w', newline='')
+            # Full per-segment/runtime telemetry.
+            f = open(segment_telemetry_csv_path, 'w', newline='')
             self._csv_file = f
             self._csv_writer = csv.writer(f)
 
-            header = build_dataset_header(self._fb_keys)
+            header = build_segment_telemetry_header(self._fb_keys)
             self._header = header
             self._col_index = {name: idx for idx, name in enumerate(header)}
             self._csv_writer.writerow(header)
 
-            # NUEVO: CSV de entrenamiento
-            ft = open(training_csv_path, 'w', newline='')
-            self._csv_train_file = ft
-            self._csv_train_writer = csv.writer(ft)
-            train_header = build_training_header()
-            self._training_header = train_header
-            self._csv_train_writer.writerow(train_header)
+            # Compact evaluation-oriented segment records.
+            ft = open(evaluation_segments_csv_path, 'w', newline='')
+            self._csv_eval_file = ft
+            self._csv_eval_writer = csv.writer(ft)
+            eval_header = build_evaluation_segments_header()
+            self._evaluation_segments_header = eval_header
+            self._csv_eval_writer.writerow(eval_header)
 
             print(f"🧾 Logs en: {run_dir}")
-            print(f"   - Dataset:    {os.path.basename(dataset_csv_path)}")
-            print(f"   - Entrenamiento: {os.path.basename(training_csv_path)}")
+            print(f"   - Segment telemetry: {os.path.basename(segment_telemetry_csv_path)}")
+            print(f"   - Evaluation segments: {os.path.basename(evaluation_segments_csv_path)}")
 
         self.media_engine.start()
 
@@ -466,12 +457,12 @@ class Player:
                         derived['eval_phase'],
                         derived['is_preroll'], derived['use_for_eval']
                     ] + [0, 0.0]  # stall_* para INIT
-                    validate_row_length(row, self._header, schema_name="dataset.csv")
+                    validate_row_length(row, self._header, schema_name=SEGMENT_TELEMETRY_FILENAME)
                     self._csv_writer.writerow(row)
                     self._csv_file.flush()
 
-                # NUEVO: fila de entrenamiento
-                self._write_training_row(
+                # Evaluation-oriented segment row.
+                self._write_evaluation_segment_row(
                     seg_idx=self.cur_index,
                     is_init=1,
                     eval_phase=derived['eval_phase'],
@@ -568,15 +559,15 @@ class Player:
                             if is_init:
                                 # INIT con datos reales (raro), cerramos la fila completa
                                 row += [0, 0.0]
-                                validate_row_length(row, self._header, schema_name="dataset.csv")
+                                validate_row_length(row, self._header, schema_name=SEGMENT_TELEMETRY_FILENAME)
                                 self._csv_writer.writerow(row)
                                 self._csv_file.flush()
                             else:
                                 # guardamos pendiente (stall_* y policy/switch se pueden actualizar luego)
                                 self._pending_rows[self.cur_index] = row
 
-                        # NUEVO: fila de entrenamiento (para INIT reales también)
-                        self._write_training_row(
+                        # Evaluation-oriented segment row for real INIT and media segments.
+                        self._write_evaluation_segment_row(
                             seg_idx=self.cur_index,
                             is_init=int(is_init),
                             eval_phase=derived['eval_phase'],
@@ -668,9 +659,9 @@ class Player:
                 self._csv_file.close()
             except:
                 pass
-        if getattr(self, "_csv_train_file", None):
+        if getattr(self, "_csv_eval_file", None):
             try:
-                self._csv_train_file.close()
+                self._csv_eval_file.close()
             except:
                 pass
         if hasattr(self.media_engine, "stop"):
@@ -680,6 +671,29 @@ class Player:
                 pass
 
     # ------------------------- helpers CSV -------------------------
+    def _resolve_run_dir(self):
+        if self.run_dir:
+            run_dir = os.fspath(self.run_dir)
+            os.makedirs(run_dir, exist_ok=True)
+            return run_dir
+
+        for path in [self.segment_telemetry_csv_path, self.evaluation_segments_csv_path]:
+            if path:
+                run_dir = os.path.dirname(os.fspath(path)) or "."
+                os.makedirs(run_dir, exist_ok=True)
+                return run_dir
+
+        if self.log_path and os.path.isdir(self.log_path):
+            base_dir = os.fspath(self.log_path)
+        else:
+            log_text = os.fspath(self.log_path) if self.log_path else ""
+            base_dir = os.path.dirname(log_text) or "."
+
+        run_stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        run_dir = os.path.join(base_dir, f"run_{run_stamp}")
+        os.makedirs(run_dir, exist_ok=True)
+        return run_dir
+
     def _update_pending_policy_and_switch(self, seg_idx, target_rate, chosen_level, decision_ms, is_up, is_down, magnitude):
         """Rellena en la fila pendiente los campos de policy y switches del segmento seg_idx."""
         row = self._pending_rows.get(seg_idx)
@@ -716,13 +730,13 @@ class Player:
             si = {"flag": 0, "duration": 0.0}
 
         final_row = base_row + [int(si.get("flag", 0)), float(si.get("duration", 0.0))]
-        validate_row_length(final_row, self._header, schema_name="dataset.csv")
+        validate_row_length(final_row, self._header, schema_name=SEGMENT_TELEMETRY_FILENAME)
         self._csv_writer.writerow(final_row)
         self._csv_file.flush()
 
-    def _write_training_row(self, seg_idx, is_init, eval_phase, use_for_eval, last_size, last_time, frag_dur):
-        """NUEVO: escribe una fila en el CSV de entrenamiento."""
-        if not self._csv_train_writer:
+    def _write_evaluation_segment_row(self, seg_idx, is_init, eval_phase, use_for_eval, last_size, last_time, frag_dur):
+        """Write a compact evaluation-oriented segment row."""
+        if not self._csv_eval_writer:
             return
         row = [
             int(seg_idx),
@@ -733,9 +747,9 @@ class Player:
             float(last_time) if last_time is not None else 0.0,
             float(frag_dur) if frag_dur is not None else 0.0
         ]
-        validate_row_length(row, self._training_header, schema_name="dataset_training.csv")
-        self._csv_train_writer.writerow(row)
-        self._csv_train_file.flush()
+        validate_row_length(row, self._evaluation_segments_header, schema_name=EVALUATION_SEGMENTS_FILENAME)
+        self._csv_eval_writer.writerow(row)
+        self._csv_eval_file.flush()
 
     # ------------------------- features derivadas -------------------------
     def _compute_derived_features(self, fb: dict, wall_time_elapsed: float, is_init: bool):

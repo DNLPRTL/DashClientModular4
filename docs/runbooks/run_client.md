@@ -126,7 +126,8 @@ The output root is controlled by config:
 ```yaml
 output:
   root_dir: "logs"
-  dataset_filename: "dataset.csv"
+  segment_telemetry_filename: "segment_telemetry.csv"
+  evaluation_segments_filename: "evaluation_segments.csv"
 ```
 
 Each non-interactive run creates one timestamped subdirectory under that root:
@@ -140,11 +141,11 @@ That directory is the authoritative run artifact. It contains:
 - `run_manifest.json`
 - `config.resolved.json`
 - `environment.json`
-- `dataset.csv`
-- `dataset_training.csv`
+- `segment_telemetry.csv`
+- `evaluation_segments.csv`
 - `run.log`
 
-Generated run artifacts are validation output, not final benchmark results yet, and must not be committed. In CSV outputs, `eval_phase` separates startup, warm-up, steady-state, drain, terminal, and error context; rows with `use_for_eval=false` are not benchmark rows. Terminal drain stalls must not be interpreted as steady-state rebuffering. See `docs/runbooks/run_layout.md`.
+Generated run artifacts are validation/control output, not final benchmark results yet, and must not be committed. `segment_telemetry.csv` is full runtime telemetry. `evaluation_segments.csv` is compact evaluation-oriented segment data, not a final IA training dataset. In CSV outputs, `eval_phase` separates startup, warm-up, steady-state, drain, terminal, and error context; rows with `use_for_eval=false` are not benchmark rows. Terminal drain stalls must not be interpreted as steady-state rebuffering. See `docs/runbooks/run_layout.md`.
 
 On Ubuntu, inspect the latest runs with:
 
@@ -159,7 +160,7 @@ Run Tier 1 and Tier 2 tests:
 
 ```powershell
 python -m unittest discover
-python -m py_compile main.py core\client_config.py core\controller\registry.py core\controller\base.py core\controller\contract.py core\controller\fixed_quality.py core\controller\scripted_quality.py core\runtime_feedback.py core\benchmark_contract.py core\run_context.py core\dataset_schema.py player.py scripts\check_environment.py
+python -m py_compile main.py core\client_config.py core\controller\registry.py core\controller\base.py core\controller\contract.py core\controller\fixed_quality.py core\controller\scripted_quality.py core\runtime_feedback.py core\benchmark_contract.py core\output_artifacts.py core\run_context.py core\dataset_schema.py player.py scripts\check_environment.py
 python scripts\check_environment.py --profile dev
 python scripts\check_environment.py --profile gst
 ```

@@ -6,6 +6,8 @@ Convert DashClientModular4 into an ABR-neutral, reproducible, benchmark-oriented
 
 ## Completed
 
+Current canonical run CSVs are `segment_telemetry.csv` and `evaluation_segments.csv`. Legacy names `dataset.csv` and `dataset_training.csv` are deprecated and are not produced by new default runs.
+
 ### Block 1 - Importability
 
 - Removed eager imports of missing controllers from `main.py`.
@@ -39,7 +41,7 @@ Convert DashClientModular4 into an ABR-neutral, reproducible, benchmark-oriented
 ### Block 4 - Reproducible Run Layout
 
 - Added `core/run_context.py` to create authoritative run directories.
-- Each non-interactive run now writes `run_manifest.json`, `config.resolved.json`, `environment.json`, `run.log`, and the existing dataset CSVs in one `logs/run_*` directory.
+- Each non-interactive run writes `run_manifest.json`, `config.resolved.json`, `environment.json`, `run.log`, and run CSV artifacts in one `logs/run_*` directory.
 - Added run context tests.
 - Added run layout runbook and architecture note.
 - No benchmark/runtime semantics were changed.
@@ -49,18 +51,18 @@ Convert DashClientModular4 into an ABR-neutral, reproducible, benchmark-oriented
 - Added an offline fake-engine smoke test through the official `main.main(argv)` config runner path.
 - The smoke test uses a temporary local MPD, `FakeMediaEngine`, and a patched downloader at `main.SegmentDownloader`.
 - The smoke test blocks external HTTP and requires no GStreamer, media files, GUI, server, ML tooling, or `config/client.local.yaml`.
-- The test asserts the reproducible run layout writes manifest, resolved config, environment, log, dataset, and training CSV artifacts.
+- The test asserts the reproducible run layout writes manifest, resolved config, environment, log, and CSV artifacts.
 - Documented Phase 1 validation tiers across README, runbooks, and the Block 5 architecture note.
 - No ABR algorithms were added and no runtime/benchmark semantics were changed.
 
-### Block 6 - Dataset / Telemetry Schema Contract
+### Block 6 - CSV Telemetry Schema Contract
 
-- Added `core/dataset_schema.py` with explicit dataset and training header builders.
-- Prefixed feedback-derived `dataset.csv` columns with `feedback_` to avoid collisions with top-level row columns such as `segment_index`.
-- Kept `dataset.csv` as the full telemetry CSV and `dataset_training.csv` as the minimal training-oriented CSV.
+- Added `core/dataset_schema.py` with explicit CSV header builders.
+- Prefixed feedback-derived full telemetry columns with `feedback_` to avoid collisions with top-level row columns such as `segment_index`.
+- Historical output names from this block were later deprecated by Block 11 in favor of `segment_telemetry.csv` and `evaluation_segments.csv`.
 - Added schema unit tests and extended the fake-engine smoke test to assert unique headers and row/header length alignment.
 - Units, row values, output filenames, output paths, ABR decisions, buffering, downloader behavior, parser behavior, QoE logic, and GStreamer timing were not changed.
-- Current generated datasets remain validation artifacts, not final benchmark results.
+- Current generated CSVs remain validation artifacts, not final benchmark results.
 
 ### Block 7 - Controller API / ABR Decision Contract
 
@@ -94,7 +96,7 @@ Convert DashClientModular4 into an ABR-neutral, reproducible, benchmark-oriented
 ### Block 10 - Benchmark Neutrality Contract
 
 - Added `core/benchmark_contract.py` with pure helpers for evaluation phase classification, stall/event classification, and benchmark eligibility flags.
-- Added `eval_phase` to `dataset.csv` and `dataset_training.csv`.
+- Added `eval_phase` to both run CSV outputs.
 - Kept `use_for_eval` as the canonical row-level benchmark eligibility flag; rows marked `use_for_eval=false` are not benchmark rows.
 - Documented that init, startup, warm-up, drain, terminal, and error rows are separate from steady-state rows.
 - Documented that terminal drain stalls must not be counted as steady-state rebuffering.
@@ -102,14 +104,24 @@ Convert DashClientModular4 into an ABR-neutral, reproducible, benchmark-oriented
 - Added benchmark contract tests and extended smoke/schema/import coverage for the new metadata.
 - No ABR baseline, AI controller, final QoE/reward definition, downloader change, parser change, media-engine change, retry/backoff change, buffering change, pacing/drain change, GStreamer timing change, or network behavior change was introduced.
 
+### Block 11 - Academic Output Hygiene / Legacy Cleanup
+
+- Added `core/output_artifacts.py` with canonical run artifact filenames and manifest output keys.
+- Renamed new run CSV outputs to `segment_telemetry.csv` and `evaluation_segments.csv`.
+- Deprecated `dataset.csv` and `dataset_training.csv`; new default runs do not produce them.
+- Updated `run_manifest.json` output keys to `run_manifest`, `resolved_config`, `environment`, `segment_telemetry`, `evaluation_segments`, and `run_log`.
+- Added manifest benchmark-neutrality metadata documenting that run outputs are not final benchmark results, `use_for_eval` is the row gate, terminal drain stalls are not steady-state rebuffering, final QoE/reward is undefined, and no final IA training dataset exists yet.
+- Updated config, schema helpers, tests, README, runbooks, and output artifact documentation around the canonical names.
+- No playback semantics, ABR logic, downloader behavior, parser behavior, media-engine behavior, buffering, pacing, drain mechanics, QoE/reward finalization, baselines, AI, Mahimahi, trace infrastructure, benchmark scripts, or GStreamer hardening were introduced.
+
 ## Current Constraints
 
 - Do not implement BBA, BOLA, MPC, robustMPC, PPO, PANDA, FESTIVE, SARA, ELASTIC, RBC, WISH, or any real ABR controller yet.
 - Keep only deterministic test/debug controllers plus legacy max-quality stress behavior until the base client is stable.
 - Prioritize reproducibility, config-driven execution, headless validation, and clean run outputs.
 
-## Pending Technical Direction After Block 10
+## Pending Technical Direction After Block 11
 
-The next implementation block is not started in this commit. Phase 1 acceptance, event-level stall telemetry, baseline ABR algorithms, final QoE metrics, reward definitions, benchmark comparisons, and analysis input/output alignment remain pending technical direction after Block 10.
+The next implementation block is not started in this commit. Phase 1 acceptance, event-level stall telemetry, baseline ABR algorithms, final QoE metrics, reward definitions, benchmark comparisons, and analysis input/output alignment remain pending technical direction after Block 11.
 
 GStreamer remains an integration/runtime path for now and is not benchmark-grade. Fake-engine and GStreamer behavior are not claimed to be equal.

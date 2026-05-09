@@ -5,6 +5,12 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
 
+from core.output_artifacts import (
+    EVALUATION_SEGMENTS_FILENAME,
+    LEGACY_OUTPUT_FILENAMES,
+    SEGMENT_TELEMETRY_FILENAME,
+)
+
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_EXAMPLE_CONFIG = REPO_ROOT / "config" / "client.example.yaml"
@@ -48,7 +54,8 @@ class DownloaderConfig:
 @dataclass(frozen=True)
 class OutputConfig:
     root_dir: str = "logs"
-    dataset_filename: str = "dataset.csv"
+    segment_telemetry_filename: str = SEGMENT_TELEMETRY_FILENAME
+    evaluation_segments_filename: str = EVALUATION_SEGMENTS_FILENAME
 
 
 @dataclass(frozen=True)
@@ -137,7 +144,19 @@ class ClientConfig:
             ),
             output=OutputConfig(
                 root_dir=_as_str(output_raw.get("root_dir", logging_raw.get("output_dir", "logs"))),
-                dataset_filename=_as_str(output_raw.get("dataset_filename", "dataset.csv")),
+                segment_telemetry_filename=_output_filename(
+                    output_raw.get(
+                        "segment_telemetry_filename",
+                        output_raw.get("dataset_filename", SEGMENT_TELEMETRY_FILENAME),
+                    ),
+                    default=SEGMENT_TELEMETRY_FILENAME,
+                    deprecated_default="dataset.csv",
+                ),
+                evaluation_segments_filename=_output_filename(
+                    output_raw.get("evaluation_segments_filename", EVALUATION_SEGMENTS_FILENAME),
+                    default=EVALUATION_SEGMENTS_FILENAME,
+                    deprecated_default="dataset_training.csv",
+                ),
             ),
             logging=LoggingConfig(
                 enabled=_as_bool(logging_raw.get("enabled", True), "logging.enabled"),
@@ -177,7 +196,8 @@ class ClientConfig:
             },
             "output": {
                 "root_dir": self.output.root_dir,
-                "dataset_filename": self.output.dataset_filename,
+                "segment_telemetry_filename": self.output.segment_telemetry_filename,
+                "evaluation_segments_filename": self.output.evaluation_segments_filename,
             },
             "logging": {
                 "enabled": self.logging.enabled,
@@ -335,6 +355,14 @@ def _as_optional_str(value: Any) -> Optional[str]:
         return None
     text = str(value).strip()
     return text or None
+
+
+def _output_filename(value: Any, default: str, deprecated_default: str) -> str:
+    text = _as_str(value).strip()
+    name = Path(text).name
+    if not name or name.lower() == deprecated_default or name.lower() in LEGACY_OUTPUT_FILENAMES:
+        return default
+    return name
 
 
 def _as_bool(value: Any, field_name: str) -> bool:

@@ -4,13 +4,16 @@ import unittest
 
 from core.dataset_schema import (
     build_dataset_header,
+    build_evaluation_segments_header,
+    build_segment_telemetry_header,
     build_training_header,
     feedback_column_names,
     validate_unique_columns,
 )
+from core.output_artifacts import EVALUATION_SEGMENTS_FILENAME, SEGMENT_TELEMETRY_FILENAME
 
 
-class DatasetSchemaTest(unittest.TestCase):
+class SegmentTelemetrySchemaTest(unittest.TestCase):
     def test_feedback_keys_are_prefixed_deterministically(self):
         self.assertEqual(
             [
@@ -29,8 +32,8 @@ class DatasetSchemaTest(unittest.TestCase):
             ),
         )
 
-    def test_dataset_header_has_unique_names_with_feedback_segment_index(self):
-        header = build_dataset_header(["queued_time", "segment_index", "start_segment_request"])
+    def test_segment_telemetry_header_has_unique_names_with_feedback_segment_index(self):
+        header = build_segment_telemetry_header(["queued_time", "segment_index", "start_segment_request"])
 
         self.assertEqual(1, header.count("segment_index"))
         self.assertIn("segment_index", header)
@@ -40,19 +43,28 @@ class DatasetSchemaTest(unittest.TestCase):
         self.assertIn("use_for_eval", header)
         self.assertEqual(len(header), len(set(header)))
 
-    def test_training_header_has_unique_names(self):
-        header = build_training_header()
+    def test_evaluation_segments_header_has_unique_names(self):
+        header = build_evaluation_segments_header()
 
         self.assertIn("eval_phase", header)
         self.assertIn("use_for_eval", header)
         self.assertEqual(len(header), len(set(header)))
 
+    def test_legacy_header_aliases_point_to_canonical_builders(self):
+        feedback_keys = ["queued_time"]
+        self.assertEqual(build_segment_telemetry_header(feedback_keys), build_dataset_header(feedback_keys))
+        self.assertEqual(build_evaluation_segments_header(), build_training_header())
+
     def test_duplicate_detection_reports_clear_error(self):
         with self.assertRaisesRegex(RuntimeError, "duplicate column names: segment_index"):
             validate_unique_columns(
                 ["segment_index", "timestamp", "segment_index"],
-                schema_name="dataset.csv",
+                schema_name=SEGMENT_TELEMETRY_FILENAME,
             )
+
+    def test_canonical_schema_names_are_clear(self):
+        self.assertEqual("segment_telemetry.csv", SEGMENT_TELEMETRY_FILENAME)
+        self.assertEqual("evaluation_segments.csv", EVALUATION_SEGMENTS_FILENAME)
 
 
 if __name__ == "__main__":

@@ -7,6 +7,7 @@ REQUIRED_IMPORTS = [
     "player",
     "core.benchmark_contract",
     "core.client_config",
+    "core.output_artifacts",
     "core.run_context",
     "core.runtime_feedback",
     "core.parser.dash",

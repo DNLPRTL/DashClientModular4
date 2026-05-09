@@ -28,7 +28,8 @@ downloader:
 
 output:
   root_dir: "logs"
-  dataset_filename: "dataset.csv"
+  segment_telemetry_filename: "segment_telemetry.csv"
+  evaluation_segments_filename: "evaluation_segments.csv"
 
 logging:
   enabled: true

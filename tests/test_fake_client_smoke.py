@@ -10,6 +10,7 @@ from pathlib import Path
 from unittest import mock
 
 import main
+from core.output_artifacts import EVALUATION_SEGMENTS_FILENAME, SEGMENT_TELEMETRY_FILENAME
 
 
 class FakeSegmentDownloader:
@@ -119,7 +120,8 @@ class FakeClientSmokeTest(unittest.TestCase):
                         "  verbose: false",
                         "output:",
                         '  root_dir: "{0}"'.format(output_root.as_posix()),
-                        '  dataset_filename: "dataset.csv"',
+                        '  segment_telemetry_filename: "{0}"'.format(SEGMENT_TELEMETRY_FILENAME),
+                        '  evaluation_segments_filename: "{0}"'.format(EVALUATION_SEGMENTS_FILENAME),
                         "logging:",
                         "  enabled: true",
                         '  level: "WARNING"',
@@ -151,66 +153,82 @@ class FakeClientSmokeTest(unittest.TestCase):
                 resolved_config_path = run_dir / "config.resolved.json"
                 environment_path = run_dir / "environment.json"
                 log_path = run_dir / "run.log"
-                dataset_path = run_dir / "dataset.csv"
-                training_path = run_dir / "dataset_training.csv"
+                segment_telemetry_path = run_dir / SEGMENT_TELEMETRY_FILENAME
+                evaluation_segments_path = run_dir / EVALUATION_SEGMENTS_FILENAME
+                legacy_dataset_path = run_dir / "dataset.csv"
+                legacy_training_path = run_dir / "dataset_training.csv"
 
                 for expected_path in [
                     manifest_path,
                     resolved_config_path,
                     environment_path,
                     log_path,
-                    dataset_path,
-                    training_path,
+                    segment_telemetry_path,
+                    evaluation_segments_path,
                 ]:
                     self.assertTrue(expected_path.is_file(), expected_path)
+                self.assertFalse(legacy_dataset_path.exists())
+                self.assertFalse(legacy_training_path.exists())
 
                 manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
                 self.assertEqual("completed", manifest["status"])
                 self.assertEqual("fixed_quality", manifest["controller"]["name"])
                 self.assertEqual("fake", manifest["media_engine"]["name"])
                 self.assertTrue(manifest["headless"])
-                self.assertEqual("dataset.csv", manifest["outputs"]["dataset"])
-                self.assertEqual("dataset_training.csv", manifest["outputs"]["training"])
+                self.assertEqual(SEGMENT_TELEMETRY_FILENAME, manifest["outputs"]["segment_telemetry"])
+                self.assertEqual(EVALUATION_SEGMENTS_FILENAME, manifest["outputs"]["evaluation_segments"])
+                self.assertNotIn("dataset", manifest["outputs"])
+                self.assertNotIn("training", manifest["outputs"])
+                self.assertFalse(manifest["benchmark_neutrality"]["outputs_are_benchmark_results"])
+                self.assertEqual("use_for_eval", manifest["benchmark_neutrality"]["row_eval_gate"])
 
                 resolved = json.loads(resolved_config_path.read_text(encoding="utf-8"))
                 self.assertEqual(mpd_url, resolved["mpd_url"])
+                self.assertEqual(SEGMENT_TELEMETRY_FILENAME, resolved["output"]["segment_telemetry_filename"])
+                self.assertEqual(EVALUATION_SEGMENTS_FILENAME, resolved["output"]["evaluation_segments_filename"])
+                self.assertNotIn("dataset_filename", resolved["output"])
 
-                with dataset_path.open(newline="", encoding="utf-8") as dataset_file:
-                    dataset_rows = list(csv.reader(dataset_file))
-                with training_path.open(newline="", encoding="utf-8") as training_file:
-                    training_rows = list(csv.reader(training_file))
+                with segment_telemetry_path.open(newline="", encoding="utf-8") as segment_telemetry_file:
+                    segment_telemetry_rows = list(csv.reader(segment_telemetry_file))
+                with evaluation_segments_path.open(newline="", encoding="utf-8") as evaluation_segments_file:
+                    evaluation_segment_rows = list(csv.reader(evaluation_segments_file))
 
-                self.assertGreaterEqual(len(dataset_rows), 2)
-                self.assertGreaterEqual(len(training_rows), 2)
+                self.assertGreaterEqual(len(segment_telemetry_rows), 2)
+                self.assertGreaterEqual(len(evaluation_segment_rows), 2)
 
-                dataset_header = dataset_rows[0]
-                training_header = training_rows[0]
-                self.assertEqual(len(dataset_header), len(set(dataset_header)))
-                self.assertEqual(len(training_header), len(set(training_header)))
-                self.assertIn("segment_index", dataset_header)
-                self.assertIn("feedback_segment_index", dataset_header)
-                self.assertIn("feedback_queued_time", dataset_header)
-                self.assertIn("policy_name", dataset_header)
-                self.assertIn("eval_phase", dataset_header)
-                self.assertIn("use_for_eval", dataset_header)
-                self.assertIn("stall_flag", dataset_header)
-                self.assertIn("eval_phase", training_header)
-                self.assertIn("use_for_eval", training_header)
+                segment_telemetry_header = segment_telemetry_rows[0]
+                evaluation_segments_header = evaluation_segment_rows[0]
+                self.assertEqual(len(segment_telemetry_header), len(set(segment_telemetry_header)))
+                self.assertEqual(len(evaluation_segments_header), len(set(evaluation_segments_header)))
+                self.assertIn("segment_index", segment_telemetry_header)
+                self.assertIn("feedback_segment_index", segment_telemetry_header)
+                self.assertIn("feedback_queued_time", segment_telemetry_header)
+                self.assertIn("policy_name", segment_telemetry_header)
+                self.assertIn("eval_phase", segment_telemetry_header)
+                self.assertIn("use_for_eval", segment_telemetry_header)
+                self.assertIn("stall_flag", segment_telemetry_header)
+                self.assertIn("eval_phase", evaluation_segments_header)
+                self.assertIn("use_for_eval", evaluation_segments_header)
 
-                for row in dataset_rows[1:]:
-                    self.assertEqual(len(dataset_header), len(row))
-                for row in training_rows[1:]:
-                    self.assertEqual(len(training_header), len(row))
+                for row in segment_telemetry_rows[1:]:
+                    self.assertEqual(len(segment_telemetry_header), len(row))
+                for row in evaluation_segment_rows[1:]:
+                    self.assertEqual(len(evaluation_segments_header), len(row))
 
-                eval_phase_idx = dataset_header.index("eval_phase")
-                use_for_eval_idx = dataset_header.index("use_for_eval")
-                observed_phases = {row[eval_phase_idx] for row in dataset_rows[1:]}
+                eval_phase_idx = segment_telemetry_header.index("eval_phase")
+                use_for_eval_idx = segment_telemetry_header.index("use_for_eval")
+                observed_phases = {row[eval_phase_idx] for row in segment_telemetry_rows[1:]}
                 self.assertIn("init", observed_phases)
                 self.assertIn("warmup", observed_phases)
                 self.assertIn("steady_state", observed_phases)
-                for row in dataset_rows[1:]:
+                for row in segment_telemetry_rows[1:]:
                     if row[eval_phase_idx] != "steady_state":
                         self.assertEqual("0", row[use_for_eval_idx])
+                eval_segments_phase_idx = evaluation_segments_header.index("eval_phase")
+                eval_segments_use_idx = evaluation_segments_header.index("use_for_eval")
+                for row in evaluation_segment_rows[1:]:
+                    if row[eval_segments_phase_idx] != "steady_state":
+                        self.assertEqual("0", row[eval_segments_use_idx])
 
                 self.assertEqual(1, len(FakeSegmentDownloader.instances))
                 downloaded_urls = FakeSegmentDownloader.instances[0].downloaded_urls

@@ -92,11 +92,13 @@ def run_client(config: ClientConfig, command_args: Optional[List[str]] = None) -
             media_engine=media_engine,
             downloader=downloader,
             controller=controller,
-            log_path=str(run_context.dataset_path),
+            log_path=str(run_context.log_path),
             mpd_url=config.mpd_url,
             initial_level=config.playback.initial_quality,
             use_initial_controller_decision=config.playback.initial_controller_decision,
             run_dir=str(run_context.run_dir),
+            segment_telemetry_path=str(run_context.segment_telemetry_path),
+            evaluation_segments_path=str(run_context.evaluation_segments_path),
         )
         _apply_runtime_config(player, config)
 
@@ -273,7 +275,8 @@ def _prompt_for_manual_config() -> ClientConfig:
             },
             "output": {
                 "root_dir": "logs",
-                "dataset_filename": "dataset.csv",
+                "segment_telemetry_filename": "segment_telemetry.csv",
+                "evaluation_segments_filename": "evaluation_segments.csv",
             },
             "analysis": {
                 "enabled": False,
