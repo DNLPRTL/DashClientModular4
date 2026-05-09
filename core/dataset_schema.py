@@ -4,8 +4,8 @@ from collections import Counter
 from typing import Iterable, List, Sequence
 
 
-DATASET_SCHEMA_VERSION = "1.0"
-TRAINING_SCHEMA_VERSION = "1.0"
+DATASET_SCHEMA_VERSION = "1.1"
+TRAINING_SCHEMA_VERSION = "1.1"
 
 DATASET_ROW_COLUMNS = [
     "segment_index",
@@ -36,6 +36,7 @@ DATASET_DERIVED_COLUMNS = [
     "policy_target_rate",
     "policy_chosen_level",
     "policy_decision_ms",
+    "eval_phase",
     "is_preroll",
     "use_for_eval",
 ]
@@ -48,6 +49,7 @@ DATASET_STALL_COLUMNS = [
 TRAINING_COLUMNS = [
     "segment_index",
     "is_init",
+    "eval_phase",
     "use_for_eval",
     "last_fragment_size",
     "last_download_time",

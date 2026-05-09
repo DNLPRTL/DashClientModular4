@@ -6,6 +6,7 @@ from math import sqrt
 import os
 from datetime import datetime
 
+from core.benchmark_contract import classify_segment_phase, should_use_segment_for_eval
 from core.dataset_schema import build_dataset_header, build_training_header, validate_row_length
 from core.runtime_feedback import build_controller_feedback
 
@@ -462,6 +463,7 @@ class Player:
                         0, 0, 0,  # switches (INIT no decide)
                         derived['phase_raw'], derived['phase_smooth'],
                         self._policy_name, "", "", 0.0,  # policy (no aplica aún)
+                        derived['eval_phase'],
                         derived['is_preroll'], derived['use_for_eval']
                     ] + [0, 0.0]  # stall_* para INIT
                     validate_row_length(row, self._header, schema_name="dataset.csv")
@@ -472,6 +474,7 @@ class Player:
                 self._write_training_row(
                     seg_idx=self.cur_index,
                     is_init=1,
+                    eval_phase=derived['eval_phase'],
                     use_for_eval=derived['use_for_eval'],
                     last_size=0,
                     last_time=0.0,
@@ -559,6 +562,7 @@ class Player:
                                 0, 0, 0,  # switches → se rellenan tras la decisión
                                 derived['phase_raw'], derived['phase_smooth'],
                                 self._policy_name, "", "", 0.0,  # policy → se rellena tras decisión
+                                derived['eval_phase'],
                                 derived['is_preroll'], derived['use_for_eval']
                             ]
                             if is_init:
@@ -575,6 +579,7 @@ class Player:
                         self._write_training_row(
                             seg_idx=self.cur_index,
                             is_init=int(is_init),
+                            eval_phase=derived['eval_phase'],
                             use_for_eval=derived['use_for_eval'],
                             last_size=sz if not is_init else 0,
                             last_time=dt_used if not is_init else 0.0,
@@ -715,13 +720,14 @@ class Player:
         self._csv_writer.writerow(final_row)
         self._csv_file.flush()
 
-    def _write_training_row(self, seg_idx, is_init, use_for_eval, last_size, last_time, frag_dur):
+    def _write_training_row(self, seg_idx, is_init, eval_phase, use_for_eval, last_size, last_time, frag_dur):
         """NUEVO: escribe una fila en el CSV de entrenamiento."""
         if not self._csv_train_writer:
             return
         row = [
             int(seg_idx),
             int(is_init),
+            str(eval_phase),
             int(use_for_eval),
             int(last_size) if last_size is not None else 0,
             float(last_time) if last_time is not None else 0.0,
@@ -773,9 +779,20 @@ class Player:
         self._current_phase_raw = raw_phase
         self._current_phase_smooth = smooth_phase
 
-        # Preroll (marcado para evaluación)
+        # Preroll and benchmark-neutral row eligibility.
         is_preroll = 1 if wall_time_elapsed < self.PREROLL_SECONDS else 0
-        use_for_eval = 0 if is_preroll else 1
+        total_segments = (int(self._last_common_index) + 1) if getattr(self, "_last_common_index", -1) >= 0 else None
+        eval_phase = classify_segment_phase(
+            fb.get('segment_index', self.cur_index),
+            total_segments=total_segments,
+            warmup_segments=1,
+            is_init=is_init,
+            drain_active=False,
+            success=True,
+            startup_active=bool(is_preroll),
+            warmup_active=(not is_init and bool(getattr(self, "_warmup", False))),
+        )
+        use_for_eval = 1 if should_use_segment_for_eval(eval_phase, success=True, is_init=is_init) else 0
 
         return {
             'tp_now': float(tp_now),
@@ -786,6 +803,7 @@ class Player:
             'headroom': float(headroom),
             'phase_raw': raw_phase,
             'phase_smooth': smooth_phase,
+            'eval_phase': eval_phase,
             'is_preroll': int(is_preroll),
             'use_for_eval': int(use_for_eval),
         }

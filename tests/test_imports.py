@@ -5,6 +5,7 @@ import unittest
 REQUIRED_IMPORTS = [
     "main",
     "player",
+    "core.benchmark_contract",
     "core.client_config",
     "core.run_context",
     "core.runtime_feedback",

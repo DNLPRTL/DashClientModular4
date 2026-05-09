@@ -36,11 +36,15 @@ class DatasetSchemaTest(unittest.TestCase):
         self.assertIn("segment_index", header)
         self.assertIn("feedback_segment_index", header)
         self.assertIn("feedback_queued_time", header)
+        self.assertIn("eval_phase", header)
+        self.assertIn("use_for_eval", header)
         self.assertEqual(len(header), len(set(header)))
 
     def test_training_header_has_unique_names(self):
         header = build_training_header()
 
+        self.assertIn("eval_phase", header)
+        self.assertIn("use_for_eval", header)
         self.assertEqual(len(header), len(set(header)))
 
     def test_duplicate_detection_reports_clear_error(self):

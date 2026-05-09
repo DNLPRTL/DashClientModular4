@@ -68,7 +68,7 @@ The controller API is still the legacy dict-based contract:
 - `calcControlAction()` returns a target rate in bytes per second.
 - `quantizeRate(rate)` maps that target rate to an integer quality level in the MPD bitrate ladder.
 
-Feedback keys and units are documented in `core/controller/contract.py`. This contract is a prerequisite for future comparable baselines; it is not a baseline implementation. Real baseline implementation, runtime/player responsibility separation, and benchmark neutrality remain pending.
+Feedback keys and units are documented in `core/controller/contract.py`. Evaluation phases and row eligibility are documented in `core/benchmark_contract.py`. These contracts are prerequisites for future comparable baselines; they are not baseline implementations. Final QoE/reward, academic baselines, and AI design remain pending.
 
 ## 3. Select The Media Engine
 
@@ -144,7 +144,7 @@ That directory is the authoritative run artifact. It contains:
 - `dataset_training.csv`
 - `run.log`
 
-Generated run artifacts are validation output, not benchmark results yet, and must not be committed. See `docs/runbooks/run_layout.md`.
+Generated run artifacts are validation output, not final benchmark results yet, and must not be committed. In CSV outputs, `eval_phase` separates startup, warm-up, steady-state, drain, terminal, and error context; rows with `use_for_eval=false` are not benchmark rows. Terminal drain stalls must not be interpreted as steady-state rebuffering. See `docs/runbooks/run_layout.md`.
 
 On Ubuntu, inspect the latest runs with:
 
@@ -159,7 +159,7 @@ Run Tier 1 and Tier 2 tests:
 
 ```powershell
 python -m unittest discover
-python -m py_compile main.py core\client_config.py core\controller\registry.py core\controller\base.py core\controller\contract.py core\controller\fixed_quality.py core\controller\scripted_quality.py core\runtime_feedback.py core\run_context.py core\dataset_schema.py player.py scripts\check_environment.py
+python -m py_compile main.py core\client_config.py core\controller\registry.py core\controller\base.py core\controller\contract.py core\controller\fixed_quality.py core\controller\scripted_quality.py core\runtime_feedback.py core\benchmark_contract.py core\run_context.py core\dataset_schema.py player.py scripts\check_environment.py
 python scripts\check_environment.py --profile dev
 python scripts\check_environment.py --profile gst
 ```

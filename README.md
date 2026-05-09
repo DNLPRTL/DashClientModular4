@@ -36,9 +36,9 @@ logs/run_YYYYMMDD_HHMMSS/
 
 That directory contains the run manifest, resolved config, environment snapshot, run log, and the existing dataset CSVs. See [docs/runbooks/run_layout.md](docs/runbooks/run_layout.md).
 
-`dataset.csv` is the full telemetry CSV. Feedback-derived columns use a `feedback_` prefix, for example `feedback_segment_index`, so they do not collide with top-level row columns. `dataset_training.csv` remains the minimal training-oriented CSV. These files are still validation artifacts, not final benchmark results.
+`dataset.csv` is the full telemetry CSV. Feedback-derived columns use a `feedback_` prefix, for example `feedback_segment_index`, so they do not collide with top-level row columns. `dataset_training.csv` remains the minimal training-oriented CSV. `eval_phase` separates init, startup, warm-up, steady-state, drain, terminal, and error rows; rows with `use_for_eval: false` are not benchmark rows. These files are still validation artifacts, not final benchmark results.
 
-Controllers still use the legacy dict-based API. Feedback keys and units are documented in `core/controller/contract.py`; target rates are bytes per second, and quality levels are integer indices into the MPD bitrate ladder. `fixed_quality` and `scripted_quality` are deterministic test/debug controllers for verifying the client path without policy ambiguity; they are not academic ABR baselines. `max_quality` remains available as legacy/debug/stress behavior, not as a comparable baseline. Real baseline implementation, benchmark neutrality, final QoE/reward definitions, and benchmark-grade runtime separation are still pending.
+Controllers still use the legacy dict-based API. Feedback keys and units are documented in `core/controller/contract.py`; target rates are bytes per second, and quality levels are integer indices into the MPD bitrate ladder. `fixed_quality` and `scripted_quality` are deterministic test/debug controllers for verifying the client path without policy ambiguity; they are not academic ABR baselines. `max_quality` remains available as legacy/debug/stress behavior, not as a comparable baseline. Terminal drain stalls must not be counted as steady-state rebuffering. Real baseline implementation, Phase 1 benchmark acceptance, final QoE/reward definitions, and benchmark-grade runtime separation are still pending.
 
 ## Environment
 
@@ -82,6 +82,7 @@ python -m unittest discover
 
 - `core/controller`: controller interface and registry.
 - `core/controller/contract.py`: controller feedback, units, target-rate, and quantization contract.
+- `core/benchmark_contract.py`: benchmark-neutral evaluation phase and stall classification helpers.
 - `core/media_engine`: fake and GStreamer playback engines.
 - `core/parser`: MPD parser and DASH parsing helpers.
 - `core/downloader.py`: segment downloader.

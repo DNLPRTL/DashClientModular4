@@ -91,14 +91,25 @@ Convert DashClientModular4 into an ABR-neutral, reproducible, benchmark-oriented
 - Reused `fixed_quality` and `scripted_quality` as deterministic guardrails for the runtime/controller split.
 - No ABR baseline, AI controller, benchmark-neutrality work, QoE/reward change, downloader change, parser change, buffering change, retry/backoff change, warm-up change, preroll change, pacing change, drain change, stall-semantics change, GStreamer timing change, or media-engine behavior change was introduced.
 
+### Block 10 - Benchmark Neutrality Contract
+
+- Added `core/benchmark_contract.py` with pure helpers for evaluation phase classification, stall/event classification, and benchmark eligibility flags.
+- Added `eval_phase` to `dataset.csv` and `dataset_training.csv`.
+- Kept `use_for_eval` as the canonical row-level benchmark eligibility flag; rows marked `use_for_eval=false` are not benchmark rows.
+- Documented that init, startup, warm-up, drain, terminal, and error rows are separate from steady-state rows.
+- Documented that terminal drain stalls must not be counted as steady-state rebuffering.
+- Added `docs/architecture/telemetry_metric_audit.md` to classify current metrics as `eval_ready`, `runtime_only`, `legacy_debug`, `pending_semantics`, or `deprecated_later`.
+- Added benchmark contract tests and extended smoke/schema/import coverage for the new metadata.
+- No ABR baseline, AI controller, final QoE/reward definition, downloader change, parser change, media-engine change, retry/backoff change, buffering change, pacing/drain change, GStreamer timing change, or network behavior change was introduced.
+
 ## Current Constraints
 
 - Do not implement BBA, BOLA, MPC, robustMPC, PPO, PANDA, FESTIVE, SARA, ELASTIC, RBC, WISH, or any real ABR controller yet.
 - Keep only deterministic test/debug controllers plus legacy max-quality stress behavior until the base client is stable.
 - Prioritize reproducibility, config-driven execution, headless validation, and clean run outputs.
 
-## Pending Technical Direction After Block 9
+## Pending Technical Direction After Block 10
 
-The next implementation block is not started in this commit. Runtime responsibility separation, benchmark neutrality, baseline ABR algorithms, final QoE metrics, reward definitions, benchmark comparisons, and analysis input/output alignment remain pending technical direction after Block 9.
+The next implementation block is not started in this commit. Phase 1 acceptance, event-level stall telemetry, baseline ABR algorithms, final QoE metrics, reward definitions, benchmark comparisons, and analysis input/output alignment remain pending technical direction after Block 10.
 
 GStreamer remains an integration/runtime path for now and is not benchmark-grade. Fake-engine and GStreamer behavior are not claimed to be equal.

@@ -191,12 +191,26 @@ class FakeClientSmokeTest(unittest.TestCase):
                 self.assertIn("feedback_segment_index", dataset_header)
                 self.assertIn("feedback_queued_time", dataset_header)
                 self.assertIn("policy_name", dataset_header)
+                self.assertIn("eval_phase", dataset_header)
+                self.assertIn("use_for_eval", dataset_header)
                 self.assertIn("stall_flag", dataset_header)
+                self.assertIn("eval_phase", training_header)
+                self.assertIn("use_for_eval", training_header)
 
                 for row in dataset_rows[1:]:
                     self.assertEqual(len(dataset_header), len(row))
                 for row in training_rows[1:]:
                     self.assertEqual(len(training_header), len(row))
+
+                eval_phase_idx = dataset_header.index("eval_phase")
+                use_for_eval_idx = dataset_header.index("use_for_eval")
+                observed_phases = {row[eval_phase_idx] for row in dataset_rows[1:]}
+                self.assertIn("init", observed_phases)
+                self.assertIn("warmup", observed_phases)
+                self.assertIn("steady_state", observed_phases)
+                for row in dataset_rows[1:]:
+                    if row[eval_phase_idx] != "steady_state":
+                        self.assertEqual("0", row[use_for_eval_idx])
 
                 self.assertEqual(1, len(FakeSegmentDownloader.instances))
                 downloaded_urls = FakeSegmentDownloader.instances[0].downloaded_urls

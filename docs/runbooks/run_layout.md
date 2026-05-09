@@ -34,9 +34,12 @@ Block 6 makes the CSV headers explicit and test-protected:
 - Every data row must have the same number of columns as its header.
 - Top-level `segment_index` remains unchanged.
 - Feedback-derived columns use the `feedback_` prefix, for example `feedback_segment_index` and `feedback_queued_time`.
-- Units and row values are not changed in Block 6.
+- `eval_phase` separates `init`, `startup`, `warmup`, `steady_state`, `drain`, `terminal`, and `error` rows.
+- `use_for_eval=false` means the row is not a benchmark row.
+- Terminal drain stalls must not be counted as steady-state rebuffering.
+- Units and row values from earlier schema blocks remain stable except for explicit evaluation metadata added in Block 10.
 
-The generated CSVs are still validation artifacts, not final benchmark results. GStreamer runtime validation is still not benchmark-grade yet, and baseline ABR algorithms remain pending.
+The generated CSVs are still validation artifacts, not final benchmark results. The fake engine is the controlled path for reproducible tests. GStreamer runtime validation is still not benchmark-grade yet, and baseline ABR algorithms remain pending.
 
 ## Inspect A Run
 
@@ -44,7 +47,7 @@ Windows:
 
 ```powershell
 python -m unittest discover
-python -m py_compile main.py core\client_config.py core\controller\registry.py core\controller\base.py core\controller\contract.py core\controller\fixed_quality.py core\controller\scripted_quality.py core\runtime_feedback.py core\run_context.py core\dataset_schema.py player.py scripts\check_environment.py
+python -m py_compile main.py core\client_config.py core\controller\registry.py core\controller\base.py core\controller\contract.py core\controller\fixed_quality.py core\controller\scripted_quality.py core\runtime_feedback.py core\benchmark_contract.py core\run_context.py core\dataset_schema.py player.py scripts\check_environment.py
 python scripts/check_environment.py --profile dev
 python scripts/check_environment.py --profile gst
 ```
@@ -87,7 +90,7 @@ GStreamer availability is an environment capability. It is not proof that the cu
 
 ## Current Status Of Outputs
 
-Current datasets and logs are validation artifacts only. They are useful for inspecting whether the client ran and what it recorded, but they are not benchmark results until later Phase 1 work tightens benchmark neutrality and dataset semantics.
+Current datasets and logs are validation artifacts only. They are useful for inspecting whether the client ran and what it recorded, but they are not final benchmark results until Phase 1 acceptance, final QoE/reward methodology, and baseline controller implementation are complete.
 
 ## Git Hygiene
 
