@@ -7,6 +7,7 @@ import os
 from datetime import datetime
 
 from core.dataset_schema import build_dataset_header, build_training_header, validate_row_length
+from core.runtime_feedback import build_controller_feedback
 
 # reloj monotónico
 perf_now = time.perf_counter
@@ -791,40 +792,21 @@ class Player:
 
     # ------------------------- feedback (incluye BWE) -------------------------
     def get_feedback(self, last_paused, last_size, last_time, fragment_duration=None):
-        qb = self.media_engine.get_queued_bytes()
-        qt = self.media_engine.get_queued_time()
-        dl = self.downloaded_bytes
-        cur = self.rates[self.cur_level]
-        mx, mn = max(self.rates), min(self.rates)
-        fd = fragment_duration if fragment_duration is not None else self.frag_durations[self.cur_level]
-
-        if last_time and last_size and last_time > 0:
-            bwe_measured = float(last_size) / float(last_time)   # B/s
-        else:
-            bwe_measured = float(cur)
-
-        fb = {
-            'queued_bytes': qb,
-            'queued_time': qt,
-            'cur_bitrate': cur,
-            'bwe': bwe_measured,
-            'level': self.cur_level,
-            'max_level': self.max_level,
-            'cur_rate': cur,
-            'max_rate': mx,
-            'min_rate': mn,
-            'max_bitrate': mx,
-            'min_bitrate': mn,
-            'last_fragment_size': last_size,
-            'last_download_time': last_time,
-            'downloaded_bytes': dl,
-            'fragment_duration': fd,
-            'rates': self.rates,
-            'segment_index': self.cur_index,
-            'start_segment_request': self.start_segment_request,
-            'stop_segment_request': self.stop_segment_request,
-        }
-        return fb
+        return build_controller_feedback(
+            queued_bytes=self.media_engine.get_queued_bytes(),
+            queued_time=self.media_engine.get_queued_time(),
+            rates=self.rates,
+            fragment_durations=self.frag_durations,
+            cur_level=self.cur_level,
+            max_level=self.max_level,
+            downloaded_bytes=self.downloaded_bytes,
+            segment_index=self.cur_index,
+            start_segment_request=self.start_segment_request,
+            stop_segment_request=self.stop_segment_request,
+            last_size=last_size,
+            last_time=last_time,
+            fragment_duration=fragment_duration,
+        )
 
     # ---------------------- info para la UI ----------------------
     def get_current_segment_info(self):

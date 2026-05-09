@@ -159,7 +159,7 @@ Run Tier 1 and Tier 2 tests:
 
 ```powershell
 python -m unittest discover
-python -m py_compile main.py core\client_config.py core\controller\registry.py core\controller\base.py core\controller\contract.py core\controller\fixed_quality.py core\controller\scripted_quality.py core\run_context.py core\dataset_schema.py player.py scripts\check_environment.py
+python -m py_compile main.py core\client_config.py core\controller\registry.py core\controller\base.py core\controller\contract.py core\controller\fixed_quality.py core\controller\scripted_quality.py core\runtime_feedback.py core\run_context.py core\dataset_schema.py player.py scripts\check_environment.py
 python scripts\check_environment.py --profile dev
 python scripts\check_environment.py --profile gst
 ```

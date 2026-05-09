@@ -82,14 +82,23 @@ Convert DashClientModular4 into an ABR-neutral, reproducible, benchmark-oriented
 - No academic, learned, AI, or adaptive ABR controller was added.
 - No runtime/player refactor, benchmark-neutrality work, dataset semantics change, QoE finalization, downloader change, parser change, buffering change, retry change, warm-up change, preroll change, pacing change, stall handling change, throughput-estimation change, media-engine behavior change, or GStreamer timing change was introduced.
 
+### Block 9 - Runtime / Player Responsibility Split
+
+- Added `core/runtime_feedback.py` with `build_controller_feedback()` as the first extracted runtime helper.
+- Kept `Player.get_feedback()` as the public Player method and delegated it to the helper without changing the feedback payload.
+- Preserved the legacy dict-based controller contract, feedback key order, rate units, throughput-estimation semantics, and dataset CSV schema.
+- Added unit tests covering feedback key order, measured and fallback bandwidth values, explicit fragment-duration overrides, and the Player wrapper path.
+- Reused `fixed_quality` and `scripted_quality` as deterministic guardrails for the runtime/controller split.
+- No ABR baseline, AI controller, benchmark-neutrality work, QoE/reward change, downloader change, parser change, buffering change, retry/backoff change, warm-up change, preroll change, pacing change, drain change, stall-semantics change, GStreamer timing change, or media-engine behavior change was introduced.
+
 ## Current Constraints
 
 - Do not implement BBA, BOLA, MPC, robustMPC, PPO, PANDA, FESTIVE, SARA, ELASTIC, RBC, WISH, or any real ABR controller yet.
 - Keep only deterministic test/debug controllers plus legacy max-quality stress behavior until the base client is stable.
 - Prioritize reproducibility, config-driven execution, headless validation, and clean run outputs.
 
-## Pending Technical Direction After Block 8
+## Pending Technical Direction After Block 9
 
-The next implementation block is not started in this commit. Runtime responsibility separation, benchmark neutrality, baseline ABR algorithms, final QoE metrics, reward definitions, benchmark comparisons, and analysis input/output alignment remain pending technical direction after Block 8.
+The next implementation block is not started in this commit. Runtime responsibility separation, benchmark neutrality, baseline ABR algorithms, final QoE metrics, reward definitions, benchmark comparisons, and analysis input/output alignment remain pending technical direction after Block 9.
 
 GStreamer remains an integration/runtime path for now and is not benchmark-grade. Fake-engine and GStreamer behavior are not claimed to be equal.

@@ -7,6 +7,7 @@ REQUIRED_IMPORTS = [
     "player",
     "core.client_config",
     "core.run_context",
+    "core.runtime_feedback",
     "core.parser.dash",
     "core.downloader",
     "core.media_engine.fake",

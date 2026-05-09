@@ -86,6 +86,7 @@ python -m unittest discover
 - `core/parser`: MPD parser and DASH parsing helpers.
 - `core/downloader.py`: segment downloader.
 - `core/run_context.py`: run directory and metadata helper.
+- `core/runtime_feedback.py`: controller feedback payload helper used by `Player`.
 - `core/dataset_schema.py`: dataset and training CSV schema helpers.
 - `config`: example client configuration.
 - `scripts/check_environment.py`: environment capability checks.
