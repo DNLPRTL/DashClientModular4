@@ -100,7 +100,7 @@ media_engine:
   sink_name: "autovideosink"
 ```
 
-Missing GStreamer does not break config loading or import tests. It only fails when a run explicitly requests `media_engine.name: "gst"`. Explicit missing sinks fail clearly instead of silently falling back to `fakesink`. GStreamer is integration/runtime only for now and is not benchmark-grade; fake-engine and GStreamer behavior are not claimed to be equal. See `docs/runbooks/gstreamer_playback.md`.
+Missing GStreamer does not break config loading or import tests. It only fails when a run explicitly requests `media_engine.name: "gst"`. Explicit missing sinks fail clearly instead of silently falling back to `fakesink`. GStreamer is integration/demo only for now and is not benchmark-grade; fake-engine and GStreamer behavior are not claimed to be equal. Headless `decode_video=false`/`fakesink` validation is structural only and may complete faster than real time. See `docs/runbooks/gstreamer_playback.md`.
 
 ## 4. Keep Validation Runs Headless
 
@@ -155,7 +155,7 @@ That directory is the authoritative run artifact. It contains:
 - `evaluation_segments.csv`
 - `run.log`
 
-Generated run artifacts are validation/control output, not final benchmark results yet, and must not be committed. `segment_telemetry.csv` is full runtime telemetry. `evaluation_segments.csv` is compact evaluation-oriented segment data, not a final IA training dataset. In CSV outputs, `eval_phase` separates startup, warm-up, steady-state, drain, terminal, and error context; rows with `use_for_eval=false` are not benchmark rows. Terminal drain stalls must not be interpreted as steady-state rebuffering. See `docs/runbooks/run_layout.md`.
+Generated run artifacts are validation/control output, not final benchmark results yet, and must not be committed. `segment_telemetry.csv` is full runtime telemetry. `evaluation_segments.csv` is compact evaluation-oriented segment data, not a final IA training dataset. In CSV outputs, `eval_phase` separates startup, warm-up, steady-state, drain, terminal, and error context; rows with `use_for_eval=false` are not benchmark rows. Terminal drain stalls must not be interpreted as steady-state rebuffering. Column provenance is documented in `docs/architecture/telemetry_column_provenance.md`. Console/progress output is human diagnostics and must not be parsed by benchmark scripts; see `docs/architecture/runtime_console_output_contract.md`. See `docs/runbooks/run_layout.md`.
 
 On Ubuntu, inspect the latest runs with:
 

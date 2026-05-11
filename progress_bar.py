@@ -169,9 +169,7 @@ class ProgressBarWindow:
             text=f"Reproducción: {fmt_mmss(cur_time)} / {fmt_mmss(total)}    |    Buffer: {buffer_time:.1f}s ({buffer_bytes} bytes)"
         )
 
-        # =======================
-        #   BW (SIEMPRE feedback['bwe'])
-        # =======================
+        # Human label for legacy feedback['bwe']; this is not benchmark output.
         fb_dict = {}
         try:
             ctrl = getattr(self.player, "controller", None)
@@ -186,12 +184,12 @@ class ProgressBarWindow:
                 return None
 
         bwe_bps = safe_float(fb_dict.get("bwe"))
-        bw_mbps_text = f"{bps_bytes_to_mbps(bwe_bps):.2f}" if (bwe_bps is not None and bwe_bps > 0) else "-"
+        measured_rate_mbps_text = f"{bps_bytes_to_mbps(bwe_bps):.2f}" if (bwe_bps is not None and bwe_bps > 0) else "-"
 
-        # Línea secundaria: nivel + bitrate + BW (bwe)
+        # Secondary line: level + representation rate + measured download-rate signal.
         self.label_frag.config(
             text=(f"Descargado: {dl_idx_show}   |   Reproduciendo: {play_idx_show}   |   "
-                  f"Nivel: {lvl} ({br_mbps_text} Mbps)   |   BW (bwe): {bw_mbps_text} Mbps")
+                  f"Nivel: {lvl} ({br_mbps_text} Mbps)   |   Tasa descarga medida (bwe): {measured_rate_mbps_text} Mbps")
         )
 
         # Reprogramar si no ha terminado

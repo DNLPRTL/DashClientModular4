@@ -822,7 +822,7 @@ class Player:
             'use_for_eval': int(use_for_eval),
         }
 
-    # ------------------------- feedback (incluye BWE) -------------------------
+    # ------------------------- controller feedback -------------------------
     def get_feedback(self, last_paused, last_size, last_time, fragment_duration=None):
         return build_controller_feedback(
             queued_bytes=self.media_engine.get_queued_bytes(),

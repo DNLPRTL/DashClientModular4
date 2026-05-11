@@ -54,6 +54,8 @@ Block 11 keeps the row values and ordering stable while renaming the generated a
 
 The generated CSVs are still validation/control artifacts, not final benchmark results. The fake engine is the controlled path for reproducible tests. GStreamer runtime validation is still not benchmark-grade yet, and baseline ABR algorithms remain pending.
 
+Full column provenance is tracked in `docs/architecture/telemetry_column_provenance.md`. Console/progress output is human diagnostics only and is covered by `docs/architecture/runtime_console_output_contract.md`.
+
 ## Inspect A Run
 
 Windows:
@@ -94,7 +96,7 @@ head -n 5 "$RUN_DIR/evaluation_segments.csv"
 - Ubuntu client VM: real runtime, fake and GStreamer execution, GStreamer capability checks.
 - Ubuntu server VM: hosts MPDs and DASH segments over HTTP.
 
-GStreamer availability is an environment capability. It is not proof that the current `gst` path is benchmark-ready. See `docs/runbooks/gstreamer_playback.md` for headless and optional visible playback checks.
+GStreamer availability is an environment capability. It is not proof that the current `gst` path is benchmark-ready. Headless `decode_video=false`/`fakesink` runs are structural validation only and may complete faster than real time. See `docs/runbooks/gstreamer_playback.md` for headless and optional visible playback checks.
 
 ## Test Tier Coverage
 
@@ -104,7 +106,7 @@ GStreamer availability is an environment capability. It is not proof that the cu
 
 ## Current Status Of Outputs
 
-Current run CSVs and logs are validation/control artifacts only. They are useful for inspecting whether the client ran and what it recorded, but they are not final benchmark results until Phase 1 acceptance, final QoE/reward methodology, and baseline controller implementation are complete.
+Current run CSVs and logs are validation/control artifacts only. They are useful for inspecting whether the client ran and what it recorded, but they are not final benchmark results until final QoE/reward methodology, baseline controller implementation, and benchmark scripts are complete.
 
 Fake-engine outputs and GStreamer outputs must not be mixed as equivalent benchmark results.
 

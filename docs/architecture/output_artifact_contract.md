@@ -1,8 +1,10 @@
 # Output Artifact Contract
 
-Date: 2026-05-09
+Date: 2026-05-11
 
 This contract names the current run artifacts for Phase 1 hardening. It is an output hygiene contract, not a benchmark methodology.
+
+Column-level provenance for `segment_telemetry.csv` and `evaluation_segments.csv` is documented in `docs/architecture/telemetry_column_provenance.md`. Console/progress output is covered separately by `docs/architecture/runtime_console_output_contract.md` and is not a canonical artifact.
 
 | Artifact name | Purpose | Source module | Benchmark / evaluation role | Canonical? | Legacy / deprecated? | Notes / risks |
 |---|---|---|---|---|---|---|
@@ -25,4 +27,4 @@ Run outputs are not automatically benchmark results. They are validation/control
 
 Rows with `use_for_eval=false` are not benchmark rows. Terminal drain stalls are not steady-state rebuffering. No final QoE/reward exists yet. No final IA training dataset exists yet. No academic baseline comparison exists yet.
 
-Fake-engine outputs and GStreamer outputs must not be mixed as equivalent benchmark results. The fake engine is useful for deterministic tests. GStreamer remains an integration/runtime path and is not benchmark-grade in this block.
+Fake-engine outputs and GStreamer outputs must not be mixed as equivalent benchmark results. The fake engine is the controlled path for deterministic tests and future replay/control work. GStreamer remains an integration/demo path and is not benchmark-grade in this block; headless `decode_video=false`/`fakesink` validation can complete faster than real time and must not be used for playback-timing QoE.

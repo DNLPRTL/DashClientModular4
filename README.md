@@ -38,9 +38,9 @@ logs/run_YYYYMMDD_HHMMSS/
 
 That directory contains the run manifest, resolved config, environment snapshot, run log, `segment_telemetry.csv`, and `evaluation_segments.csv`. See [docs/runbooks/run_layout.md](docs/runbooks/run_layout.md).
 
-`segment_telemetry.csv` is the full per-segment/runtime telemetry CSV. Feedback-derived columns use a `feedback_` prefix, for example `feedback_segment_index`, so they do not collide with top-level row columns. `evaluation_segments.csv` is compact evaluation-oriented segment data, not a final IA training dataset. `eval_phase` separates init, startup, warm-up, steady-state, drain, terminal, and error rows; rows with `use_for_eval: false` are not benchmark rows. These files are validation/control artifacts, not final benchmark results.
+`segment_telemetry.csv` is the full per-segment/runtime telemetry CSV. Feedback-derived columns use a `feedback_` prefix, for example `feedback_segment_index`, so they do not collide with top-level row columns. `evaluation_segments.csv` is compact evaluation-oriented segment data, not a final IA training dataset. `eval_phase` separates init, startup, warm-up, steady-state, drain, terminal, and error rows; rows with `use_for_eval: false` are not benchmark rows. These files are validation/control artifacts, not final benchmark results. Column provenance is documented in [docs/architecture/telemetry_column_provenance.md](docs/architecture/telemetry_column_provenance.md).
 
-Controllers still use the legacy dict-based API. Feedback keys and units are documented in `core/controller/contract.py`; target rates are bytes per second, and quality levels are integer indices into the MPD bitrate ladder. `fixed_quality` and `scripted_quality` are deterministic test/debug controllers for verifying the client path without policy ambiguity; they are not academic ABR baselines. `max_quality` remains available as legacy/debug/stress behavior, not as a comparable baseline. Terminal drain stalls must not be counted as steady-state rebuffering. Real baseline implementation, Phase 1 benchmark acceptance, final QoE/reward definitions, and benchmark-grade runtime separation are still pending.
+Controllers still use the legacy dict-based API. Feedback keys and units are documented in `core/controller/contract.py`; target rates are bytes per second, and quality levels are integer indices into the MPD bitrate ladder. `fixed_quality` and `scripted_quality` are deterministic test/debug controllers for verifying the client path without policy ambiguity; they are not academic ABR baselines. `max_quality` remains available as legacy/debug/stress behavior, not as a comparable baseline. Terminal drain stalls must not be counted as steady-state rebuffering. Phase 1 acceptance is documented in [docs/architecture/phase1_acceptance.md](docs/architecture/phase1_acceptance.md). Real baseline implementation, final QoE/reward definitions, and benchmark methodology are still pending.
 
 ## Environment
 
@@ -64,7 +64,7 @@ python scripts/check_environment.py --profile gst --strict
 
 See [docs/runbooks/environment.md](docs/runbooks/environment.md) for the Windows host, Ubuntu client VM, and Ubuntu server VM setup.
 
-GStreamer is an integration/runtime path for now and is not benchmark-grade. Fake-engine and GStreamer behavior are not claimed to be equal. See [docs/runbooks/gstreamer_playback.md](docs/runbooks/gstreamer_playback.md) for headless and optional visible playback validation on Ubuntu.
+GStreamer is an integration/runtime path for now and is not benchmark-grade. Fake-engine and GStreamer behavior are not claimed to be equal. Headless GST with `decode_video=false`/`fakesink` is structural validation only and may complete faster than real time. See [docs/runbooks/gstreamer_playback.md](docs/runbooks/gstreamer_playback.md) for headless and optional visible playback validation on Ubuntu.
 
 ## Test Tiers
 
@@ -95,6 +95,7 @@ python -m unittest discover
 - `config`: example client configuration.
 - `scripts/check_environment.py`: environment capability checks.
 - `docs`: architecture notes and runbooks.
+- `docs/roadmap`: future work registrations, including the GUI/operator dashboard roadmap.
 - `tests`: import, config, environment, run-context, and offline fake-client smoke tests.
 
 ## Important Rule
