@@ -32,7 +32,7 @@ Tier 1 covers importability, config loading, environment profile behavior, and r
 
 - Must pass on Windows without GStreamer.
 - Must not require network access, media files, GUI, server infrastructure, ML tooling, or `config/client.local.yaml`.
-- Covered by `tests/test_imports.py`, `tests/test_config.py`, `tests/test_environment_check.py`, `tests/test_run_context.py`, and `tests/test_output_artifacts.py`.
+- Covered by `tests/test_imports.py`, `tests/test_config.py`, `tests/test_environment_check.py`, `tests/test_run_context.py`, `tests/test_output_artifacts.py`, and mocked GStreamer contract tests in `tests/test_gst_media_engine.py`.
 
 ### Tier 2 - Offline Fake-Engine Smoke Tests
 
@@ -87,6 +87,8 @@ sudo apt install -y python3-gi gir1.2-gstreamer-1.0 gstreamer1.0-tools \
 
 GStreamer presence means the environment can attempt real media playback. It does not make the current `gst` path benchmark-grade by itself.
 
+See `docs/runbooks/gstreamer_playback.md` for headless and optional visible playback validation.
+
 ## Windows Setup
 
 From the repository root:
@@ -97,7 +99,7 @@ python -m venv .venv
 python -m pip install --upgrade pip
 pip install -r requirements.txt
 python -m unittest discover
-python -m py_compile main.py core\client_config.py core\controller\registry.py core\controller\base.py core\controller\contract.py core\controller\fixed_quality.py core\controller\scripted_quality.py core\runtime_feedback.py core\benchmark_contract.py core\output_artifacts.py core\run_context.py core\dataset_schema.py player.py scripts\check_environment.py
+python -m py_compile main.py core\client_config.py core\controller\registry.py core\controller\base.py core\controller\contract.py core\controller\fixed_quality.py core\controller\scripted_quality.py core\run_context.py core\runtime_feedback.py core\dataset_schema.py core\benchmark_contract.py core\output_artifacts.py core\media_engine\base.py core\media_engine\fake.py core\media_engine\gst_media_engine.py player.py scripts\check_environment.py
 python scripts/check_environment.py --profile dev
 python scripts/check_environment.py --profile gst
 ```
@@ -116,7 +118,7 @@ source .venv/bin/activate
 python -m pip install --upgrade pip
 pip install -r requirements.txt
 python -m unittest discover
-python -m py_compile main.py core/client_config.py core/controller/registry.py core/controller/base.py core/controller/contract.py core/controller/fixed_quality.py core/controller/scripted_quality.py core/runtime_feedback.py core/benchmark_contract.py core/output_artifacts.py core/run_context.py core/dataset_schema.py player.py scripts/check_environment.py
+python -m py_compile main.py core/client_config.py core/controller/registry.py core/controller/base.py core/controller/contract.py core/controller/fixed_quality.py core/controller/scripted_quality.py core/run_context.py core/runtime_feedback.py core/dataset_schema.py core/benchmark_contract.py core/output_artifacts.py core/media_engine/base.py core/media_engine/fake.py core/media_engine/gst_media_engine.py player.py scripts/check_environment.py
 python scripts/check_environment.py --profile dev
 python scripts/check_environment.py --profile gst
 python scripts/check_environment.py --profile gst --strict

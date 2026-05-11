@@ -114,14 +114,26 @@ Current canonical run CSVs are `segment_telemetry.csv` and `evaluation_segments.
 - Updated config, schema helpers, tests, README, runbooks, and output artifact documentation around the canonical names.
 - No playback semantics, ABR logic, downloader behavior, parser behavior, media-engine behavior, buffering, pacing, drain mechanics, QoE/reward finalization, baselines, AI, Mahimahi, trace infrastructure, benchmark scripts, or GStreamer hardening were introduced.
 
+### Block 12 - GStreamer Integration Hardening / Optional Visible Playback
+
+- Hardened `core/media_engine/gst_media_engine.py` as an integration/demo path.
+- Improved unavailable GStreamer/PyGObject diagnostics with explicit guidance for `media_engine.name: fake`, Windows expectations, and Ubuntu `scripts/check_environment.py --profile gst --strict`.
+- Added clear missing-element errors for required GStreamer elements and the selected sink.
+- Prevented silent fallback to `fakesink` when `media_engine.sink_name` is explicit and cannot be created.
+- Added concise startup diagnostics for `decode_video`, selected sink, visible playback, and `min_queue_time`.
+- Made GStreamer stop/cleanup safer during repeated calls and partial startup failure.
+- Added mocked unit tests for GStreamer integration contracts without requiring real GStreamer, a display server, network, or a DASH server.
+- Added `docs/runbooks/gstreamer_playback.md`.
+- No ABR baseline, AI, QoE/reward finalization, benchmark methodology change, fake-engine behavior change, downloader change, parser change, controller decision change, runtime feedback change, or CSV semantics change was introduced.
+
 ## Current Constraints
 
 - Do not implement BBA, BOLA, MPC, robustMPC, PPO, PANDA, FESTIVE, SARA, ELASTIC, RBC, WISH, or any real ABR controller yet.
 - Keep only deterministic test/debug controllers plus legacy max-quality stress behavior until the base client is stable.
 - Prioritize reproducibility, config-driven execution, headless validation, and clean run outputs.
 
-## Pending Technical Direction After Block 11
+## Pending Technical Direction After Block 12
 
-The next implementation block is not started in this commit. Phase 1 acceptance, event-level stall telemetry, baseline ABR algorithms, final QoE metrics, reward definitions, benchmark comparisons, and analysis input/output alignment remain pending technical direction after Block 11.
+The next implementation block is not started in this commit. Phase 1 acceptance, event-level stall telemetry, baseline ABR algorithms, final QoE metrics, reward definitions, benchmark comparisons, and analysis input/output alignment remain pending technical direction after Block 12.
 
 GStreamer remains an integration/runtime path for now and is not benchmark-grade. Fake-engine and GStreamer behavior are not claimed to be equal.

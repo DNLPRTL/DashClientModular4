@@ -90,7 +90,17 @@ media_engine:
   sink_name: null
 ```
 
-Missing GStreamer does not break config loading or import tests. It only fails when a run explicitly requests `media_engine.name: "gst"`. GStreamer is integration/runtime only for now and is not benchmark-grade; fake-engine and GStreamer behavior are not claimed to be equal.
+With `decode_video: false` and `sink_name: null`, the GST engine selects `fakesink` for headless validation. Optional visible playback uses `decode_video: true` and an explicit or default video sink such as `autovideosink`:
+
+```yaml
+media_engine:
+  name: "gst"
+  min_queue_time: 1.0
+  decode_video: true
+  sink_name: "autovideosink"
+```
+
+Missing GStreamer does not break config loading or import tests. It only fails when a run explicitly requests `media_engine.name: "gst"`. Explicit missing sinks fail clearly instead of silently falling back to `fakesink`. GStreamer is integration/runtime only for now and is not benchmark-grade; fake-engine and GStreamer behavior are not claimed to be equal. See `docs/runbooks/gstreamer_playback.md`.
 
 ## 4. Keep Validation Runs Headless
 
@@ -160,7 +170,7 @@ Run Tier 1 and Tier 2 tests:
 
 ```powershell
 python -m unittest discover
-python -m py_compile main.py core\client_config.py core\controller\registry.py core\controller\base.py core\controller\contract.py core\controller\fixed_quality.py core\controller\scripted_quality.py core\runtime_feedback.py core\benchmark_contract.py core\output_artifacts.py core\run_context.py core\dataset_schema.py player.py scripts\check_environment.py
+python -m py_compile main.py core\client_config.py core\controller\registry.py core\controller\base.py core\controller\contract.py core\controller\fixed_quality.py core\controller\scripted_quality.py core\run_context.py core\runtime_feedback.py core\dataset_schema.py core\benchmark_contract.py core\output_artifacts.py core\media_engine\base.py core\media_engine\fake.py core\media_engine\gst_media_engine.py player.py scripts\check_environment.py
 python scripts\check_environment.py --profile dev
 python scripts\check_environment.py --profile gst
 ```

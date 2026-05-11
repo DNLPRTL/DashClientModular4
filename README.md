@@ -64,7 +64,7 @@ python scripts/check_environment.py --profile gst --strict
 
 See [docs/runbooks/environment.md](docs/runbooks/environment.md) for the Windows host, Ubuntu client VM, and Ubuntu server VM setup.
 
-GStreamer is an integration/runtime path for now and is not benchmark-grade. Fake-engine and GStreamer behavior are not claimed to be equal.
+GStreamer is an integration/runtime path for now and is not benchmark-grade. Fake-engine and GStreamer behavior are not claimed to be equal. See [docs/runbooks/gstreamer_playback.md](docs/runbooks/gstreamer_playback.md) for headless and optional visible playback validation on Ubuntu.
 
 ## Test Tiers
 
@@ -86,7 +86,7 @@ python -m unittest discover
 - `core/controller/contract.py`: controller feedback, units, target-rate, and quantization contract.
 - `core/benchmark_contract.py`: benchmark-neutral evaluation phase and stall classification helpers.
 - `core/output_artifacts.py`: canonical run artifact filenames and manifest keys.
-- `core/media_engine`: fake and GStreamer playback engines.
+- `core/media_engine`: fake and GStreamer playback engines. The fake engine is the deterministic test path; GStreamer is integration/demo.
 - `core/parser`: MPD parser and DASH parsing helpers.
 - `core/downloader.py`: segment downloader.
 - `core/run_context.py`: run directory and metadata helper.

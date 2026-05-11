@@ -5,6 +5,10 @@ mpd_url: ""
 
 media_engine:
   name: "fake"
+  # GStreamer integration/demo mode can use name: "gst" on Ubuntu.
+  # Headless GST validation normally uses decode_video: false and sink_name: null,
+  # which selects fakesink. Optional visible playback uses decode_video: true
+  # with sink_name such as "autovideosink" on a machine with a display server.
   min_queue_time: 1.0
   decode_video: false
   sink_name: null

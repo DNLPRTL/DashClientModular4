@@ -38,6 +38,24 @@ logging.basicConfig(
 log = logging.getLogger("GstMediaEngine")
 
 
+def gstreamer_unavailable_message() -> str:
+    detail = _format_exception(GST_IMPORT_ERROR) if GST_IMPORT_ERROR else "unknown import failure"
+    return (
+        "GStreamer/PyGObject is unavailable ({0}). Use media_engine.name: fake for "
+        "Windows development, deterministic tests, and benchmark/control work. "
+        "Ubuntu GStreamer validation should first pass: "
+        "python scripts/check_environment.py --profile gst --strict. "
+        "Windows does not require GStreamer."
+    ).format(detail)
+
+
+def _format_exception(exc: BaseException) -> str:
+    message = str(exc)
+    if message:
+        return "{0}: {1}".format(exc.__class__.__name__, message)
+    return exc.__class__.__name__
+
+
 class GstMediaEngine:
     """
     GStreamer media engine con timeline propia para cola lógica:
@@ -60,13 +78,13 @@ class GstMediaEngine:
 
     def __init__(self, decode_video: bool = True, min_queue_time: float = 5.0, sink_name: Optional[str] = None):
         if not GST_AVAILABLE:
-            raise RuntimeError(
-                "GStreamer/PyGObject is not available; use FakeMediaEngine or install the GStreamer runtime."
-            ) from GST_IMPORT_ERROR
+            raise RuntimeError(gstreamer_unavailable_message()) from GST_IMPORT_ERROR
 
-        self.decode_video = decode_video
+        self.decode_video = bool(decode_video)
         self.min_queue_time = float(min_queue_time)
-        self.sink_name = sink_name if sink_name else ("autovideosink" if decode_video else "fakesink")
+        self._explicit_sink_name = bool(sink_name)
+        self.sink_name = sink_name if sink_name else ("autovideosink" if self.decode_video else "fakesink")
+        self.visible_playback = bool(self.decode_video and self.sink_name != "fakesink")
 
         self.pipeline: Optional[Gst.Pipeline] = None
         self.appsrc: Optional[Gst.Element] = None
@@ -101,8 +119,25 @@ class GstMediaEngine:
 
         self.on_event: Optional[Callable[[str, dict], None]] = None
 
-        Gst.init(None)
-        log.debug("GStreamer iniciado")
+        try:
+            Gst.init(None)
+        except Exception as exc:
+            raise RuntimeError(
+                "GStreamer could be imported but Gst.init(None) failed: {0}. "
+                "Run python scripts/check_environment.py --profile gst --strict on Ubuntu. "
+                "Windows development can use media_engine.name: fake."
+                .format(_format_exception(exc))
+            ) from exc
+
+        log.info(
+            "GStreamer configured: decode_video=%s sink_name=%s explicit_sink=%s "
+            "visible_playback=%s min_queue_time=%.3fs",
+            self.decode_video,
+            self.sink_name,
+            self._explicit_sink_name,
+            self.visible_playback,
+            self.min_queue_time,
+        )
 
     # -------- util eventos --------
     def _emit(self, event: str, info: Optional[dict] = None):
@@ -118,68 +153,93 @@ class GstMediaEngine:
             log.warning("start(): pipeline ya creado")
             return
 
-        self.pipeline = Gst.Pipeline.new("dash-pipeline")
-        log.info("Creando pipeline")
+        log.info(
+            "Creating GStreamer pipeline: decode_video=%s sink_name=%s "
+            "visible_playback=%s min_queue_time=%.3fs",
+            self.decode_video,
+            self.sink_name,
+            self.visible_playback,
+            self.min_queue_time,
+        )
 
-        self.appsrc = Gst.ElementFactory.make("appsrc", "src")
-        self.appsrc.set_property("is-live", False)
-        self.appsrc.set_property("format", Gst.Format.TIME)
-        self.appsrc.set_property("block", True)
-        self.appsrc.set_property("do-timestamp", True)
-        # Consejo: si alimentas fMP4, explícitar caps ayuda a qtdemux a no “dudar”.
-        # caps = Gst.Caps.from_string("video/quicktime, variants=iso")
-        # self.appsrc.set_property("caps", caps)
-        self.pipeline.add(self.appsrc)
-        log.debug("appsrc creado y configurado")
-
-        self.demux = Gst.ElementFactory.make("qtdemux", "demux")
-        self.pipeline.add(self.demux)
-
-        self.parser = Gst.ElementFactory.make("h264parse", "parser")
-        self.queue_v = Gst.ElementFactory.make("queue", "queue_v")
-        self.queue_v.set_property("max-size-buffers", 0)
-        self.queue_v.set_property("max-size-bytes", 0)
-        self.queue_v.set_property("max-size-time", 0)
-        self.queue_v.set_property("min-threshold-time", int(self.min_queue_time * 1e9))
-
-        # Señales de la queue para detectar vaciados/llenados reales
         try:
-            self.queue_v.connect("underrun", self._on_queue_underrun)
-            self.queue_v.connect("overrun", self._on_queue_overrun)
+            self.pipeline = Gst.Pipeline.new("dash-pipeline")
+            if self.pipeline is None:
+                raise RuntimeError("Could not create GStreamer pipeline 'dash-pipeline'.")
+
+            self.appsrc = self._make_required_element("appsrc", "src")
+            self.appsrc.set_property("is-live", False)
+            self.appsrc.set_property("format", Gst.Format.TIME)
+            self.appsrc.set_property("block", True)
+            self.appsrc.set_property("do-timestamp", True)
+            # Consejo: si alimentas fMP4, explícitar caps ayuda a qtdemux a no “dudar”.
+            # caps = Gst.Caps.from_string("video/quicktime, variants=iso")
+            # self.appsrc.set_property("caps", caps)
+            self.pipeline.add(self.appsrc)
+            log.debug("appsrc creado y configurado")
+
+            self.demux = self._make_required_element("qtdemux", "demux")
+            self.pipeline.add(self.demux)
+
+            self.parser = self._make_required_element("h264parse", "parser")
+            self.queue_v = self._make_required_element("queue", "queue_v")
+            self.queue_v.set_property("max-size-buffers", 0)
+            self.queue_v.set_property("max-size-bytes", 0)
+            self.queue_v.set_property("max-size-time", 0)
+            self.queue_v.set_property("min-threshold-time", int(self.min_queue_time * 1e9))
+
+            # Señales de la queue para detectar vaciados/llenados reales
+            try:
+                self.queue_v.connect("underrun", self._on_queue_underrun)
+                self.queue_v.connect("overrun", self._on_queue_overrun)
+            except Exception:
+                pass
+
+            self.decoder = self._make_required_element("avdec_h264", "decoder") if self.decode_video else None
+            self.sink = self._make_sink_element()
+
+            for elem in [self.parser, self.queue_v, self.decoder, self.sink]:
+                if elem:
+                    self.pipeline.add(elem)
+
+            self._link_or_raise(self.appsrc, self.demux, "appsrc", "qtdemux")
+            self.demux.connect("pad-added", self._on_demux_pad_added)
+            self.demux.connect("no-more-pads", self._on_demux_no_more_pads)
+
+            # Bus: EOS/errores/varios
+            bus = self.pipeline.get_bus()
+            bus.add_signal_watch()
+            bus.connect("message", self._on_bus_message)
+
+            self._main_loop = GLib.MainLoop()
+            self._loop_thread = threading.Thread(target=self._main_loop.run, name="GstMainLoop", daemon=True)
+            self._loop_thread.start()
+
+            self.pipeline.set_state(Gst.State.PAUSED)
+            self.status = self.PAUSED
+            log.info("Pipeline en PAUSED (preroll)")
+
+            self._running_check_id = GLib.timeout_add(100, self._on_running)
         except Exception:
-            pass
-
-        self.decoder = Gst.ElementFactory.make("avdec_h264", "decoder") if self.decode_video else None
-        self.sink = Gst.ElementFactory.make(self.sink_name, "sink") or Gst.ElementFactory.make("fakesink", "sink")
-
-        for elem in [self.parser, self.queue_v, self.decoder, self.sink]:
-            if elem:
-                self.pipeline.add(elem)
-
-        assert self.appsrc.link(self.demux), "No se pudo enlazar appsrc→demux"
-        self.demux.connect("pad-added", self._on_demux_pad_added)
-        self.demux.connect("no-more-pads", self._on_demux_no_more_pads)
-
-        # Bus: EOS/errores/varios
-        bus = self.pipeline.get_bus()
-        bus.add_signal_watch()
-        bus.connect("message", self._on_bus_message)
-
-        self._main_loop = GLib.MainLoop()
-        self._loop_thread = threading.Thread(target=self._main_loop.run, name="GstMainLoop", daemon=True)
-        self._loop_thread.start()
-
-        self.pipeline.set_state(Gst.State.PAUSED)
-        self.status = self.PAUSED
-        log.info("Pipeline en PAUSED (preroll)")
-
-        self._running_check_id = GLib.timeout_add(100, self._on_running)
+            self.stop()
+            raise
 
     def stop(self):
         log.info("Parando pipeline…")
+        running_check_id = self._running_check_id
+        self._running_check_id = None
+        if running_check_id:
+            try:
+                GLib.source_remove(running_check_id)
+            except Exception:
+                pass
+
+        pipeline = self.pipeline
         try:
-            if self.pipeline:
-                self.pipeline.set_state(Gst.State.NULL)
+            if pipeline:
+                pipeline.set_state(Gst.State.NULL)
+        except Exception as exc:
+            log.warning("Error while stopping GStreamer pipeline: %r", exc)
         finally:
             self.pipeline = None
             self.appsrc = None
@@ -188,13 +248,6 @@ class GstMediaEngine:
             self.queue_v = None
             self.decoder = None
             self.sink = None
-
-        if self._running_check_id:
-            try:
-                GLib.source_remove(self._running_check_id)
-            except Exception:
-                pass
-            self._running_check_id = None
 
         if self._main_loop:
             try:
@@ -216,6 +269,45 @@ class GstMediaEngine:
         self._pushed_any_data = False
         self._eos_pending = False
         log.info("Pipeline detenido y estado interno reiniciado")
+
+    def _make_required_element(self, factory_name: str, instance_name: str):
+        element = Gst.ElementFactory.make(factory_name, instance_name)
+        if element is None:
+            raise RuntimeError(
+                "Required GStreamer element '{0}' could not be created. "
+                "Check that the needed GStreamer plugin package is installed, then run: "
+                "python scripts/check_environment.py --profile gst --strict."
+                .format(factory_name)
+            )
+        return element
+
+    def _make_sink_element(self):
+        sink = Gst.ElementFactory.make(self.sink_name, "sink")
+        if sink is None:
+            detail = "explicit media_engine.sink_name" if self._explicit_sink_name else "selected default sink"
+            raise RuntimeError(
+                "Required GStreamer element '{0}' could not be created for {1}. "
+                "If visible playback is requested, verify that a display server is available "
+                "and that the selected video sink plugin is installed. For headless validation, "
+                "use decode_video: false and sink_name: null so fakesink is selected."
+                .format(self.sink_name, detail)
+            )
+        return sink
+
+    @staticmethod
+    def _link_or_raise(src, dst, src_name: str, dst_name: str) -> None:
+        try:
+            linked = bool(src.link(dst))
+        except Exception as exc:
+            raise RuntimeError(
+                "Could not link GStreamer elements {0}->{1}: {2}".format(
+                    src_name,
+                    dst_name,
+                    _format_exception(exc),
+                )
+            ) from exc
+        if not linked:
+            raise RuntimeError("Could not link GStreamer elements {0}->{1}.".format(src_name, dst_name))
 
     def end_of_stream(self):
         """Señaliza fin de stream en appsrc (EOS). Seguro y compatible."""
@@ -388,7 +480,7 @@ class GstMediaEngine:
         elif t == Gst.MessageType.ERROR:
             err, dbg = msg.parse_error()
             log.error(f"[BUS] ERROR desde {src}: {err} (debug: {dbg})")
-            self._emit("error", {"error": str(err), "debug": dbg})
+            self._emit("error", {"source": src, "error": str(err), "debug": dbg})
 
         elif t == Gst.MessageType.STATE_CHANGED:
             old, new, pend = msg.parse_state_changed()

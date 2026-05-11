@@ -23,10 +23,19 @@ from core.run_context import create_run_context
 from player import Player
 
 try:
-    from core.media_engine.gst_media_engine import GST_AVAILABLE, GstMediaEngine
+    from core.media_engine.gst_media_engine import GST_AVAILABLE, GstMediaEngine, gstreamer_unavailable_message
 except Exception:
     GstMediaEngine = None
     GST_AVAILABLE = False
+
+    def gstreamer_unavailable_message() -> str:
+        return (
+            "GStreamer/PyGObject is unavailable. Use media_engine.name: fake for "
+            "Windows development, deterministic tests, and benchmark/control work. "
+            "Ubuntu GStreamer validation should first pass: "
+            "python scripts/check_environment.py --profile gst --strict. "
+            "Windows does not require GStreamer."
+        )
 
 
 def main(argv: Optional[List[str]] = None) -> int:
@@ -143,10 +152,7 @@ def _create_media_engine(config: ClientConfig):
 
     if engine_name == "gst":
         if not GST_AVAILABLE or GstMediaEngine is None:
-            raise ConfigError(
-                "media_engine.name is 'gst', but GStreamer/PyGObject is not available. "
-                "Use media_engine.name: fake for import tests and headless benchmark development."
-            )
+            raise ConfigError(gstreamer_unavailable_message())
         return GstMediaEngine(
             min_queue_time=config.media_engine.min_queue_time,
             decode_video=config.media_engine.decode_video,

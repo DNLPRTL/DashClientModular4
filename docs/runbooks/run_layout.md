@@ -60,7 +60,7 @@ Windows:
 
 ```powershell
 python -m unittest discover
-python -m py_compile main.py core\client_config.py core\controller\registry.py core\controller\base.py core\controller\contract.py core\controller\fixed_quality.py core\controller\scripted_quality.py core\runtime_feedback.py core\benchmark_contract.py core\output_artifacts.py core\run_context.py core\dataset_schema.py player.py scripts\check_environment.py
+python -m py_compile main.py core\client_config.py core\controller\registry.py core\controller\base.py core\controller\contract.py core\controller\fixed_quality.py core\controller\scripted_quality.py core\run_context.py core\runtime_feedback.py core\dataset_schema.py core\benchmark_contract.py core\output_artifacts.py core\media_engine\base.py core\media_engine\fake.py core\media_engine\gst_media_engine.py player.py scripts\check_environment.py
 python scripts/check_environment.py --profile dev
 python scripts/check_environment.py --profile gst
 ```
@@ -94,7 +94,7 @@ head -n 5 "$RUN_DIR/evaluation_segments.csv"
 - Ubuntu client VM: real runtime, fake and GStreamer execution, GStreamer capability checks.
 - Ubuntu server VM: hosts MPDs and DASH segments over HTTP.
 
-GStreamer availability is an environment capability. It is not proof that the current `gst` path is benchmark-ready.
+GStreamer availability is an environment capability. It is not proof that the current `gst` path is benchmark-ready. See `docs/runbooks/gstreamer_playback.md` for headless and optional visible playback checks.
 
 ## Test Tier Coverage
 
