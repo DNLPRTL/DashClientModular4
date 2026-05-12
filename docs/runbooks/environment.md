@@ -102,6 +102,7 @@ python -m unittest discover
 python -m py_compile main.py core\client_config.py core\controller\registry.py core\controller\base.py core\controller\contract.py core\controller\fixed_quality.py core\controller\scripted_quality.py core\run_context.py core\runtime_feedback.py core\dataset_schema.py core\benchmark_contract.py core\output_artifacts.py core\media_engine\base.py core\media_engine\fake.py core\media_engine\gst_media_engine.py player.py scripts\check_environment.py
 python scripts/check_environment.py --profile dev
 python scripts/check_environment.py --profile gst
+python scripts/check_client_readiness.py --strict
 ```
 
 Expected result: all commands pass without GStreamer installed.
@@ -122,6 +123,7 @@ python -m py_compile main.py core/client_config.py core/controller/registry.py c
 python scripts/check_environment.py --profile dev
 python scripts/check_environment.py --profile gst
 python scripts/check_environment.py --profile gst --strict
+python scripts/check_client_readiness.py --strict
 ```
 
 Use `--system-site-packages` so the virtual environment can see Ubuntu's `python3-gi` package.

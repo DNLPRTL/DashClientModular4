@@ -2,7 +2,7 @@
 
 Date: 2026-05-11
 
-This document records the acceptance state for Phase 1 client hardening. It is not a benchmark methodology and it does not define final QoE, reward, AI training, or academic comparison rules.
+This document records the acceptance state for Phase 1 client hardening. Block 14 adds the final baseline-entry readiness gate. After that gate passes, Phase 1 client hardening is closed only as a stable technical base for Phase 0 methodology and later ABR baseline implementation. It is not a benchmark methodology and it does not define final QoE, reward, AI training, or academic comparison rules.
 
 ## Expected Commit
 
@@ -27,6 +27,7 @@ The Block 13 acceptance commit must be a direct descendant of that base. If a fu
 11. Academic output hygiene / legacy cleanup.
 12. GStreamer integration hardening / optional visible playback.
 13. Phase 1 acceptance, semantic provenance audit, console contract, and GUI roadmap registration.
+14. Client readiness certification / baseline-entry gate.
 
 ## Windows Acceptance Checklist
 
@@ -133,4 +134,4 @@ Phase 1 acceptance explicitly does not mean that the following exist:
 
 ## Next Phase Recommendation
 
-After closing Phase 1, return to Phase 0 methodology work before implementing baseline controllers. Classical ABR controllers should be implemented only after their primary papers/specifications and benchmark methodology decisions are documented.
+After closing Phase 1 through the Block 14 readiness gate, return to Phase 0 methodology work before implementing baseline controllers. Classical ABR controllers should be implemented only after their primary papers/specifications and benchmark methodology decisions are documented.

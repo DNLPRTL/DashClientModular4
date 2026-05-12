@@ -6,6 +6,8 @@ This audit classifies current CSV telemetry for Phase 1 hardening. It covers `se
 
 For full column-by-column provenance, including source module/function, unit, timing/source event, semantic status, benchmark usability, and risks, see `docs/architecture/telemetry_column_provenance.md`. This file remains the shorter metric-risk summary from the neutrality block.
 
+Block 14 adds `docs/architecture/metric_catalog.md` for producer/consumer/formula decisions and exposes the current default feedback keys in code so validation does not invent telemetry columns.
+
 Classification labels:
 
 - `eval_ready`: allowed as evaluation-oriented context when `use_for_eval=true`; not a final score by itself.

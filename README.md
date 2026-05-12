@@ -1,6 +1,6 @@
 # DashClientModular4
 
-Modular DASH client for a TFG project. Phase 1 is focused on hardening the base client into an ABR-neutral, reproducible benchmarking skeleton before adding real ABR algorithms.
+Modular DASH client for a TFG project. Phase 1 client hardening is ready to close after the Block 14 readiness gate: the repository is a stable technical base for returning to Phase 0 methodology before adding real ABR algorithms.
 
 ## Current Run Path
 
@@ -40,7 +40,7 @@ That directory contains the run manifest, resolved config, environment snapshot,
 
 `segment_telemetry.csv` is the full per-segment/runtime telemetry CSV. Feedback-derived columns use a `feedback_` prefix, for example `feedback_segment_index`, so they do not collide with top-level row columns. `evaluation_segments.csv` is compact evaluation-oriented segment data, not a final IA training dataset. `eval_phase` separates init, startup, warm-up, steady-state, drain, terminal, and error rows; rows with `use_for_eval: false` are not benchmark rows. These files are validation/control artifacts, not final benchmark results. Column provenance is documented in [docs/architecture/telemetry_column_provenance.md](docs/architecture/telemetry_column_provenance.md).
 
-Controllers still use the legacy dict-based API. Feedback keys and units are documented in `core/controller/contract.py`; target rates are bytes per second, and quality levels are integer indices into the MPD bitrate ladder. `fixed_quality` and `scripted_quality` are deterministic test/debug controllers for verifying the client path without policy ambiguity; they are not academic ABR baselines. `max_quality` remains available as legacy/debug/stress behavior, not as a comparable baseline. Terminal drain stalls must not be counted as steady-state rebuffering. Phase 1 acceptance is documented in [docs/architecture/phase1_acceptance.md](docs/architecture/phase1_acceptance.md). Real baseline implementation, final QoE/reward definitions, and benchmark methodology are still pending.
+Controllers still use the legacy dict-based API. Feedback keys, units, aliases, and baseline-entry semantics are documented in `core/controller/contract.py` and [docs/architecture/baseline_entry_contract.md](docs/architecture/baseline_entry_contract.md); target rates are bytes per second, and quality levels are integer indices into the MPD bitrate ladder. `fixed_quality` and `scripted_quality` are deterministic test/debug controllers for verifying the client path without policy ambiguity; they are not academic ABR baselines. `max_quality` remains available as legacy/debug/stress behavior, not as a comparable baseline. Terminal drain stalls must not be counted as steady-state rebuffering. Phase 1 acceptance is documented in [docs/architecture/phase1_acceptance.md](docs/architecture/phase1_acceptance.md) and the final readiness report is in [docs/architecture/client_readiness_report.md](docs/architecture/client_readiness_report.md). Real baseline implementation, final QoE/reward definitions, and benchmark methodology are still pending.
 
 ## Environment
 
@@ -53,6 +53,7 @@ python -m pip install --upgrade pip
 pip install -r requirements.txt
 python -m unittest discover
 python scripts/check_environment.py --profile dev
+python scripts/check_client_readiness.py --strict
 ```
 
 Optional offline analysis dependencies live in `requirements-analysis.txt`. Optional GStreamer support is checked separately on Ubuntu with:

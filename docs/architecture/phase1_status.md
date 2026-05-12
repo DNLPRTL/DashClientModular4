@@ -136,15 +136,25 @@ Current canonical run CSVs are `segment_telemetry.csv` and `evaluation_segments.
 - Reaffirmed that GStreamer is integration/demo only, visible playback is not academic benchmark validity, and headless `fakesink` validation can complete faster than real time.
 - No ABR baseline, AI controller, PPO/training, QoE/reward finalization, trace infrastructure, benchmark scripts, GUI implementation, downloader change, parser change, fake-engine change, GStreamer pipeline change, or playback semantics change was introduced.
 
+### Block 14 - Client Readiness Certification / Baseline-Entry Gate
+
+- Added `docs/architecture/client_architecture_audit.md`, `docs/architecture/baseline_entry_contract.md`, `docs/architecture/metric_catalog.md`, `docs/architecture/client_readiness_report.md`, and `docs/architecture/hardening_step_14_client_readiness.md`.
+- Added `scripts/check_client_readiness.py` as an objective static/readiness gate.
+- Added canonical current feedback-key metadata through `CURRENT_FEEDBACK_KEYS`, feedback aliases, semantic status, and a default segment telemetry header builder.
+- Made `progress_bar.py` import-safe when Tkinter is unavailable; visible UI still requires Tkinter at runtime.
+- Added tests for readiness, baseline-entry docs/contracts, and controlled fake-path fragment flow.
+- Phase 1 client hardening is ready to close as a stable technical base for Phase 0 methodology and later baseline implementation.
+- No baseline algorithm, AI controller, PPO/training, QoE/reward finalization, trace infrastructure, final benchmark script, GUI implementation, fake-engine behavior change, GStreamer pipeline change, or playback semantic change was introduced.
+
 ## Current Constraints
 
 - Do not implement BBA, BOLA, MPC, robustMPC, PPO, PANDA, FESTIVE, SARA, ELASTIC, RBC, WISH, or any real ABR controller yet.
 - Keep only deterministic test/debug controllers plus legacy max-quality stress behavior until the base client is stable.
 - Prioritize reproducibility, config-driven execution, headless validation, and clean run outputs.
 
-## Pending Technical Direction After Block 13
+## Pending Technical Direction After Block 14
 
-Phase 1 hardening acceptance is documented, but final methodology is not closed. Event-level stall telemetry, baseline ABR algorithms, final QoE metrics, reward definitions, benchmark comparisons, trace/replay infrastructure, and analysis input/output alignment remain pending technical direction after Block 13.
+Phase 1 hardening is closed only as a client-readiness milestone. Final methodology is not closed. Event-level stall telemetry, baseline ABR algorithms, final QoE metrics, reward definitions, benchmark comparisons, trace/replay infrastructure, and analysis input/output alignment remain pending technical direction after Block 14.
 
 GStreamer remains an integration/runtime path for now and is not benchmark-grade. Fake-engine and GStreamer behavior are not claimed to be equal.
 

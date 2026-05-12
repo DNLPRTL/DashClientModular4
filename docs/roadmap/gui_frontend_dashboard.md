@@ -4,6 +4,8 @@ Date: 2026-05-11
 
 This is a roadmap document only. It registers a future UI block and does not implement a GUI.
 
+After Block 14, the GUI remains outside Phase 1 closure. CLI/config/run artifacts remain canonical.
+
 ## Future UI Block
 
 Future block: GUI / operator dashboard / VLC-like frontend.

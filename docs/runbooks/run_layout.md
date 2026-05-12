@@ -15,7 +15,7 @@ logs/
     run.log
 ```
 
-The run directory is the authoritative artifact for a validation run. Generated run artifacts are local output and must not be committed.
+The run directory is the authoritative artifact for a validation run. Generated run artifacts are local output and must not be committed. Console/progress output is diagnostic only.
 
 ## Files
 
@@ -109,6 +109,8 @@ GStreamer availability is an environment capability. It is not proof that the cu
 Current run CSVs and logs are validation/control artifacts only. They are useful for inspecting whether the client ran and what it recorded, but they are not final benchmark results until final QoE/reward methodology, baseline controller implementation, and benchmark scripts are complete.
 
 Fake-engine outputs and GStreamer outputs must not be mixed as equivalent benchmark results.
+
+After Block 14, Phase 1 client hardening is ready to close as a technical base. It does not turn these artifacts into final benchmark outputs.
 
 ## Git Hygiene
 

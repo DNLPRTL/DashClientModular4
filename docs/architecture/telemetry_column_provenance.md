@@ -19,6 +19,8 @@ It documents the current implementation; it does not define final QoE, reward, A
 
 `segment_telemetry.csv` is built by `core.dataset_schema.build_segment_telemetry_header()` using the feedback key order returned by `core.runtime_feedback.build_controller_feedback()`. Feedback-derived columns are prefixed with `feedback_`.
 
+Block 14 makes that key order explicit through `core.controller.contract.CURRENT_FEEDBACK_KEYS`, `core.dataset_schema.DEFAULT_SEGMENT_TELEMETRY_FEEDBACK_KEYS`, and `core.dataset_schema.build_default_segment_telemetry_header()`. Readiness checks must use those real keys, not invented examples.
+
 The default feedback keys are: `queued_bytes`, `queued_time`, `cur_bitrate`, `bwe`, `level`, `max_level`, `cur_rate`, `max_rate`, `min_rate`, `max_bitrate`, `min_bitrate`, `last_fragment_size`, `last_download_time`, `downloaded_bytes`, `fragment_duration`, `rates`, `segment_index`, `start_segment_request`, and `stop_segment_request`.
 
 Controllers may add feedback keys through `augment_feedback()`. Such extra columns are outside this current-column audit and must receive their own provenance before benchmark use.

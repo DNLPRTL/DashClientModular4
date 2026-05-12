@@ -3,13 +3,16 @@ from __future__ import annotations
 import unittest
 
 from core.dataset_schema import (
+    DEFAULT_SEGMENT_TELEMETRY_FEEDBACK_KEYS,
     build_dataset_header,
+    build_default_segment_telemetry_header,
     build_evaluation_segments_header,
     build_segment_telemetry_header,
     build_training_header,
     feedback_column_names,
     validate_unique_columns,
 )
+from core.controller.contract import CURRENT_FEEDBACK_KEYS
 from core.output_artifacts import EVALUATION_SEGMENTS_FILENAME, SEGMENT_TELEMETRY_FILENAME
 
 
@@ -41,6 +44,15 @@ class SegmentTelemetrySchemaTest(unittest.TestCase):
         self.assertIn("feedback_queued_time", header)
         self.assertIn("eval_phase", header)
         self.assertIn("use_for_eval", header)
+        self.assertEqual(len(header), len(set(header)))
+
+    def test_default_segment_telemetry_header_uses_current_feedback_keys(self):
+        header = build_default_segment_telemetry_header()
+
+        self.assertEqual(CURRENT_FEEDBACK_KEYS, DEFAULT_SEGMENT_TELEMETRY_FEEDBACK_KEYS)
+        self.assertIn("feedback_bwe", header)
+        self.assertIn("feedback_rates", header)
+        self.assertIn("feedback_last_download_time", header)
         self.assertEqual(len(header), len(set(header)))
 
     def test_evaluation_segments_header_has_unique_names(self):

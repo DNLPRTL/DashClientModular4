@@ -6,6 +6,8 @@ This contract names the current run artifacts for Phase 1 hardening. It is an ou
 
 Column-level provenance for `segment_telemetry.csv` and `evaluation_segments.csv` is documented in `docs/architecture/telemetry_column_provenance.md`. Console/progress output is covered separately by `docs/architecture/runtime_console_output_contract.md` and is not a canonical artifact.
 
+After the Block 14 readiness gate passes, these artifacts remain canonical for client runs. They still are not final benchmark result tables.
+
 | Artifact name | Purpose | Source module | Benchmark / evaluation role | Canonical? | Legacy / deprecated? | Notes / risks |
 |---|---|---|---|---|---|---|
 | `run_manifest.json` | Run index with config, environment, git, output paths, and neutrality metadata. | `core.run_context` | Helps audit a run; not a score. | Yes | No | Must use clear output keys and must not advertise `dataset` or `training` as canonical outputs. |

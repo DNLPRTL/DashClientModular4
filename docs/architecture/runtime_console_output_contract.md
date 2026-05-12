@@ -4,6 +4,8 @@ Date: 2026-05-11
 
 Runtime console output, progress bars, and small operator windows are human-facing diagnostics. They are not canonical benchmark output and must not be parsed by benchmark scripts.
 
+Block 14 readiness checks enforce this boundary. CLI/config/run artifacts remain the authority for experiments.
+
 ## Canonical Data Artifacts
 
 The canonical run artifacts are:

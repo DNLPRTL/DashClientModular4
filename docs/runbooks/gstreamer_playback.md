@@ -2,6 +2,8 @@
 
 GStreamer is an integration/demo playback path for Phase 1. It is useful for validating that the client can feed a real media pipeline on Ubuntu, but it is not the primary benchmark path and is not benchmark-grade yet.
 
+Block 14 readiness keeps this boundary: GStreamer is useful for integration evidence, not final timing/QoE authority.
+
 The fake media engine remains preferred for deterministic tests, replay, and future benchmark/control work. Do not compare fake-engine and GStreamer outputs as equivalent benchmark results.
 
 Visible playback proves integration/demo behavior on one prepared machine. It does not prove academic benchmark validity.

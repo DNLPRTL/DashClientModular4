@@ -1,8 +1,14 @@
 # progress_bar.py
-import tkinter as tk
+try:
+    import tkinter as tk
+except Exception:
+    tk = None
 
 class ProgressBarWindow:
     def __init__(self, media_engine, total_duration_sec, get_current_time, player, poll_interval=200):
+        if tk is None:
+            raise RuntimeError("Tkinter is unavailable; run with playback.headless: true on this machine.")
+
         self.media_engine = media_engine
         try:
             self.total_duration_sec = float(total_duration_sec) if total_duration_sec is not None else 0.0

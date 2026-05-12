@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import Optional, Sequence
 
+from core.controller.contract import CURRENT_FEEDBACK_KEYS
+
 
 def build_controller_feedback(
     queued_bytes,
@@ -18,7 +20,7 @@ def build_controller_feedback(
     last_time,
     fragment_duration: Optional[float] = None,
 ):
-    """Build the legacy dict-based controller feedback payload."""
+    """Build the current dict-based controller feedback payload."""
     cur = rates[cur_level]
     mx, mn = max(rates), min(rates)
     fd = fragment_duration if fragment_duration is not None else fragment_durations[cur_level]
@@ -28,7 +30,7 @@ def build_controller_feedback(
     else:
         bwe_measured = float(cur)
 
-    return {
+    feedback = {
         'queued_bytes': queued_bytes,
         'queued_time': queued_time,
         'cur_bitrate': cur,
@@ -49,3 +51,4 @@ def build_controller_feedback(
         'start_segment_request': start_segment_request,
         'stop_segment_request': stop_segment_request,
     }
+    return {key: feedback[key] for key in CURRENT_FEEDBACK_KEYS}

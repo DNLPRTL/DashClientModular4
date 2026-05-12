@@ -3,30 +3,7 @@ from __future__ import annotations
 import unittest
 from pathlib import Path
 
-from core.dataset_schema import build_evaluation_segments_header, build_segment_telemetry_header
-from core.runtime_feedback import build_controller_feedback
-
-
 ROOT = Path(__file__).resolve().parents[1]
-
-
-def default_feedback_keys():
-    feedback = build_controller_feedback(
-        queued_bytes=10,
-        queued_time=1.5,
-        rates=[100.0, 200.0],
-        fragment_durations=[2.0, 2.0],
-        cur_level=0,
-        max_level=1,
-        downloaded_bytes=1000,
-        segment_index=0,
-        start_segment_request=1.0,
-        stop_segment_request=2.0,
-        last_size=500,
-        last_time=0.5,
-        fragment_duration=2.0,
-    )
-    return list(feedback.keys())
 
 
 class TelemetryColumnProvenanceDocsTest(unittest.TestCase):
@@ -34,7 +11,9 @@ class TelemetryColumnProvenanceDocsTest(unittest.TestCase):
         self.text = (ROOT / "docs/architecture/telemetry_column_provenance.md").read_text(encoding="utf-8")
 
     def test_mentions_every_current_csv_column(self):
-        segment_columns = build_segment_telemetry_header(default_feedback_keys())
+        from core.dataset_schema import build_default_segment_telemetry_header, build_evaluation_segments_header
+
+        segment_columns = build_default_segment_telemetry_header()
         evaluation_columns = build_evaluation_segments_header()
 
         for column in sorted(set(segment_columns + evaluation_columns)):

@@ -4,7 +4,13 @@ import unittest
 
 from core.controller.base import BaseController
 from core.controller.contract import (
+    CONTROLLER_API_STATUS,
+    CURRENT_FEEDBACK_KEYS,
+    FEEDBACK_CANONICAL_ALIASES,
+    FEEDBACK_SEMANTIC_STATUS,
     FEEDBACK_UNITS,
+    LEGACY_FEEDBACK_KEYS,
+    QUALITY_LEVEL_UNIT,
     REQUIRED_FEEDBACK_KEYS,
     TARGET_RATE_UNIT,
     missing_feedback_keys,
@@ -43,6 +49,7 @@ def complete_feedback(**overrides):
 
 class ControllerContractTest(unittest.TestCase):
     def test_required_feedback_keys_include_current_player_feedback(self):
+        self.assertEqual(REQUIRED_FEEDBACK_KEYS, CURRENT_FEEDBACK_KEYS)
         for key in [
             "queued_bytes",
             "queued_time",
@@ -61,6 +68,17 @@ class ControllerContractTest(unittest.TestCase):
         self.assertEqual("bytes_per_second_list", FEEDBACK_UNITS["rates"])
         self.assertEqual("segment_or_item_index", FEEDBACK_UNITS["segment_index"])
         self.assertEqual("bytes_per_second", TARGET_RATE_UNIT)
+        self.assertEqual("representation_index", QUALITY_LEVEL_UNIT)
+
+    def test_contract_exposes_baseline_entry_semantics(self):
+        self.assertEqual("current_dict_based_compatibility_api", CONTROLLER_API_STATUS)
+        self.assertIn("bwe", LEGACY_FEEDBACK_KEYS)
+        self.assertEqual("measured_download_rate", FEEDBACK_CANONICAL_ALIASES["bwe"])
+        self.assertEqual("representation_rate", FEEDBACK_CANONICAL_ALIASES["cur_rate"])
+        self.assertEqual("buffer_seconds", FEEDBACK_CANONICAL_ALIASES["queued_time"])
+        self.assertEqual("representation_rates", FEEDBACK_CANONICAL_ALIASES["rates"])
+        self.assertEqual("deprecated_compatibility_alias", FEEDBACK_SEMANTIC_STATUS["bwe"])
+        self.assertEqual("mpd_ladder_context", FEEDBACK_SEMANTIC_STATUS["rates"])
 
     def test_missing_feedback_keys_are_deterministic(self):
         feedback = complete_feedback()

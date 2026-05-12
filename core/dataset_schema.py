@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections import Counter
 from typing import Iterable, List, Sequence
 
+from core.controller.contract import CURRENT_FEEDBACK_KEYS
 from core.output_artifacts import EVALUATION_SEGMENTS_FILENAME, SEGMENT_TELEMETRY_FILENAME
 
 SEGMENT_TELEMETRY_SCHEMA_VERSION = "1.1"
@@ -57,6 +58,8 @@ EVALUATION_SEGMENTS_COLUMNS = [
     "fragment_duration",
 ]
 
+DEFAULT_SEGMENT_TELEMETRY_FEEDBACK_KEYS = CURRENT_FEEDBACK_KEYS
+
 
 def feedback_column_name(feedback_key: object) -> str:
     return "feedback_{0}".format(feedback_key)
@@ -76,6 +79,10 @@ def build_segment_telemetry_header(feedback_keys: Iterable[object]) -> List[str]
     )
     validate_unique_columns(header, schema_name=SEGMENT_TELEMETRY_FILENAME)
     return header
+
+
+def build_default_segment_telemetry_header() -> List[str]:
+    return build_segment_telemetry_header(DEFAULT_SEGMENT_TELEMETRY_FEEDBACK_KEYS)
 
 
 def build_evaluation_segments_header() -> List[str]:
