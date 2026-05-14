@@ -9,3 +9,17 @@
 | 5 | mpc | same five required academic docs | horizon, throughput predictor, internal provisional objective weights, rebuffer model, segment-size model | horizon search, predicted downloads, internal score ranking | fake run with internal objective only; no benchmark claim | predicted throughput, candidate scores, chosen level | controller name, horizon, internal weights | confusing internal controller objective with final evaluation QoE | docs complete, internal objective declared provisional, tests pass | `feat(controller): add MPC ABR baseline` |
 | 6 | robust_mpc | same five required academic docs plus Pensieve artifact note | all MPC params plus past-5 prediction-error normalization | error tracking, robust throughput, internal score ranking | fake run after MPC is validated; no Pensieve/RL path | robust prediction factor, candidate scores, chosen level | controller name, horizon, internal weights, error window | divergence from Pensieve comparison semantics or accidental RL scope creep | docs complete, MPC-compatible tests pass, no Pensieve implementation | `feat(controller): add RobustMPC ABR baseline` |
 | 7 | optional candidates | candidate card promoted to full five-doc package | method-specific | method-specific | only after mandatory set is stable | method-specific | method-specific | scope creep | explicit later decision recorded | TBD |
+
+## Phase 2.3 Gate Binding
+
+Before any row above moves into code, it must pass `controller_implementation_readiness_gate.md` and be reviewed against:
+
+- `controller_academic_validation_protocol.md`
+- `controller_unit_test_protocol.md`
+- `fake_smoke_validation_protocol.md`
+- `metric_validity_for_baselines.md`
+- `baseline_result_interpretation_policy.md`
+- `controller_code_review_checklist.md`
+- `controller_traceability_matrix.md`
+
+The closure criterion for Phase 2.3 implementation work is not "the controller runs once". It is: the controller matches its docs, passes unit tests, passes fake-engine smoke validation, preserves client readiness, and makes no final benchmark or QoE claim.

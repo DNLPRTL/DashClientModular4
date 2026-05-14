@@ -8,6 +8,9 @@
 | Baseline family map | 2 | Place rate-based, buffer-based, BOLA, MPC, RobustMPC, optional methods | Field map | planned |
 | Signal dependency map | 4 | Show which controller needs which signal | Signal matrix | planned |
 | Evaluation path | 6 | Separate fake-engine benchmark path from GStreamer demo path | Phase 1/Phase 2 scope | planned |
+| Validation ladder | 5/6 | Separate unit tests, fake smoke, readiness, future replay and final QoE claims | controller validation protocols | planned |
+| Python development timeline | 4/5 | Show incremental hardening before controller implementation | `python_development_narrative_plan.md` | planned |
+| Controller traceability flow | 5 | Show source evidence -> spec -> mapping -> tests -> code -> memory | `controller_traceability_matrix.md` | planned |
 
 ## Figure Policy
 

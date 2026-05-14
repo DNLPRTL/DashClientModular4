@@ -12,6 +12,8 @@ This register tracks candidate thesis visuals and tables before they are created
 | F4 | Baseline implementation gate | Phase 2 methodology | planned original diagram |
 | F5 | MPC horizon concept | MPC spec when created | deferred |
 | F6 | RobustMPC prediction-error adjustment | RobustMPC spec when created | deferred |
+| F7 | Controller validation ladder | Unit/fake/readiness/result interpretation protocols | planned original diagram |
+| F8 | Python development timeline | Python development narrative plan | planned original diagram |
 
 ## Tables
 
@@ -23,3 +25,8 @@ This register tracks candidate thesis visuals and tables before they are created
 | T4 | Implementation order | `baseline_implementation_plan.md` | draft |
 | T5 | Acceptance matrix | `baseline_acceptance_matrix.md` | draft |
 | T6 | Traceability matrix | `baseline_memory_traceability_matrix.md` | draft |
+| T7 | Controller implementation readiness gate | `controller_implementation_readiness_gate.md` | draft |
+| T8 | Unit test protocol matrix | `controller_unit_test_protocol.md` | draft |
+| T9 | Fake smoke scenario matrix | `fake_smoke_validation_protocol.md` | draft |
+| T10 | Metric validity classification | `metric_validity_for_baselines.md` | draft |
+| T11 | Controller code review checklist | `controller_code_review_checklist.md` | draft |

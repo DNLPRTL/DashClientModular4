@@ -1,0 +1,14 @@
+# Controller Traceability Matrix
+
+| controller | source paper | source_evidence | implementation_spec | mapping | acceptance_tests | expected code module | expected test module | smoke scenario | memory chapter | status |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| sanity_controllers | local sanity specs | N/A | `sanity_controllers/*.md` | `baseline_entry_contract.md` | `sanity_controllers/acceptance_tests.md` | `core/controller/min_rate.py`, `core/controller/fixed_rate.py`, `core/controller/max_rate.py` or documented existing equivalents | `tests/test_sanity_controllers.py` | single ladder, min/fixed/max deterministic fake run | Chapter 5 validation path | gate ready, not academic baseline |
+| rate_based | `rate_based/paper_card.md` | `rate_based/source_evidence.md` | `rate_based/implementation_spec.md` | `rate_based/controller_api_mapping.md` | `rate_based/acceptance_tests.md` | `core/controller/rate_based.py` | `tests/test_rate_based_controller.py` | stable high/low capacity, drop, recovery, low buffer | Chapters 2, 5, 6 later | docs ready for implementation |
+| bba | `bba/paper_card.md` | `bba/source_evidence.md` | `bba/implementation_spec.md` | `bba/controller_api_mapping.md` | `bba/acceptance_tests.md` | `core/controller/bba.py` | `tests/test_bba_controller.py` | reservoir, cushion, high buffer, invalid buffer | Chapters 2, 5, 6 later | docs ready for implementation |
+| bola | `bola/paper_card.md`, `bola/dashjs_source_card.md` | `bola/source_evidence.md`, `bola/dashjs_practical_evidence.md` | `bola/implementation_spec.md` | `bola/controller_api_mapping.md` | `bola/acceptance_tests.md` | `core/controller/bola.py` | `tests/test_bola_controller.py` | low buffer, higher buffer, no throughput, no dash.js hybrid | Chapters 2, 5, 6 later | docs ready for BOLA-basic implementation |
+| mpc | `mpc/paper_card.md` | `mpc/source_evidence.md` | `mpc/implementation_spec.md` | `mpc/controller_api_mapping.md` | `mpc/acceptance_tests.md` | `core/controller/mpc.py` | `tests/test_mpc_controller.py` | high throughput/high buffer, low throughput, missing history | Chapters 2, 5, 6 later | docs ready with internal objective boundary |
+| robust_mpc | `robust_mpc/paper_card.md`, `robust_mpc/pensieve_source_artifact_card.md` | `robust_mpc/source_evidence.md` | `robust_mpc/implementation_spec.md` | `robust_mpc/controller_api_mapping.md` | `robust_mpc/acceptance_tests.md` | `core/controller/robust_mpc.py` | `tests/test_robust_mpc_controller.py` | zero error, high error, insufficient history, no RL | Chapters 2, 5, 6 later | docs ready; Pensieve excluded |
+
+## Traceability Rule
+
+Any future code module must cite its local Markdown spec in comments or developer notes. If implementation behavior diverges from this matrix, update the science docs before merging code.

@@ -8,3 +8,12 @@
 | bola | objective and utility documented; no bandwidth prediction dependency | low buffer, high buffer, equal utilities, variable segment duration | rates, buffer seconds, segment duration | objective-selected target rate/level | silent dash.js variant mixing, missing utility calibration | required | fake engine required | same validation plus controller tests | same validation when available |
 | mpc | enumerates horizon candidates deterministically; internal provisional objective documented | no throughput history, low buffer, predicted rebuffer, one-level ladder | rates, buffer, throughput history, segment duration, internal weights | first action of best internal-score sequence | treating internal objective as final QoE, inconsistent horizon, missing predictor spec | required | fake engine required, with no benchmark claim | same validation plus controller tests | same validation when available |
 | robust_mpc | same MPC invariants plus documented prediction-error normalization | fewer than 5 past chunks, high prediction error, zero observed throughput | MPC inputs plus prediction error history | first action of best robust sequence | missing past-error handling, incompatible with MPC tests, accidental Pensieve/RL implementation | required | fake engine required after MPC, with no benchmark claim | same validation plus controller tests | same validation when available |
+
+## Protocol Binding
+
+Acceptance evidence must be interpreted through `baseline_result_interpretation_policy.md`:
+
+- unit tests validate decision logic;
+- fake smoke validates integration and artifact production;
+- readiness validates that client neutrality remains intact;
+- none of these alone validates paper-level performance, final QoE, real-network superiority or benchmark ranking.
