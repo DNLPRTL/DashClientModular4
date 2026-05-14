@@ -18,7 +18,7 @@
 | segment_duration_seconds | seconds | optional | optional | required | required | required | no | yes | `fragment_duration` | parser/player duration context | init rows use zero | use for media rows |
 | segment_index | index | optional | optional | optional | required | required | optional | yes | `segment_index` | player segment index | sequence semantics must stay reproducible | use |
 | utility_function | dimensionless | no | no | required | required | required | no | no | spec | usually derived from bitrate or quality model | source-specific and QoE-sensitive | defer |
-| qoe_reward_weights | formula parameters | no | no | optional | required | required | no | no | methodology | quality/rebuffer/switch penalty weights | final QoE is explicitly deferred | block MPC until resolved |
+| qoe_reward_weights | formula parameters | no | no | optional | internal only | internal only | no | no | controller spec | provisional quality/rebuffer/switch weights for controller decisions | final evaluation QoE is explicitly deferred; internal objective must not become benchmark reward | use internally only |
 | idle_duration | seconds | optional | no | possible | possible | possible | no | API exists | `getIdleDuration()` | controller return path | semantics not part of current science block | defer |
 | stall_signal | seconds_or_boolean | no | no | evaluation only | evaluation only | evaluation only | no | partial | `stall_flag`, `stall_duration` | media event aggregation | final QoE interpretation not defined | do not use as final reward yet |
 | device_or_user_context | mixed | no | no | no | no | no | no | no | none | would require new data | out of initial scope | exclude |
