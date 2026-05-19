@@ -2,6 +2,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Callable, Mapping, Optional
 
+from .bba import BbaController
 from .fixed_quality import FixedQualityController
 from .max_quality_controller import MaxQualityController
 from .rate_based import RateBasedController
@@ -36,6 +37,11 @@ CONTROLLER_REGISTRY = {
         key="rate_based",
         label="Rate-based throughput baseline",
         factory=RateBasedController,
+    ),
+    "bba": ControllerSpec(
+        key="bba",
+        label="BBA buffer-based baseline",
+        factory=BbaController,
     ),
     "fixed_quality": ControllerSpec(
         key="fixed_quality",

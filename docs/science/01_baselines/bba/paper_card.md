@@ -12,8 +12,8 @@
 | key contribution | Uses playback buffer occupancy as the primary decision signal, with capacity estimation mainly useful during startup and a simple reservoir/cushion buffer map. |
 | algorithm family if applicable | Buffer-based ABR. |
 | required signals if applicable | Buffer occupancy in seconds, representation ladder, current level, reservoir, cushion, and startup rule. |
-| implementation relevance | Future implementation should document the buffer map, reservoir/cushion parameters, startup behavior, and ladder quantization. |
+| implementation relevance | Implemented in Phase 2.3.3: documents and implements the BBA-0 buffer map, reservoir/cushion parameters, safe startup/min fallback, and ladder quantization. |
 | what it does NOT justify | Does not justify throughput-only control, final QoE reward, or benchmark trace design. |
 | use in thesis memory | Chapter 2 buffer-based ABR; Chapter 5 implementation; Chapter 6 comparison. |
 | provisional BibTeX key | `huang2014bba` |
-| decision | Mandatory later baseline; implementation blocked until the full five-doc package exists. |
+| decision | Mandatory baseline implemented second among academic ABR controllers, after `rate_based`; fake smoke is integration validation only, not benchmark evidence. |

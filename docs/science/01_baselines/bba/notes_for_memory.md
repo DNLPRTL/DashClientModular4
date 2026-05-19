@@ -2,54 +2,110 @@
 
 ## Neutral Academic Summary
 
-The `bba` baseline represents buffer-based ABR. It maps playback buffer occupancy to a representation through a reservoir and cushion: low buffer selects the minimum rate, high buffer selects the maximum rate, and the intermediate region maps deterministically across the bitrate ladder.
-
-## Citation Plan
+`bba` is the second academic ABR baseline implemented after `rate_based`. It represents the classical buffer-based family: the client maps playback buffer occupancy to a representation using a reservoir and cushion.
 
 Primary citation: Huang et al. 2014, `huang2014bba`.
 
-Use Bentaleb et al. 2019 for taxonomy if needed. Do not cite the implementation as Netflix production behavior.
+## Why BBA Follows rate_based
 
-## Chapter 2 Contribution
+`rate_based` established the throughput-driven baseline. BBA is implemented next because it is the cleanest contrast: it does not predict capacity as the main rule, and instead treats buffer occupancy as the central control state.
 
-Use BBA to explain the buffer-based design philosophy: buffer level can summarize previous network behavior and can drive bitrate selection without a continuous bandwidth predictor.
+This order makes the thesis narrative simple:
 
-## Chapter 5 Contribution
+1. sanity controllers prove the contract and fake integration;
+2. `rate_based` proves application-layer throughput ABR;
+3. `bba` proves buffer-map ABR.
 
-Use the implementation spec to document:
+## How BBA Differs From Throughput-Based ABR
 
-- `queued_time` as `buffer_level_s`;
-- `reservoir_s` and `cushion_s`;
-- deterministic discrete mapping to the MPD ladder;
-- fallback to minimum rate on invalid buffer;
-- no throughput dependency for BBA-0.
+`rate_based` asks: "What representation fits under a safe throughput estimate?"
 
-## Chapter 6 Contribution Later
+`bba` asks: "How full is the playback buffer?"
 
-After methodology exists, BBA can be compared against rate-based controllers to show the contrast between capacity-driven and buffer-driven adaptation. It should also be compared with BOLA to distinguish hand-designed buffer maps from utility-based buffer optimization.
+The Phase 2.3.3 BBA controller ignores throughput fields for the decision. Two feedback dictionaries with the same `queued_time` and different `bwe`/download measurements must produce the same target rate.
 
-## Suggested Table
+## Reservoir And Cushion
 
-Buffer threshold table:
+Defaults:
+
+```text
+reservoir_s = 5.0
+cushion_s = 10.0
+```
+
+Decision regions:
 
 | buffer region | expected decision |
 | --- | --- |
 | `buffer <= reservoir_s` | minimum representation |
-| `reservoir_s < buffer < reservoir_s + cushion_s` | intermediate ladder mapping |
+| `reservoir_s < buffer < reservoir_s + cushion_s` | deterministic intermediate ladder mapping |
 | `buffer >= reservoir_s + cushion_s` | maximum representation |
 
-## Suggested Figure
+Intermediate mapping:
 
-Original reservoir/cushion diagram with buffer on the x-axis and selected representation on the y-axis. Do not copy paper figures.
+```text
+x = (buffer_level_s - reservoir_s) / cushion_s
+target_level = floor(x * (num_representations - 1))
+```
 
-## Limitations To Disclose
+The controller returns `rates[target_level]` in bytes per second.
 
-- This is BBA-0-style, not Netflix production internals.
-- Reservoir and cushion defaults are configurable experimental choices.
-- Startup throughput guard is deferred.
-- VBR-specific behavior is not implemented initially.
-- No final QoE/reward is defined here.
+## What BBA-0 Simplification Means
 
-## Defense Message
+BBA-0 here means the simple reservoir/cushion rate map:
 
-BBA is included because it is the cleanest contrast to throughput-driven ABR: it makes the buffer the central state variable and keeps the initial controller simple enough to verify deterministically.
+- no startup capacity estimator;
+- no Netflix production internals;
+- no VBR-specific tuning;
+- no throughput primary rule;
+- no final QoE/reward;
+- no benchmark claim from smoke output.
+
+Startup capacity estimation is documented as optional in the paper evidence but deferred because the first implementation should isolate the buffer-map behavior.
+
+## Paper-To-Code Mapping
+
+| paper concept | DashClientModular4 implementation |
+| --- | --- |
+| playback buffer occupancy | `queued_time` |
+| reservoir | `reservoir_s` parameter |
+| cushion | `cushion_s` parameter |
+| discrete bitrate ladder | `rates` in bytes/s |
+| selected representation | quantized target rate / representation index |
+| invalid low buffer state | minimum representation fallback |
+| capacity estimate | deferred, not used in BBA-0 |
+
+## Fake Smoke Interpretation
+
+Fake smoke validates that:
+
+- `bba` can be selected by config;
+- it receives controller feedback;
+- it returns bytes/s target rates;
+- the player quantizes those targets to representation indices;
+- canonical artifacts are produced;
+- deprecated `dataset.csv` and `dataset_training.csv` are not produced.
+
+Fake smoke does not prove final performance, QoE improvement, real-network superiority, Netflix production equivalence, or paper-level benchmark behavior. Comparison against BOLA, MPC and RobustMPC is deferred.
+
+## How Tests Prove Correctness
+
+The unit tests prove the local BBA-0 decision rule:
+
+- buffer below or equal to reservoir selects minimum;
+- buffer above or equal to reservoir+cushion selects maximum;
+- mid-cushion buffer maps deterministically to an intermediate level;
+- increasing buffer gives non-decreasing quality;
+- missing/negative/non-finite buffer falls back safely;
+- invalid reservoir/cushion values use documented defaults;
+- throughput and forbidden network/text fields do not affect decisions.
+
+They do not prove final QoE or benchmark superiority.
+
+## Suggested Chapter Usage
+
+Chapter 2: introduce BBA as the classical buffer-based ABR contrast to throughput-based adaptation.
+
+Chapter 5: explain the implemented reservoir/cushion map, parameter defaults, API mapping and tests.
+
+Chapter 6 later: use it as a comparator only after benchmark methodology and final QoE/reward are defined.

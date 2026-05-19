@@ -11,6 +11,7 @@ from core.client_config import (
     load_client_config,
     validate_config_for_run,
 )
+from core.controller.bba import BbaController
 from core.controller.max_quality_controller import MaxQualityController
 from core.controller.rate_based import RateBasedController
 from core.controller.registry import create_controller
@@ -161,6 +162,21 @@ class ControllerConfigLookupTest(unittest.TestCase):
         controller = create_controller(config.controller.name, config.controller.params)
 
         self.assertIsInstance(controller, RateBasedController)
+
+    def test_registry_creates_bba_controller(self):
+        config = ClientConfig.from_dict(
+            {
+                "mpd_url": "http://example.invalid/video.mpd",
+                "controller": {
+                    "name": "bba",
+                    "params": {"reservoir_s": 5.0, "cushion_s": 10.0},
+                },
+            }
+        )
+
+        controller = create_controller(config.controller.name, config.controller.params)
+
+        self.assertIsInstance(controller, BbaController)
 
     def test_unknown_controller_name_fails(self):
         with self.assertRaises(ValueError):

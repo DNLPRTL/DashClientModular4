@@ -10,7 +10,7 @@ This document maps future implementation evidence to the TFG memory. It is a pla
 | Controller contract | Feedback keys, units, target rate, quality index, ladder source. | `baseline_entry_contract.md`, API mappings. | Controller contract table. |
 | Baseline implementation method | Documentation-first gate before coding. | `controller_implementation_readiness_gate.md`, `controller_academic_validation_protocol.md`. | Implementation gate figure. |
 | Sanity controllers | Deterministic `min_rate`, `fixed_rate`, and `max_rate` behavior for registry, unit, contract and fake-engine validation. | `sanity_controllers/*.md`, `core/controller/sanity_rate.py`, `tests/test_sanity_rate_controllers.py`. | Sanity controller table. |
-| Academic baselines | `rate_based` implemented first; BBA, BOLA, MPC and RobustMPC remain deferred. | implementation specs, controller mappings and `tests/test_rate_based_controller.py`. | Baseline traceability matrix. |
+| Academic baselines | `rate_based` implemented first and `bba` implemented second; BOLA, MPC and RobustMPC remain deferred. | implementation specs, controller mappings, `tests/test_rate_based_controller.py` and `tests/test_bba_controller.py`. | Baseline traceability matrix. |
 | Testing strategy | Unit tests, fake smoke tests, readiness checks. | unit and fake smoke protocols. | Test pyramid or validation ladder figure. |
 | Reproducibility | Canonical artifacts and environment/config capture. | output artifact contract and fake smoke protocol. | Artifact flow figure. |
 | Limitations | No final QoE, no benchmark claims, no replay/traces, no AI/RL. | metric validity and result interpretation policy. | Limitations table. |
@@ -20,7 +20,7 @@ This document maps future implementation evidence to the TFG memory. It is a pla
 | baseline | Chapter 5 evidence | Chapter 6 later evidence |
 | --- | --- | --- |
 | rate_based | implemented controller, implementation spec, API mapping, unit tests for bytes/s safe throughput, conservative upshift, aggressive downshift, low-buffer guard and forbidden-signal boundaries. | Later benchmark methodology; current fake smoke is integration validation only. |
-| bba | implementation spec, mapping, reservoir/cushion tests. | Later benchmark methodology. |
+| bba | implemented controller, implementation spec, API mapping, unit tests for reservoir/cushion thresholds, intermediate mapping, monotonicity, invalid buffers, bytes/s output and forbidden throughput/text/network boundaries. | Later benchmark methodology; current fake smoke is integration validation only. |
 | bola | implementation spec, mapping, BOLA-basic tests. | Later benchmark methodology. |
 | mpc | implementation spec, mapping, internal objective tests. | Later benchmark methodology; internal objective not final QoE. |
 | robust_mpc | implementation spec, mapping, prediction-error tests. | Later benchmark methodology; no Pensieve claim. |

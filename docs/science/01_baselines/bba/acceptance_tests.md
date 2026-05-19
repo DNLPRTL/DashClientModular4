@@ -1,66 +1,87 @@
 # bba Acceptance Tests
 
-These tests define future behavior for the BBA-0-style controller. They do not add code tests in this block.
+Status: implemented in `tests/test_bba_controller.py` during Phase 2.3.3.
 
-## Unit Tests
+These tests validate the BBA-0 decision rule and client-contract compatibility. They are not benchmark results and do not define final QoE/reward.
 
-Assume default `reservoir_s = 5.0`, `cushion_s = 10.0`, and rates `[100, 200, 400, 800]` in bytes per second unless stated otherwise.
+## Unit Test Coverage
 
-| test | input | expected result | tolerance |
-| --- | --- | --- | --- |
-| below reservoir | buffer `4.99` | target `100`, level `0` | exact |
-| at reservoir | buffer `5.0` | target `100`, level `0` | exact |
-| halfway cushion | buffer `10.0` | normalized `0.5`, floor level `1`, target `200` | exact |
-| near top cushion | buffer `14.9` | level `2`, target `400` | exact |
-| at high threshold | buffer `15.0` | target `800`, level `3` | exact |
-| above high threshold | buffer `30.0` | target `800`, level `3` | exact |
-| missing buffer | buffer `None` or non-finite | target `100`, level `0` | exact |
-| negative buffer | buffer `-1.0` | target `100`, level `0` | exact |
-| one-level ladder | rates `[300]`, any valid buffer | target `300`, level `0` | exact |
-| invalid cushion | `cushion_s <= 0` | configuration validation failure | exact |
+| category | implemented case | expected result |
+| --- | --- | --- |
+| registry | `bba` is registered | `create_controller("bba")` returns `BbaController` |
+| registry regression | `min_rate`, `fixed_rate`, `max_rate`, `rate_based`, `fixed_quality`, `scripted_quality`, `max_quality` remain available | existing names still instantiate |
+| current API | `calcControlAction()` returns a numeric target rate | return value is a `float`; `getControlAction()` matches |
+| target-rate unit | ladder values are bytes/s | target rate is bytes/s and quantizes to the expected index |
+| representation index | target rate maps through `quantizeRate()` | `quality_level` is a representation index |
+| console boundary | stdout is patched during decision | controller writes no console output |
+| below reservoir | default reservoir `5.0`, buffer `4.99` | target minimum representation |
+| at reservoir | buffer `5.0` | target minimum representation |
+| above high threshold | buffer `30.0` | target maximum representation |
+| at high threshold | buffer `15.0` | target maximum representation |
+| mid cushion | buffer `10.0` with rates `[100, 200, 400, 800]` | target `200`, level `1` |
+| near top cushion | buffer `14.9` | target `400`, level `2` |
+| monotonicity | increasing buffer sequence | selected level is non-decreasing |
+| missing buffer | `queued_time` absent or `None` | safe minimum fallback |
+| invalid buffer | negative, infinite or NaN buffer | safe minimum fallback |
+| invalid parameters | `reservoir_s < 0`, `cushion_s <= 0` | defaults `5.0` and `10.0` are used |
+| single representation | one-entry ladder | target only representation, index `0` |
+| invalid ladder | empty, missing, malformed or non-positive rates | return `0.0` safely |
+| max-level clamp | high buffer with `max_level=2` | target highest available level only |
+| throughput independence | same buffer with very low and very high throughput fields | same decision |
+| forbidden network fields | RTT/loss/cwnd/server/oracle fields added | decision unchanged |
+| forbidden text fields | console/log/progress fields added | decision unchanged |
 
-## Fake Smoke Tests
+## Fake Smoke Coverage
 
-| scenario | setup | expected result | what it proves |
-| --- | --- | --- | --- |
-| low-buffer run | fake feedback keeps buffer below reservoir | controller stays at min | safe low-buffer behavior |
-| growing buffer | fake feedback increases buffer across cushion | selected level rises monotonically or holds | deterministic buffer map |
-| high buffer | fake feedback stays above high threshold | controller selects max | high-buffer mapping |
-| no throughput data | valid buffer with missing size/time | decision still succeeds | throughput not required |
+Phase 2.3.3 requires at least one short fake-engine run with `controller.name: "bba"` through the current CLI/config path.
 
-Smoke outputs are not benchmark results.
+The smoke run must verify the canonical artifacts:
 
-## Minimum Scenarios
+- `run_manifest.json`
+- `config.resolved.json`
+- `environment.json`
+- `run.log`
+- `segment_telemetry.csv`
+- `evaluation_segments.csv`
 
-- Empty ladder validation failure.
-- Single-level ladder.
-- Missing, negative, and non-finite buffer values.
-- Exact threshold equality for reservoir and reservoir plus cushion.
+The smoke run must also verify that these legacy outputs are not produced:
+
+- `dataset.csv`
+- `dataset_training.csv`
+
+## Deferred Smoke Scenarios
+
+A standard local fake smoke run is feasible with the current CLI/config path. A richer low-buffer or cross-cushion scenario is deferred until replay/traces or a controlled fake scenario fixture exists. Adding special buffer scripting in this block would create new runtime/benchmark infrastructure, which is out of scope.
 
 ## Invariants
 
 - Buffer occupancy is the primary decision signal.
-- No throughput-based primary rule in BBA-0.
+- Throughput is not used as the primary BBA-0 rule.
 - No selected level outside the ladder.
 - Target rate unit is bytes per second.
+- `quality_level` means representation index.
 - Identical feedback and parameters produce identical output.
+- No TCP RTT, packet loss, congestion window, server state, external oracle, console output, final QoE/reward, replay trace, or GStreamer-only signal is used.
 
 ## Invalidating Failures
 
 - Selecting a high rate when buffer is below or equal to reservoir.
 - Using throughput to override normal BBA-0 behavior.
+- Returning bits/s while the contract expects bytes/s.
 - Treating `queued_bytes` as benchmark-equivalent buffer.
-- Modifying runtime/player/metric/config files.
-- Claiming fake smoke output as benchmark evidence.
+- Writing custom CSVs or mutating canonical artifact semantics.
+- Treating fake smoke output as benchmark evidence.
 
 ## Platform Validation
 
-| platform | command | expected |
-| --- | --- | --- |
-| Windows | `python -m unittest discover` | pass |
-| Windows | `python scripts/check_client_readiness.py --strict` | pass |
-| Ubuntu | same commands when available | pass |
+Required commands for this implementation block:
 
-## Benchmark Claim Boundary
-
-These tests validate deterministic BBA behavior only. They do not define final QoE, trace replay, production Netflix equivalence, or benchmark results.
+```powershell
+python -m unittest discover
+python scripts/check_client_readiness.py --strict
+python -m py_compile core/controller/contract.py
+python -m py_compile core/controller/registry.py
+python -m py_compile core/controller/sanity_rate.py
+python -m py_compile core/controller/rate_based.py
+python -m py_compile core/controller/bba.py
+```

@@ -42,6 +42,10 @@ Use this checklist before the implementation chapter and defense preparation.
 - Explain that `rate_based` returns target rates in bytes/s and quality levels are representation indices.
 - Explain why `rate_based` uses buffer only as a low-buffer guard.
 - Explain BBA reservoir/cushion mapping.
+- Explain why `bba` follows `rate_based` as the second academic ABR baseline.
+- Explain that BBA is buffer-based, not throughput-based.
+- Explain what BBA-0 simplification means and why startup capacity estimation is deferred.
+- Explain that `bba` returns target rates in bytes/s and quality levels are representation indices.
 - Explain BOLA utility, segment-size approximation and BOLA-basic boundary.
 - Explain MPC harmonic mean, horizon enumeration, buffer simulation and internal objective.
 - Explain RobustMPC prediction-error correction and why it is not Pensieve.
