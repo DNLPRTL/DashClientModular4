@@ -1,64 +1,85 @@
 # rate_based Acceptance Tests
 
-These are documentation-level acceptance tests. They are precise enough to become future `unittest` cases and fake-engine smoke checks, but no code tests are added in this block.
+Status: implemented in `tests/test_rate_based_controller.py` during Phase 2.3.2.
 
-## Unit Tests
+These tests validate decision logic and client-contract compatibility. They are not benchmark results and do not define final QoE/reward.
 
-| test | input | expected result | tolerance |
-| --- | --- | --- | --- |
-| startup fallback | rates `[100, 200, 400]`, no valid size/time | target `100`, level `0` | exact |
-| highest safe rate | rates `[100, 200, 400]`, smoothed throughput `300`, safety `0.85` gives `255` | target `200`, level `1` | exact |
-| below minimum | rates `[100, 200, 400]`, safe throughput `80` | target `100`, level `0` | exact |
-| above maximum with conservative up | rates `[100, 200, 400]`, current level `1`, safe throughput `1000` | target `400`, level `2` | exact |
-| conservative up from min | rates `[100, 200, 400, 800]`, current level `0`, safe throughput `800` | target `200`, level `1` | exact |
-| aggressive down | rates `[100, 200, 400, 800]`, current level `3`, safe throughput `180` | target `100`, level `0` | exact |
-| critical buffer guard | rates `[100, 200, 400]`, current level `2`, safe throughput `400`, buffer below threshold | target no higher than `200` | exact |
-| invalid download time | positive size and `last_download_time <= 0` | startup fallback | exact |
-| one-level ladder | rates `[250]` | target `250`, level `0` | exact |
-| forbidden signals absent | feedback contains no RTT/loss keys | decision still succeeds | exact |
+## Unit Test Coverage
 
-## Fake Smoke Tests
+| category | implemented case | expected result |
+| --- | --- | --- |
+| registry | `rate_based` is registered | `create_controller("rate_based")` returns `RateBasedController` |
+| registry regression | `min_rate`, `fixed_rate`, `max_rate`, `fixed_quality`, `scripted_quality`, `max_quality` remain available | existing names still instantiate |
+| current API | `calcControlAction()` returns a numeric target rate | return value is a `float`; `getControlAction()` matches |
+| target-rate unit | explicit `bps` throughput converts to bytes/s | target rate is bytes/s and quantizes to the expected index |
+| representation index | target rate maps through `quantizeRate()` | `quality_level` is a representation index |
+| console boundary | stdout is patched during decision | controller writes no console output |
+| measured throughput | rates `[100, 200, 400, 800]`, `bwe=300`, safety `0.85` | target `200`, level `1` |
+| below minimum | safe throughput below the minimum ladder rate | target minimum representation |
+| above maximum | throughput above maximum from current level `1` | upshift limited to one level, target `400` |
+| startup fallback | no valid throughput, no valid size/time | target startup/min representation |
+| invalid download time | size present with zero or negative time | no crash; startup/min fallback |
+| direct bytes/time | `last_fragment_size / last_download_time = 300 B/s` | safe `255 B/s`, target `200` |
+| safety factor | same throughput with `0.5` vs `1.0` safety | lower safety factor selects lower target |
+| low buffer guard | high throughput but `queued_time <= 2.0` | target lowered from current high level |
+| explicit units | `rates_unit=bps` and `measured_throughput_bps` | converted to bytes/s before selection |
+| invalid ladder | empty, missing, malformed or non-positive rates | return `0.0` safely |
+| conservative upshift | high throughput from level `0` | at most one-level upshift |
+| aggressive downshift | unsafe throughput from level `3` | multi-level drop to safe low level |
+| EWMA/drop behavior | high estimate followed by unsafe instant measurement | instant unsafe drop remains aggressive |
+| single representation | one-entry ladder | target only representation, index `0` |
+| forbidden signals | RTT/loss/cwnd/server/oracle fields added | decision unchanged |
+| forbidden field absence | no RTT/loss/server fields | decision still succeeds |
 
-| scenario | setup | expected result | what it proves |
-| --- | --- | --- | --- |
-| stable high throughput | fake run with repeated fast downloads and adequate buffer | gradual upshift, at most one level per segment | deterministic conservative increase |
-| sudden capacity drop | high level followed by slow download measurements | immediate downshift to safe lower level | aggressive decrease |
-| startup no history | first media decision without valid previous measurement | startup/min representation | safe startup |
-| low buffer despite high throughput | high throughput but `queued_time` below critical threshold | lower or minimum representation | buffer is safety guard |
+## Fake Smoke Coverage
 
-Smoke outputs are not benchmark results.
+Phase 2.3.2 requires at least one short fake-engine run with `controller.name: "rate_based"` through the current CLI/config path.
 
-## Minimum Scenarios
+The smoke run must verify the canonical artifacts:
 
-- Empty ladder must raise validation failure.
-- Single-representation ladder must select level 0.
-- Missing `last_fragment_size` or `last_download_time` must not crash.
-- All target rates must be bytes per second.
+- `run_manifest.json`
+- `config.resolved.json`
+- `environment.json`
+- `run.log`
+- `segment_telemetry.csv`
+- `evaluation_segments.csv`
+
+The smoke run must also verify that these legacy outputs are not produced:
+
+- `dataset.csv`
+- `dataset_training.csv`
+
+## Deferred Smoke Scenarios
+
+A stable local fake smoke run is feasible with the current CLI/config path. A capacity-drop or low-capacity smoke scenario is deferred until replay/traces or a controlled downloader/network fixture exists. Creating a throttling system in this block would add benchmark infrastructure, which is explicitly out of scope.
 
 ## Invariants
 
 - Deterministic output for identical feedback and controller state.
-- No quality index outside the ladder.
-- No TCP RTT or packet loss dependency.
-- No console/log/progress dependency.
-- No CSV or metric mutation by the controller.
+- No selected quality outside the ladder.
+- All target rates are bytes/s.
+- `quality_level` means representation index.
+- Buffer is a guard only, not the primary decision rule.
+- No TCP RTT, packet loss, congestion window, server state, external oracle, console output, final QoE/reward, replay trace, or GStreamer-only signal is used.
 
 ## Invalidating Failures
 
-- Returning bits per second while the contract expects bytes per second.
-- Selecting a level outside `[0, max_level]`.
-- Upshifting more than one level when `conservative_up=true`.
-- Using GStreamer events as benchmark-grade rebuffering input.
-- Claiming fake smoke output as benchmark evidence.
+- Returning bits/s while the contract expects bytes/s.
+- Selecting a representation index outside `[0, max_level]`.
+- Upshifting more than `max_upshift_levels` when conservative upshift is enabled.
+- Using forbidden network/server/oracle fields.
+- Writing custom CSVs or mutating canonical artifact semantics.
+- Treating fake smoke output as benchmark evidence.
 
 ## Platform Validation
 
-| platform | command | expected |
-| --- | --- | --- |
-| Windows | `python -m unittest discover` | pass |
-| Windows | `python scripts/check_client_readiness.py --strict` | pass |
-| Ubuntu | same commands when available | pass |
+Required commands for this implementation block:
 
-## Benchmark Claim Boundary
-
-These acceptance tests validate controller behavior and integration readiness only. They do not define final QoE, benchmark reward, replay methodology, or comparative results.
+```powershell
+python -m unittest discover
+python scripts/check_client_readiness.py --strict
+python -m py_compile core/controller/contract.py
+python -m py_compile core/controller/registry.py
+python -m py_compile core/controller/sanity_rate.py
+python -m py_compile core/controller/rate_based.py
+```

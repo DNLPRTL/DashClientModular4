@@ -2,56 +2,96 @@
 
 ## Neutral Academic Summary
 
-The `rate_based` baseline represents classical client-side throughput adaptation. It measures segment download performance at the application layer, smooths the estimate, applies a conservative margin, and selects the highest representation below the safe throughput.
-
-## Citation Plan
+`rate_based` is the first academic ABR baseline implemented after the sanity controllers. It represents classical client-side throughput adaptation: measure application-layer segment download throughput, smooth it, apply a safety margin, and select the highest representation below the safe estimate.
 
 Primary citation: Liu et al. 2011, `liu2011rateAdaptation`.
 
-Use Bentaleb et al. 2019 only for taxonomy context if needed. Do not cite TCP-level mechanisms because the selected implementation deliberately avoids RTT and packet-loss inputs.
+## Why It Comes After Sanity Controllers
 
-## Chapter 2 Contribution
+The sanity controllers (`min_rate`, `fixed_rate`, `max_rate`) were implemented first to prove that the registry, controller contract, target-rate units, representation-index quantization, fake-engine path, and canonical artifacts work before adding an academic algorithm.
 
-Use this baseline to introduce throughput-based ABR as the simplest classical family. Emphasize receiver-driven segment-boundary decisions and application-layer measurements.
+`rate_based` then becomes the first scientifically traceable baseline because its paper card, source evidence, implementation spec, API mapping, acceptance tests, and memory notes already exist.
 
-## Chapter 5 Contribution
+## How Throughput Is Computed
 
-Use the implementation spec to explain:
+The direct implementation formula is:
 
-- feedback keys used by the controller;
-- bytes/s target-rate contract;
-- throughput calculation from segment size and download time;
-- EWMA/conservative estimator;
-- safety factor and low-buffer guard.
+```text
+throughput_Bps = last_fragment_size_bytes / last_download_time_s
+```
 
-## Chapter 6 Contribution Later
+If feedback already contains a measured throughput signal such as `bwe` or an explicit `measured_throughput*` key, the controller may use it first. If a key explicitly says `bps` or `kbps`, the controller converts it to bytes/s before comparing with the ladder.
 
-After evaluation methodology exists, this baseline can act as a transparent lower-complexity comparator against BBA, BOLA, MPC, and RobustMPC. Fake-engine smoke tests should be described as validation, not benchmark results.
+The paper's ratio:
 
-## Suggested Table
+```text
+mu = MSD / SFT
+```
 
-`rate_based` signal mapping:
+is the conceptual bridge: downloading a segment faster than its media duration indicates that the current representation may be sustainable. DashClientModular4 uses bytes/time directly because the downloader and player already expose segment size and download time.
 
-| paper concept | DashClientModular4 signal |
+## How The Safety Factor Works
+
+The default `safety_factor` is `0.85`.
+
+```text
+safe_throughput_Bps = decision_throughput_Bps * 0.85
+```
+
+The controller selects the highest ladder rate whose bytes/s value is less than or equal to this safe throughput. This avoids selecting a representation that exactly equals a noisy measured throughput estimate.
+
+## Why RTT And Loss Are Not Required
+
+Liu et al. 2011 supports a receiver-driven HTTP adaptation approach that can operate from segment fetch measurements. The implementation intentionally does not use TCP RTT, packet loss, congestion window, sender/server state, external bandwidth oracles, console output, or future throughput hints.
+
+This makes the baseline compatible with the current DashClientModular4 controller contract and avoids adding network-layer instrumentation.
+
+## Paper-To-Code Mapping
+
+| paper concept | DashClientModular4 implementation |
 | --- | --- |
-| SFT | `last_download_time` |
-| MSD | `fragment_duration` |
-| measured throughput | `last_fragment_size / last_download_time` |
-| representation ladder | `rates` |
-| safety buffer guard | `queued_time` |
+| Segment Fetch Time (SFT) | `last_download_time` |
+| media segment duration (MSD) | `fragment_duration` for explanation/context |
+| segment-level measurement | `last_fragment_size / last_download_time` |
+| available representations | `rates` in bytes/s |
+| conservative selection | `safety_factor` |
+| smoothed estimate | controller EWMA state |
+| conservative increase | `max_upshift_levels=1` by default |
+| aggressive decrease | instantaneous unsafe drops may select multiple levels lower |
+| buffer safety | `queued_time <= critical_buffer_s` lowers/holds the candidate |
 
-## Suggested Figure
+## Fake Smoke Interpretation
 
-Original diagram: segment download measurement -> throughput smoothing -> safety factor -> highest safe representation -> target rate.
+Fake smoke validates that:
 
-## Limitations To Disclose
+- `rate_based` can be selected by config;
+- it receives controller feedback;
+- it returns bytes/s target rates;
+- the player quantizes those targets to representation indices;
+- canonical artifacts are produced;
+- deprecated `dataset.csv` and `dataset_training.csv` are not produced.
 
-- Segment-level throughput is not a network-layer capacity oracle.
-- EWMA and safety factor are implementation choices.
-- Buffer is only a guard, so the algorithm may react poorly when throughput appears high but buffer is low.
-- No final QoE/reward is defined here.
-- No GStreamer benchmark claim is made.
+Fake smoke does not prove final performance, QoE improvement, real-network superiority, or paper-level benchmark behavior. Comparison against BBA, BOLA, MPC and RobustMPC is deferred until those controllers and the benchmark methodology exist.
 
-## Defense Message
+## How Tests Prove Correctness
 
-This baseline is intentionally simple and interpretable. It establishes the throughput-driven end of the comparison before buffer-based and MPC-style controllers are introduced.
+The unit tests prove the local decision rule:
+
+- valid throughput maps to the highest safe representation;
+- missing or invalid throughput falls back safely;
+- bytes/s and explicit bps conversions are correct;
+- low buffer only guards the decision;
+- upshifts are conservative;
+- downshifts can be multi-level;
+- single and invalid ladders are handled safely;
+- forbidden RTT/loss/server/oracle fields do not affect decisions.
+
+They do not prove final QoE or benchmark superiority.
+
+## Suggested Chapter Usage
+
+Chapter 2: introduce throughput-based ABR as a classical family.
+
+Chapter 5: explain the implementation with the formulas, contract units, and tests above.
+
+Chapter 6 later: use it as a transparent comparator only after benchmark methodology and final QoE/reward are defined.

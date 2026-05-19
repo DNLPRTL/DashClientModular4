@@ -17,6 +17,7 @@ REQUIRED_IMPORTS = [
     "core.controller.registry",
     "core.controller.fixed_quality",
     "core.controller.max_quality_controller",
+    "core.controller.rate_based",
     "core.controller.sanity_rate",
     "core.controller.scripted_quality",
 ]
@@ -31,7 +32,15 @@ class ImportSmokeTest(unittest.TestCase):
     def test_controller_registry_exposes_tracked_controller(self):
         registry = importlib.import_module("core.controller.registry")
 
-        expected = {"min_rate", "fixed_rate", "max_rate", "fixed_quality", "scripted_quality", "max_quality"}
+        expected = {
+            "min_rate",
+            "fixed_rate",
+            "max_rate",
+            "rate_based",
+            "fixed_quality",
+            "scripted_quality",
+            "max_quality",
+        }
 
         self.assertTrue(expected.issubset(registry.CONTROLLER_REGISTRY))
         self.assertTrue(expected.issubset({spec.key for spec in registry.available_controllers()}))

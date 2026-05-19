@@ -4,6 +4,7 @@ from typing import Callable, Mapping, Optional
 
 from .fixed_quality import FixedQualityController
 from .max_quality_controller import MaxQualityController
+from .rate_based import RateBasedController
 from .sanity_rate import FixedRateController, MaxRateController, MinRateController
 from .scripted_quality import ScriptedQualityController
 
@@ -30,6 +31,11 @@ CONTROLLER_REGISTRY = {
         key="max_rate",
         label="Max rate (sanity/control)",
         factory=MaxRateController,
+    ),
+    "rate_based": ControllerSpec(
+        key="rate_based",
+        label="Rate-based throughput baseline",
+        factory=RateBasedController,
     ),
     "fixed_quality": ControllerSpec(
         key="fixed_quality",

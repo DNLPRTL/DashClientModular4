@@ -5,51 +5,65 @@
 | field | value |
 | --- | --- |
 | controller name | `rate_based` |
-| family | throughput-based / rate-based |
+| family | throughput-based / rate-based ABR |
 | primary source | Liu et al. 2011, `paper_card.md`, `source_evidence.md` |
-| implementation status | future implementation spec; no code in this block |
+| implementation status | implemented in Phase 2.3.2 as the first academic ABR baseline |
+| code module | `core/controller/rate_based.py` |
+| test module | `tests/test_rate_based_controller.py` |
 
 ## Objective
 
-Select the highest representation whose MPD bitrate is below a conservative application-layer throughput estimate. Throughput is the primary signal. Buffer level is used only as a safety guard.
+`rate_based` selects the highest representation whose bitrate is below a conservative application-layer throughput estimate. Throughput is the primary signal. Buffer level is only a safety guard and never replaces the throughput rule.
 
-This controller does not define final QoE/reward and does not create benchmark methodology.
+This controller does not define final QoE/reward, trace replay, benchmark methodology, or comparative claims against BBA, BOLA, MPC or RobustMPC.
 
 ## Inputs From DashClientModular4
 
-| input | client key | unit | role | required |
+| input | client key | unit | role | status |
 | --- | --- | --- | --- | --- |
-| bitrate ladder | `rates` | bytes_per_second_list | candidate representations | yes |
-| current quality level | `level` | representation_index | step-wise movement and switch context | yes |
-| current representation rate | `cur_rate` or `cur_bitrate` | bytes_per_second | fallback/current-rate context | yes |
-| last segment size | `last_fragment_size` | bytes | throughput numerator | yes for measured update |
-| last download time | `last_download_time` | seconds | throughput denominator / SFT | yes for measured update |
-| segment duration | `fragment_duration` | seconds | MSD explanation and guard defaults | yes |
-| buffer level | `queued_time` | seconds | low-buffer safety guard only | yes |
-| segment index | `segment_index` | index | deterministic state/debug context | optional |
+| representation ladder | `rates` | bytes_per_second_list | candidate representations | required |
+| current quality level | `level` | representation_index | conservative upshift and downshift context | required with safe fallback |
+| measured throughput | `bwe` or explicit throughput key | bytes_per_second unless key suffix says otherwise | preferred application-layer measurement | allowed |
+| last segment size | `last_fragment_size` | bytes | direct throughput numerator | allowed |
+| last download time | `last_download_time` | seconds | SFT / throughput denominator | allowed |
+| throughput history | `throughput_history*` | bytes_per_second unless key suffix says otherwise | conservative fallback when present | optional |
+| buffer level | `queued_time` | seconds | low-buffer safety guard only | allowed |
+| segment duration | `fragment_duration` | seconds | paper mapping / documentation context | allowed |
+| segment index | `segment_index` | index | reproducibility/debug context | optional |
 
-## Output To DashClientModular4
+## Outputs To DashClientModular4
 
-Return `target_rate` in bytes per second from `calcControlAction()`. The existing quantizer maps it to a representation index. The controller must never write CSV files, change metrics, alter `eval_phase`, or depend on console output.
+`calcControlAction()` returns `target_rate` in bytes per second. `quality_level` remains the representation index obtained through `quantizeRate(target_rate)`.
+
+The controller does not write CSV files, mutate `eval_phase`, change `use_for_eval`, parse console output, download segments, parse MPDs, or alter metrics.
 
 ## Parameters
 
-| parameter | unit | suggested default | reason/configurability |
-| --- | --- | --- | --- |
-| `safety_factor` | ratio | `0.85` | conservative margin below estimated throughput |
-| `ewma_alpha` | ratio | `0.6` | smooths segment-level measurements; configurable for sensitivity |
-| `startup_level` | representation_index | `0` | safe startup when no valid measurement exists |
-| `critical_buffer_s` | seconds | `max(fragment_duration_s, 2.0)` | buffer guard threshold; derived when segment duration exists |
-| `conservative_up` | boolean | `true` | limits upward movement to one level per decision |
-| `allow_multi_level_down` | boolean | `true` | supports aggressive decrease after throughput drop |
-| `min_valid_download_time_s` | seconds | `0.001` | avoids division by zero and unstable timing |
+| parameter | default | unit | implementation note |
+| --- | ---: | --- | --- |
+| `safety_factor` | `0.85` | ratio | applied to the selected throughput estimate before ladder selection |
+| `ewma_alpha` | `0.5` | ratio | smooths segment-level measurements |
+| `critical_buffer_s` | `2.0` | seconds | low-buffer guard threshold |
+| `startup_level` / `startup_quality` | `0` | representation_index | fallback when no valid throughput or history exists |
+| `conservative_upshift` / `conservative_up` | `true` | boolean | limits upward moves |
+| `max_upshift_levels` | `1` | levels | default one-level upshift cap |
+| `aggressive_downshift` / `allow_multi_level_down` | `true` | boolean | allows multi-level decrease when throughput is unsafe |
+| `min_valid_download_time_s` | `0.0` | seconds | zero/negative download times are invalid |
 
-## Formulas
+These parameters are configurable through the existing `controller.params` mechanism. No new config schema or runtime plumbing was added.
 
-Instantaneous measured throughput:
+## Formulas And Units
+
+Direct segment throughput:
 
 ```text
 throughput_Bps = last_fragment_size_bytes / last_download_time_s
+```
+
+Bits to bytes conversion when a feedback key explicitly uses `bps`:
+
+```text
+throughput_Bps = throughput_bps / 8
 ```
 
 EWMA update:
@@ -62,97 +76,78 @@ smoothed_Bps = ewma_alpha * throughput_Bps
 Safe throughput:
 
 ```text
-safe_Bps = smoothed_Bps * safety_factor
+safe_throughput_Bps = decision_throughput_Bps * safety_factor
 ```
 
 Candidate selection:
 
 ```text
-candidate_level = max(i where rates[i] <= safe_Bps)
-target_rate_Bps = rates[candidate_level]
+candidate_level = max(i where rates_Bps[i] <= safe_throughput_Bps)
+target_rate_Bps = rates_Bps[candidate_level]
 ```
 
-The paper's `mu = MSD / SFT` remains an explanatory ratio. The future implementation should use direct bytes/time throughput because the client already exposes size and time in units compatible with the controller contract.
+The paper ratio `mu = MSD / SFT` remains the explanatory link to Liu et al. 2011. The implementation uses direct bytes/time because DashClientModular4 already exposes segment size and download time.
 
-## Pseudocode
+## Decision Rule
 
 ```text
-validate rates
-if rates has one entry:
-    return rates[0]
+normalize the ladder in bytes/s
+if the ladder is missing, empty or malformed:
+    return 0.0 as a safe no-ladder fallback
 
-if last_fragment_size <= 0 or last_download_time < min_valid_download_time_s:
-    return rates[startup_level clamped to ladder]
+if the ladder has one representation:
+    return that representation
 
-instant = last_fragment_size / last_download_time
-update smoothed throughput
-safe = smoothed * safety_factor
-candidate = highest level whose rate <= safe, else level 0
+prefer a valid measured throughput key when available
+otherwise derive throughput from last_fragment_size / last_download_time
+otherwise use valid throughput history or existing EWMA state
+otherwise return startup_level, default 0
 
-if queued_time is missing, negative or non-finite:
-    candidate = min(candidate, current level) if current level is valid else 0
+update EWMA when a new measurement exists
+if the instantaneous measurement is unsafe for the current level:
+    use the lower of instantaneous and EWMA for aggressive downshift
 
+apply safety_factor
+select the highest rate <= safe throughput
+if queued_time is missing:
+    do not upshift
 if queued_time <= critical_buffer_s:
-    candidate = min(candidate, max(0, current_level - 1))
-
-if conservative_up and candidate > current_level:
-    candidate = current_level + 1
-
-if candidate < current_level and allow_multi_level_down:
-    keep candidate
-
-return rates[candidate]
+    force at least one level lower when possible
+if conservative_upshift is true:
+    limit upward moves to max_upshift_levels
+return rates[chosen_level] in bytes/s
 ```
 
 ## Edge Cases
 
-| case | required behavior |
+| case | behavior |
 | --- | --- |
-| empty ladder | validation failure through shared controller contract |
-| one-level ladder | return the only rate |
-| no valid measurement | return `startup_level`, default level 0 |
-| zero or negative download time | ignore measurement and use startup/safe fallback |
+| empty or missing ladder | return `0.0` without crashing |
+| malformed or non-positive ladder | return `0.0` without crashing |
+| one-level ladder | return index `0` |
+| no valid throughput and no history | return startup/min representation |
+| zero or negative download time | ignore measurement and fall back safely |
 | throughput below minimum | choose minimum representation |
 | throughput above maximum | choose maximum, subject to conservative upshift |
-| critically low buffer | force minimum or one-step-down safe behavior |
-| bit/s vs bytes/s ambiguity | all internal comparisons use bytes per second |
+| low buffer | reduce or hold down the candidate as a safety guard |
+| missing current level | use last selected level or startup level |
+| explicit `bps` throughput/rate unit | convert to bytes/s before comparison |
 
-## Simplifications Accepted
+## Forbidden Signals
 
-- Direct bytes/time throughput instead of explicitly computing `mu`.
-- EWMA smoothing instead of a full production estimator.
-- Buffer as a guard only, not as the primary rule.
-- No TCP-layer instrumentation.
+The implementation intentionally does not use TCP RTT, packet loss, congestion window, sender/server state, external bandwidth oracles, console output, GStreamer-only observations, future throughput oracles, final QoE/reward, replay traces, or benchmark results.
 
-## Simplifications Prohibited
+## Telemetry And Logging
 
-- No TCP RTT, packet loss, congestion window, sender state, server state, or external bandwidth oracle.
-- No final QoE/reward definition.
-- No replay, trace, emulation, or benchmark claims.
-- No runtime/player/metric/config changes as part of this documentation block.
+The controller stores `last_metrics` for local inspection in tests and debugging. These fields are not canonical telemetry columns and do not replace `segment_telemetry.csv`, `evaluation_segments.csv`, the manifest, or the resolved config.
 
-## Telemetry And Logging Expectations
+## Validation Status
 
-Future code may expose controller-local debug fields only after separate provenance documentation. Minimum useful fields would be `measured_throughput_Bps`, `smoothed_throughput_Bps`, `safe_throughput_Bps`, and `rate_based_candidate_level`. They must not replace canonical run artifacts or console output.
+Phase 2.3.2 validation consists of:
 
-## Compatibility With `baseline_entry_contract.md`
+- unit tests in `tests/test_rate_based_controller.py`;
+- full `python -m unittest discover`;
+- strict client readiness check;
+- fake-engine smoke run through the current CLI/config path.
 
-- Target rates are bytes per second.
-- Representation ladder comes from MPD/client state through `rates`.
-- Quality levels are representation indices.
-- Decisions occur at segment boundaries.
-- The controller must not write CSVs or mutate evaluation flags.
-
-## Acceptance Criteria
-
-The future implementation is acceptable only if the tests in `acceptance_tests.md` pass, the controller remains deterministic for identical feedback/state, and no forbidden signals are used.
-
-## Risks
-
-- The current `bwe` key is a legacy fallback, so the implementation should prefer explicit size/time updates.
-- Segment duration differences from the paper's assumed range can change smoothing behavior.
-- A too-high safety factor may oscillate; a too-low factor may be overly conservative.
-
-## Memory/Thesis Usage
-
-Use this spec in Chapter 5 to explain the first academic ABR baseline implementation. In Chapter 2, cite Liu et al. as the source for classical application-layer throughput adaptation. In Chapter 6, use it only after benchmark methodology exists.
+The fake smoke run validates integration and artifact production only. It is not a benchmark and does not prove `rate_based` is better or worse than any later baseline.

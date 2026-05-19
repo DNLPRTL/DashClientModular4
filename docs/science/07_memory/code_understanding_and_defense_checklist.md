@@ -37,6 +37,10 @@ Use this checklist before the implementation chapter and defense preparation.
 ## Baseline Formulas
 
 - Explain rate_based throughput calculation and safety factor.
+- Explain why `rate_based` is the first academic ABR baseline after sanity controllers.
+- Explain that `rate_based` uses application-layer segment size/time or measured download rate, not TCP RTT/loss/cwnd.
+- Explain that `rate_based` returns target rates in bytes/s and quality levels are representation indices.
+- Explain why `rate_based` uses buffer only as a low-buffer guard.
 - Explain BBA reservoir/cushion mapping.
 - Explain BOLA utility, segment-size approximation and BOLA-basic boundary.
 - Explain MPC harmonic mean, horizon enumeration, buffer simulation and internal objective.

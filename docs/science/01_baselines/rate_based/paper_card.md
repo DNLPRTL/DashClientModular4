@@ -12,8 +12,8 @@
 | key contribution | Receiver-driven rate adaptation using HTTP segment download measurements, with smoothed throughput, conservative increase, and aggressive decrease behavior without TCP-layer RTT/loss dependency. |
 | algorithm family if applicable | Throughput-based / rate-based ABR. |
 | required signals if applicable | Segment size, segment download time, representation ladder, current level, previous throughput estimate, and segment index. |
-| implementation relevance | Future implementation should derive measured throughput from download size/time, smooth it according to the spec, and map the target rate to the ladder through the existing controller contract. |
+| implementation relevance | Implemented in Phase 2.3.2: derives measured throughput from application-layer download signals, smooths it with EWMA, applies a safety factor, and maps target rate to the ladder through the existing controller contract. |
 | what it does NOT justify | Does not justify a final QoE reward, trace replay design, TCP-layer instrumentation, or modifying downloader/player metrics. |
 | use in thesis memory | Chapter 2 baseline family; Chapter 5 implementation; Chapter 6 comparison. |
 | provisional BibTeX key | `liu2011rateAdaptation` |
-| decision | Mandatory later baseline; implementation blocked until the full five-doc package exists. |
+| decision | Mandatory baseline implemented first among academic ABR controllers; fake smoke is integration validation only, not benchmark evidence. |

@@ -2,37 +2,58 @@
 
 ## Contract Summary
 
-The future `rate_based` controller uses the current dict-based controller API. It receives feedback with `setPlayerFeedback()` and returns a target rate in bytes per second from `calcControlAction()`.
+`rate_based` uses the current dict-based controller API:
+
+- `setPlayerFeedback(feedback_dict)` receives the latest runtime feedback.
+- `calcControlAction()` returns a target rate in bytes per second.
+- `quantizeRate(target_rate)` maps that rate to a representation index.
+- `getIdleDuration()` remains `0.0`; the controller does not pace downloads.
 
 ## Signal Mapping
 
-| signal in paper | signal in DashClientModular4 | exists / derivable / missing / forbidden | paper unit | client unit | conversion | source document or runtime source | restrictions | decision |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| available bitrates | `rates` | exists | bps in DASH literature | bytes_per_second_list | compare directly in bytes/s; do not multiply by 8 unless source value is in bits/s | `baseline_entry_contract.md`, `core.runtime_feedback` | ladder must come from MPD/client state | use |
-| current bitrate | `cur_rate`, `cur_bitrate` | exists | bps | bytes_per_second | use `cur_rate`; treat `cur_bitrate` as legacy alias | `baseline_entry_contract.md` | names are legacy but units are bytes/s | use with caution |
-| current quality | `level` | exists | representation index | representation_index | none | controller feedback | must stay within ladder | use |
-| segment fetch time (SFT) | `last_download_time` | exists | seconds | seconds | none | downloader/player feedback | must be positive and finite | use |
-| media segment duration (MSD) | `fragment_duration` | exists | seconds | seconds | none | parser/player feedback | media rows only; init rows may be zero | use |
-| segment size | `last_fragment_size` | exists | bytes or bits depending paper notation | bytes | if comparing with bps, multiply bytes by 8; preferred controller comparison stays bytes/s | downloader/player feedback | must be positive for update | use |
-| measured throughput | `last_fragment_size / last_download_time` | derivable | bps | bytes_per_second | `Bps = bytes / seconds` | `source_evidence.md`, `core.runtime_feedback` | avoid relying only on legacy `bwe` fallback | derive explicitly |
-| smoothed throughput | controller state | derivable | bps | bytes_per_second | EWMA over positive measured throughput | implementation spec | deterministic state only | derive |
-| ratio `mu = MSD / SFT` | `fragment_duration / last_download_time` | derivable | ratio | ratio | no unit conversion | `source_evidence.md` | explanatory; not required for target-rate output | optional |
-| buffer guard | `queued_time` | exists | seconds | seconds | none | media engine feedback | guard only, not primary decision | use as safety guard |
-| TCP RTT | none | forbidden | seconds | none | none | prohibited by source evidence | no network-layer instrumentation | do not use |
-| packet loss | none | forbidden | ratio/count | none | none | prohibited by source evidence | no TCP-layer dependency | do not use |
-| server/sender state | none | forbidden | mixed | none | none | source evidence | client-side only | do not use |
-| console output | none | forbidden | text | none | none | runtime console contract | never an input signal | do not use |
+| paper concept | DashClientModular4 signal | status | paper unit | client unit | conversion / use | decision |
+| --- | --- | --- | --- | --- | --- | --- |
+| available bitrates | `rates` | exists | bps in DASH literature | bytes_per_second_list | compare in bytes/s; `rates_unit=bps` is converted only when explicitly provided | use |
+| current representation | `level` | exists | representation index | representation_index | clamp to ladder; fallback to last selected/startup if missing | use |
+| current bitrate | `cur_rate`, `cur_bitrate` | exists | bps in literature | bytes_per_second | used only as context when needed; names are legacy aliases | use with caution |
+| measured throughput | `bwe`, `measured_throughput*`, `throughput*` | exists/derivable | bps or B/s | bytes_per_second | explicit `bps`/`kbps` suffixes convert to bytes/s; plain `bwe` is bytes/s | use |
+| segment fetch time (SFT) | `last_download_time` | exists | seconds | seconds | must be positive; zero/negative is invalid | use |
+| segment size | `last_fragment_size` | exists | bytes/bits by paper notation | bytes | direct implementation uses `bytes / seconds` | use |
+| media segment duration (MSD) | `fragment_duration` | exists | seconds | seconds | documents the Liu ratio; not needed for bytes/time throughput | use as context |
+| smoothed throughput | controller EWMA state | derivable | bps | bytes_per_second | deterministic EWMA with `ewma_alpha=0.5` by default | derive |
+| throughput history | `throughput_history*` | optional | bps or B/s | bytes_per_second | positive values only; explicit suffix converts units | optional |
+| buffer guard | `queued_time` | exists | seconds | seconds | low buffer can only lower/hold the selected level | use as guard |
+| TCP RTT | none | forbidden | seconds | none | no TCP-layer instrumentation | do not use |
+| packet loss | none | forbidden | count/ratio | none | no TCP-layer dependency | do not use |
+| congestion window | none | forbidden | bytes/packets | none | no TCP-layer dependency | do not use |
+| server/sender state | none | forbidden | mixed | none | receiver-side controller only | do not use |
+| external bandwidth oracle | none | forbidden | mixed | none | no future oracle | do not use |
+| console/log/progress text | none | forbidden | text | none | runtime console is non-canonical | do not use |
+| final QoE/reward | none | forbidden | score | none | not defined in Phase 2.3.2 | do not use |
 
 ## Output Mapping
 
 | output | unit | client path | decision |
 | --- | --- | --- | --- |
-| target rate | bytes_per_second | `calcControlAction()` return value | return `rates[candidate_level]` |
-| chosen quality | representation_index | `quantizeRate(target_rate)` | let shared quantizer map target rate to level |
+| target rate | bytes_per_second | `calcControlAction()` | return a ladder rate in bytes/s, or `0.0` only for invalid/no ladder |
+| chosen quality | representation_index | `quantizeRate(target_rate)` | representation index after shared quantization |
 
-## API Restrictions
+## Unit Conversions
 
-- Do not add feedback keys in the first implementation unless a separate provenance note is created.
-- Do not depend on `start_segment_request` or `stop_segment_request`; they are runtime diagnostics.
-- Do not read logs, progress labels, or console text.
-- Do not alter parser, downloader, media engine, metrics, or output artifact contracts.
+```text
+bitrate_bps = bitrate_kbps * 1000
+bitrate_Bps = bitrate_bps / 8
+throughput_Bps = last_fragment_size_bytes / last_download_time_s
+throughput_bps = 8 * throughput_Bps
+safe_throughput_Bps = throughput_Bps * safety_factor
+```
+
+The implemented comparison is always in bytes per second.
+
+## API Restrictions Preserved
+
+- No new feedback keys are required.
+- No parser, downloader, player, media-engine, metric, or output-artifact contract changes are required.
+- No canonical telemetry columns are added by the controller.
+- The controller does not depend on `start_segment_request` or `stop_segment_request`; those remain diagnostics.
+- Fake smoke output is integration evidence, not benchmark evidence.
