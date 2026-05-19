@@ -6,7 +6,16 @@ Sanity controllers should be described in Chapter 5 as validation tools for the 
 
 ## Suggested Wording
 
-The min-rate, fixed-rate, and max-rate controllers are deterministic controls used to validate the ABR integration path. They provide lower, fixed, and upper ladder behavior checks before paper-derived controllers are added.
+The `min_rate`, `fixed_rate`, and `max_rate` controllers are deterministic controls used to validate the ABR integration path. They provide lower, fixed, and upper ladder behavior checks before paper-derived controllers are added.
+
+## Implementation Notes
+
+- Code module: `core/controller/sanity_rate.py`.
+- Registry names: `min_rate`, `fixed_rate`, `max_rate`.
+- Existing debug/legacy names `fixed_quality`, `scripted_quality`, and `max_quality` remain available.
+- Target rates are bytes per second.
+- Quality levels are representation indices.
+- The fake engine validates integration and artifacts, not final benchmark performance.
 
 ## Limitations
 

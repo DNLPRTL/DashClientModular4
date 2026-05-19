@@ -17,8 +17,11 @@
 ## Invariants
 
 - One-level ladders select level 0.
-- Empty or invalid ladders must fail through the shared contract validation.
+- Empty, missing or malformed ladders return safe target `0.0` without crashing in the formal controller.
 - No throughput, buffer, or QoE signal is required.
+- The formal controller name is `min_rate`.
+- The implementation module is `core/controller/sanity_rate.py`.
+- The target rate is the minimum ladder value in bytes per second.
 
 ## Non-Goals
 

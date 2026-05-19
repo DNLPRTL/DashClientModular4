@@ -17,6 +17,8 @@ Use this checklist before the implementation chapter and defense preparation.
 - Explain why quality levels are representation indices.
 - Explain where the representation ladder comes from.
 - Explain why controllers must not parse MPDs or download segments.
+- Explain why `min_rate`, `fixed_rate`, and `max_rate` were implemented before academic ABR baselines.
+- Explain how the registry maps config names to controller classes.
 
 ## Media Engine Boundary
 
@@ -43,6 +45,7 @@ Use this checklist before the implementation chapter and defense preparation.
 ## Tests And Limitations
 
 - Explain each controller unit test category.
+- Explain sanity controller tests for min, fixed, max and target-rate unit conversion.
 - Explain fake smoke scenarios and why they are not benchmarks.
 - Explain no final QoE/reward in Phase 2.
 - Explain no traces/replay/emulation yet.

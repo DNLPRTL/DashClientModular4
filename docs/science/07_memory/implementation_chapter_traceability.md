@@ -9,7 +9,7 @@ This document maps future implementation evidence to the TFG memory. It is a pla
 | Client architecture | Module boundaries: parser, downloader, media engine, controller, logging, artifacts. | Phase 1 architecture docs and readiness report. | Client architecture figure. |
 | Controller contract | Feedback keys, units, target rate, quality index, ladder source. | `baseline_entry_contract.md`, API mappings. | Controller contract table. |
 | Baseline implementation method | Documentation-first gate before coding. | `controller_implementation_readiness_gate.md`, `controller_academic_validation_protocol.md`. | Implementation gate figure. |
-| Sanity controllers | Deterministic min/fixed/max behavior for plumbing validation. | `sanity_controllers/*.md`. | Sanity controller table. |
+| Sanity controllers | Deterministic `min_rate`, `fixed_rate`, and `max_rate` behavior for registry, unit, contract and fake-engine validation. | `sanity_controllers/*.md`, `core/controller/sanity_rate.py`, `tests/test_sanity_rate_controllers.py`. | Sanity controller table. |
 | Academic baselines | rate_based, bba, bola, mpc, robust_mpc. | implementation specs and controller mappings. | Baseline traceability matrix. |
 | Testing strategy | Unit tests, fake smoke tests, readiness checks. | unit and fake smoke protocols. | Test pyramid or validation ladder figure. |
 | Reproducibility | Canonical artifacts and environment/config capture. | output artifact contract and fake smoke protocol. | Artifact flow figure. |

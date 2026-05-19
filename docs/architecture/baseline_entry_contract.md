@@ -36,11 +36,16 @@ El registro actual esta en `core/controller/registry.py`:
 
 | Nombre | Estado | Uso permitido |
 |---|---|---|
+| `min_rate` | sanity/control | Seleccionar siempre la representacion minima; valida contrato, registro y fake smoke sin claim academico. |
+| `fixed_rate` | sanity/control | Seleccionar nivel/tasa fija configurada y clampada a la ladder; valida parametros y unidades. |
+| `max_rate` | sanity/control | Seleccionar siempre la representacion maxima permitida; valida contrato y ruta de maximo nivel sin usar `max_quality` legacy. |
 | `fixed_quality` | test/debug | Smoke tests, invariantes de ruta, validacion determinista. |
 | `scripted_quality` | test/debug | Trazas deterministas de cambio de nivel. |
 | `max_quality` | legacy/debug/stress | Estresar la ruta de seleccion maxima; no comparar academicamente. |
 
-Futuros baselines deben registrarse aqui cuando Phase 0 haya cerrado sus papers/especificaciones. El nombre del controlador en el manifest identifica la ejecucion, pero no convierte al controlador en baseline academico por si mismo.
+`min_rate`, `fixed_rate` y `max_rate` son controles tecnicos de cordura. No son baselines academicos y sus smoke tests no son resultados de benchmark.
+
+Futuros baselines academicos deben registrarse aqui cuando sus papers, evidencias, especificaciones, mappings y tests esten cerrados. El nombre del controlador en el manifest identifica la ejecucion, pero no convierte al controlador en baseline academico por si mismo.
 
 ## API actual
 

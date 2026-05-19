@@ -13,6 +13,7 @@ from core.client_config import (
 )
 from core.controller.max_quality_controller import MaxQualityController
 from core.controller.registry import create_controller
+from core.controller.sanity_rate import FixedRateController
 
 
 class ConfigLoadingTest(unittest.TestCase):
@@ -129,6 +130,21 @@ class ControllerConfigLookupTest(unittest.TestCase):
 
         self.assertIsInstance(controller, MaxQualityController)
         self.assertFalse(controller.debug)
+
+    def test_registry_creates_formal_fixed_rate_controller(self):
+        config = ClientConfig.from_dict(
+            {
+                "mpd_url": "http://example.invalid/video.mpd",
+                "controller": {
+                    "name": "fixed_rate",
+                    "params": {"level": 1},
+                },
+            }
+        )
+
+        controller = create_controller(config.controller.name, config.controller.params)
+
+        self.assertIsInstance(controller, FixedRateController)
 
     def test_unknown_controller_name_fails(self):
         with self.assertRaises(ValueError):

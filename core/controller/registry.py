@@ -4,6 +4,7 @@ from typing import Callable, Mapping, Optional
 
 from .fixed_quality import FixedQualityController
 from .max_quality_controller import MaxQualityController
+from .sanity_rate import FixedRateController, MaxRateController, MinRateController
 from .scripted_quality import ScriptedQualityController
 
 
@@ -15,6 +16,21 @@ class ControllerSpec:
 
 
 CONTROLLER_REGISTRY = {
+    "min_rate": ControllerSpec(
+        key="min_rate",
+        label="Min rate (sanity/control)",
+        factory=MinRateController,
+    ),
+    "fixed_rate": ControllerSpec(
+        key="fixed_rate",
+        label="Fixed rate or level (sanity/control)",
+        factory=FixedRateController,
+    ),
+    "max_rate": ControllerSpec(
+        key="max_rate",
+        label="Max rate (sanity/control)",
+        factory=MaxRateController,
+    ),
     "fixed_quality": ControllerSpec(
         key="fixed_quality",
         label="Fixed quality (test/debug)",
