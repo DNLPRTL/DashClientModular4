@@ -47,6 +47,12 @@ Use this checklist before the implementation chapter and defense preparation.
 - Explain what BBA-0 simplification means and why startup capacity estimation is deferred.
 - Explain that `bba` returns target rates in bytes/s and quality levels are representation indices.
 - Explain BOLA utility, segment-size approximation and BOLA-basic boundary.
+- Explain why BOLA follows BBA in the implementation order.
+- Explain how BOLA differs from BBA: utility/size score instead of reservoir/cushion map.
+- Explain how `queued_time`, `fragment_duration`, `bola_v`, `bola_gamma`, utility and segment size enter the BOLA score.
+- Explain that exact per-level segment sizes are optional and otherwise approximated as `rate * fragment_duration`.
+- Explain that all non-positive BOLA scores fall back to minimum rate because no-download/wait is not expressible in the current controller contract.
+- Explain why DYNAMIC, FAST SWITCHING and BOLA-E are deferred.
 - Explain MPC harmonic mean, horizon enumeration, buffer simulation and internal objective.
 - Explain RobustMPC prediction-error correction and why it is not Pensieve.
 

@@ -2,6 +2,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Callable, Mapping, Optional
 
+from .bola import BolaController
 from .bba import BbaController
 from .fixed_quality import FixedQualityController
 from .max_quality_controller import MaxQualityController
@@ -42,6 +43,11 @@ CONTROLLER_REGISTRY = {
         key="bba",
         label="BBA buffer-based baseline",
         factory=BbaController,
+    ),
+    "bola": ControllerSpec(
+        key="bola",
+        label="BOLA-basic utility/buffer baseline",
+        factory=BolaController,
     ),
     "fixed_quality": ControllerSpec(
         key="fixed_quality",

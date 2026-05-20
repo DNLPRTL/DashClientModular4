@@ -41,6 +41,7 @@ El registro actual esta en `core/controller/registry.py`:
 | `max_rate` | sanity/control | Seleccionar siempre la representacion maxima permitida; valida contrato y ruta de maximo nivel sin usar `max_quality` legacy. |
 | `rate_based` | academic baseline | Primer baseline ABR academico implementado; selecciona la representacion mas alta bajo una estimacion conservadora de throughput de aplicacion. |
 | `bba` | academic baseline | Segundo baseline ABR academico implementado; selecciona representacion mediante mapa de buffer reservoir/cushion. |
+| `bola` | academic baseline | Tercer baseline ABR academico implementado; selecciona representacion mediante score BOLA-basic de buffer, utilidad y tamano de segmento. |
 | `fixed_quality` | test/debug | Smoke tests, invariantes de ruta, validacion determinista. |
 | `scripted_quality` | test/debug | Trazas deterministas de cambio de nivel. |
 | `max_quality` | legacy/debug/stress | Estresar la ruta de seleccion maxima; no comparar academicamente. |
@@ -50,6 +51,8 @@ El registro actual esta en `core/controller/registry.py`:
 `rate_based` se registra despues de cerrar su paper card, source evidence, implementation spec, API mapping, acceptance tests y notes for memory. Usa throughput de capa de aplicacion (`bwe` o `last_fragment_size / last_download_time`) y puede usar `queued_time` solo como guardia de seguridad. No usa TCP RTT, packet loss, congestion window, estado de servidor, oraculos externos, consola ni QoE final.
 
 `bba` se registra despues de cerrar su paper card, source evidence, implementation spec, API mapping, acceptance tests y notes for memory. Usa `queued_time` como senal primaria de buffer y los parametros `reservoir_s` y `cushion_s` para mapear el buffer a una representacion. No usa throughput como regla primaria, ni TCP RTT, packet loss, congestion window, estado de servidor, oraculos externos, consola ni QoE final.
+
+`bola` se registra despues de cerrar su paper card, source evidence, implementation spec, API mapping, acceptance tests y notes for memory. Usa `queued_time`, `fragment_duration`, `rates`, utilidad logaritmica interna y tamano de segmento exacto si se proporciona o aproximado como `rate * fragment_duration`. No requiere prediccion explicita de throughput, no implementa DYNAMIC, FAST SWITCHING, BOLA-E ni comportamiento completo de dash.js, y no define QoE final.
 
 Futuros baselines academicos deben registrarse aqui cuando sus papers, evidencias, especificaciones, mappings y tests esten cerrados. El nombre del controlador en el manifest identifica la ejecucion, pero no convierte al controlador en baseline academico por si mismo.
 

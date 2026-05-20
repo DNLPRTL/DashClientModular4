@@ -12,6 +12,7 @@ from core.client_config import (
     validate_config_for_run,
 )
 from core.controller.bba import BbaController
+from core.controller.bola import BolaController
 from core.controller.max_quality_controller import MaxQualityController
 from core.controller.rate_based import RateBasedController
 from core.controller.registry import create_controller
@@ -178,9 +179,24 @@ class ControllerConfigLookupTest(unittest.TestCase):
 
         self.assertIsInstance(controller, BbaController)
 
+    def test_registry_creates_bola_controller(self):
+        config = ClientConfig.from_dict(
+            {
+                "mpd_url": "http://example.invalid/video.mpd",
+                "controller": {
+                    "name": "bola",
+                    "params": {"bola_v": 5.0, "bola_gamma": 0.2},
+                },
+            }
+        )
+
+        controller = create_controller(config.controller.name, config.controller.params)
+
+        self.assertIsInstance(controller, BolaController)
+
     def test_unknown_controller_name_fails(self):
         with self.assertRaises(ValueError):
-            create_controller("bola")
+            create_controller("unknown_controller")
 
 
 if __name__ == "__main__":

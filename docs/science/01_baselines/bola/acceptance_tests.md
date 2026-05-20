@@ -1,6 +1,6 @@
 # bola Acceptance Tests
 
-These tests specify future BOLA-basic behavior. They do not add code tests in this block.
+These tests specify and track the Phase 2.3.4 BOLA-basic behavior implemented in `core/controller/bola.py` and covered by `tests/test_bola_controller.py`.
 
 ## Unit Tests
 
@@ -17,27 +17,39 @@ Assume rates `[100, 200, 400]` bytes/s, `segment_duration_s = 4.0`, `V = 5.0`, `
 | all negative score policy | buffer so high all scores are non-positive | target `100`, level `0` | exact |
 | one-level ladder | rates `[300]` | target `300`, level `0` | exact |
 | no throughput input | missing size/time throughput data | decision still succeeds from buffer/ladder/duration | exact |
-| invalid parameter | `V <= 0` or non-finite `gamma` | configuration validation failure | exact |
+| invalid parameter | `V <= 0` or non-finite `gamma` | documented default fallback | exact |
+
+Implemented additional checks:
+
+- `bola` is registered while `min_rate`, `fixed_rate`, `max_rate`, `rate_based`, `bba`, `fixed_quality`, `scripted_quality`, and `max_quality` remain available.
+- Returned `target_rate` is a `float` in bytes/s and `quality_level` is the representation index produced by `quantizeRate`.
+- `rates_unit` conversions from bits/s to bytes/s are explicit.
+- Throughput fields, future bandwidth/oracle fields, TCP RTT/loss/cwnd, server state, console/log/progress fields, and RL/Pensieve fields do not influence the BOLA-basic decision.
+- Missing exact sizes use `rate * fragment_duration`; optional exact positive per-level sizes are accepted.
+- Empty/malformed ladders return the safe `0.0` fallback without crashing.
+- All non-positive BOLA scores select the minimum rate because the current controller contract does not express no-download/wait.
 
 ## Fake Smoke Tests
 
 | scenario | setup | expected result | what it proves |
 | --- | --- | --- | --- |
-| low buffer | fake feedback keeps buffer below one segment | minimum representation | safe fallback |
-| increasing buffer | fake feedback increases buffer with stable ladder | chosen level should not require throughput and should follow score changes | BOLA-basic score path |
-| missing segment size matrix | only rates and segment duration available | controller uses `rate * duration` approximation | approximation path |
+| standard stable fake run | fake engine with `controller.name: bola` | canonical artifacts exist and manifest records `bola` | integration only |
+| low buffer / richer buffer zones | deferred until replay/traces or a controlled fake scenario fixture can express reproducible buffer regimes without runtime changes | documented deferral | scope boundary |
+| missing segment size matrix | standard fake path provides rates and segment duration only | controller uses `rate * duration` approximation | approximation path |
 | dash.js features absent | run without DYNAMIC/FAST SWITCHING state | controller still works | BOLA-basic boundary |
 
 Smoke outputs are not benchmark results.
 
 ## Minimum Scenarios
 
-- Empty ladder validation failure.
+- Empty ladder safe `0.0` fallback.
 - Single representation.
 - Invalid buffer.
 - Invalid duration.
 - Valid score computation over at least three ladder levels.
 - Missing exact segment sizes.
+- Optional exact segment sizes when supplied by tests.
+- Forbidden signal invariants.
 
 ## Invariants
 
@@ -66,4 +78,4 @@ Smoke outputs are not benchmark results.
 
 ## Benchmark Claim Boundary
 
-These tests validate deterministic BOLA-basic controller behavior only. They do not validate final QoE, production BOLA-E, DYNAMIC, FAST SWITCHING, replay, or benchmark performance.
+These tests validate deterministic BOLA-basic controller behavior only. Fake smoke validates integration and canonical artifact production only. They do not validate final QoE, production BOLA-E, DYNAMIC, FAST SWITCHING, replay, or benchmark performance.

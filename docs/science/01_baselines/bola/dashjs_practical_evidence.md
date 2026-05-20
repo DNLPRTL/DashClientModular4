@@ -9,6 +9,8 @@ Status: practical evidence layer only. Not an implementation spec and not runtim
 
 This document captures the practical implementation lessons from the DASH reference player paper. It prevents us from overclaiming that a simple BOLA implementation equals production dash.js behavior.
 
+Phase 2.3.4 status: DashClientModular4 implements `bola` as BOLA-basic only. This practical evidence remains a boundary note: DYNAMIC, FAST SWITCHING, BOLA-E, live low-latency behavior and full dash.js production behavior are not implemented.
+
 ## Role in the TFG
 
 This source is not a separate mandatory baseline. It is an auxiliary source for:

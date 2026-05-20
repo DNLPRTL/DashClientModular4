@@ -8,11 +8,11 @@
 | family | buffer-based / utility-based / Lyapunov optimization |
 | primary source | Spiteri et al. 2020, `paper_card.md`, `source_evidence.md` |
 | auxiliary source | Spiteri et al. 2019, `dashjs_source_card.md`, `dashjs_practical_evidence.md` |
-| implementation status | future BOLA-basic implementation spec; no code in this block |
+| implementation status | implemented in Phase 2.3.4 as BOLA-basic in `core/controller/bola.py` |
 
 ## Objective
 
-Implement a reproducible BOLA-basic controller that chooses the representation with the highest BOLA-style score using buffer level, segment duration, representation rates, utility values, and documented controller parameters.
+Implement a reproducible BOLA-basic controller that chooses the representation with the highest BOLA-style score using buffer level, segment duration, representation rates, utility values, segment sizes when available, and documented controller parameters.
 
 This implementation is not dash.js DYNAMIC, not FAST SWITCHING, not BOLA-E, and not production dash.js behavior.
 
@@ -24,7 +24,7 @@ This implementation is not dash.js DYNAMIC, not FAST SWITCHING, not BOLA-E, and 
 | segment duration | `fragment_duration` | seconds | convert buffer to segment units and estimate size | yes |
 | bitrate ladder | `rates` | bytes_per_second_list | candidate representations | yes |
 | current level | `level` | representation_index | fallback/stickiness context | optional |
-| representation size | not directly available | bytes | preferred BOLA denominator | derivable |
+| representation size | optional exact keys or approximation | bytes | preferred BOLA denominator | derivable |
 | utility per representation | controller-derived | dimensionless | BOLA score | yes |
 
 ## Output To DashClientModular4
@@ -38,14 +38,14 @@ The current controller API cannot directly express BOLA's no-download/wait optio
 | parameter | unit | suggested default | reason/configurability |
 | --- | --- | --- | --- |
 | `utility_mode` | enum | `log_rate_ratio` | reproducible monotonic utility |
-| `size_mode` | enum | `bitrate_times_duration` | exact per-segment sizes are not currently exposed |
-| `V` | controller scale | configurable, fixture default `5.0` for tests | paper-sensitive parameter; production default must be reviewed |
-| `gamma` | compatible score offset | configurable, fixture default `0.2` for tests | paper-sensitive parameter; production default must be reviewed |
-| `low_buffer_fallback_s` | seconds | `segment_duration_s` | select minimum if buffer is below one segment |
+| `size_mode` | enum | `exact_or_bitrate_duration` | use optional exact per-level sizes when supplied; otherwise use approximation |
+| `bola_v` / `V` / `v` | controller scale | `5.0` | paper-sensitive parameter; explicit default for reproducible BOLA-basic tests |
+| `bola_gamma` / `gamma` | compatible score offset | `0.2` | paper-sensitive parameter; explicit default for reproducible BOLA-basic tests |
+| `low_buffer_fallback_s` / `bola_qlow_s` / `qlow_s` | seconds | `segment_duration_s` | select minimum if buffer is below or equal to one segment unless configured |
 | `all_negative_policy` | enum | `min_rate` | API cannot express no-download in the first implementation |
 | `min_segment_duration_s` | seconds | `0.001` | avoids division by zero |
 
-`V` and `gamma` must remain explicit configuration or be derived in a later reviewed document from intuitive buffer targets such as `q_low_s` and `q_max_s`. The fixture defaults above are for deterministic unit tests only.
+Invalid or non-positive `bola_v`, `bola_gamma`, and `min_segment_duration_s` fall back to the documented defaults. Unsupported enum values fall back to the documented modes. A later reviewed document may replace these constants with a derivation from intuitive buffer targets such as `q_low_s` and `q_max_s`.
 
 ## Formulas
 
@@ -55,10 +55,13 @@ Utility:
 utility_m = ln(rate_Bps_m / min_rate_Bps)
 ```
 
-Segment-size approximation:
+Segment-size selection:
 
 ```text
-size_bytes_m = rate_Bps_m * segment_duration_s
+if exact positive per-level segment sizes are supplied:
+    size_bytes_m = exact_size_bytes_m
+else:
+    size_bytes_m = rate_Bps_m * segment_duration_s
 size_units_m = size_bytes_m / min_size_bytes
 ```
 
@@ -74,7 +77,7 @@ BOLA-basic score used for the first implementation:
 score_m = (V * (utility_m + gamma * segment_duration_s) - Q_segments) / size_units_m
 ```
 
-This normalized form keeps the score deterministic when exact segment sizes are unavailable. It is an implementation simplification and must be disclosed.
+This normalized form keeps the score deterministic when exact segment sizes are unavailable. It is an implementation simplification and must be disclosed. Exact size keys are optional controller-local inputs for tests/future callers; the current player path normally provides only `rates` and `fragment_duration`.
 
 ## Pseudocode
 
@@ -100,7 +103,7 @@ best_level = 0
 best_score = -infinity
 for each level m:
     utility = ln(rates[m] / min_rate)
-    size_units = (rates[m] * segment_duration_s) / min_size
+    size_units = segment_size_bytes[m] / min_size
     score = (V * (utility + gamma * segment_duration_s) - Q) / size_units
     if score > best_score:
         best_score = score
@@ -116,22 +119,23 @@ return rates[best_level]
 
 | case | required behavior |
 | --- | --- |
-| empty ladder | validation failure through shared controller contract |
+| empty ladder | safe `0.0` fallback, matching existing controller style |
 | one-level ladder | return the only rate |
 | missing/negative buffer | select minimum rate |
 | segment duration missing or non-positive | select minimum rate |
-| zero or negative bitrate | validation failure through shared controller contract |
+| zero or negative bitrate | safe `0.0` fallback because the ladder is invalid |
 | no exact segment size | use `rate * segment_duration` approximation |
 | all scores non-positive | select minimum rate and document no-download limitation |
-| invalid `V` or `gamma` | configuration validation failure in future implementation |
+| invalid `V` or `gamma` | fall back to documented defaults |
 
 ## Simplifications Accepted
 
 - BOLA-basic only.
 - Log-rate-ratio utility.
-- Segment-size approximation from bitrate and duration.
+- Segment-size approximation from bitrate and duration when exact per-level sizes are absent.
 - Normalized size units for deterministic score calculation.
 - Minimum-rate fallback for no-download cases.
+- Invalid parameter fallback to documented defaults.
 
 ## Simplifications Prohibited
 
@@ -145,7 +149,7 @@ return rates[best_level]
 
 ## Telemetry And Logging Expectations
 
-Future code may expose controller-local debug fields such as `bola_score_by_level`, `bola_best_level`, `bola_q_segments`, `bola_v`, and `bola_gamma` only after provenance is documented. These values are diagnostic, not final benchmark metrics.
+The implementation exposes controller-local `last_metrics` fields such as `scores_by_level`, `raw_best_level`, `q_segments`, `bola_v`, and `bola_gamma`. These values are diagnostic, not canonical telemetry and not final benchmark metrics.
 
 ## Compatibility With `baseline_entry_contract.md`
 
@@ -157,7 +161,7 @@ Future code may expose controller-local debug fields such as `bola_score_by_leve
 
 ## Acceptance Criteria
 
-The future implementation must pass `acceptance_tests.md`, must document its `V`/`gamma` configuration, and must clearly label itself BOLA-basic rather than dash.js DYNAMIC or production BOLA-E.
+The implementation must pass `acceptance_tests.md`, must document its `bola_v`/`bola_gamma` configuration, and must clearly label itself BOLA-basic rather than dash.js DYNAMIC or production BOLA-E.
 
 ## Risks
 

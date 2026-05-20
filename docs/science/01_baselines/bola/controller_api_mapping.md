@@ -2,7 +2,7 @@
 
 ## Contract Summary
 
-The future `bola` controller uses the existing dict-based API and returns a target rate in bytes per second. It computes a controller-internal BOLA-basic score for each representation.
+The implemented `bola` controller uses the existing dict-based API and returns a target rate in bytes per second. It computes a controller-internal BOLA-basic score for each representation and stores diagnostic details in `last_metrics`.
 
 ## Signal Mapping
 
@@ -11,10 +11,10 @@ The future `bola` controller uses the existing dict-based API and returns a targ
 | buffer occupancy `Q` | `queued_time` | exists | segments or seconds depending notation | seconds | `Q_segments = queued_time / fragment_duration` | `source_evidence.md`, media engine feedback | fake/GStreamer equivalence not claimed | use |
 | segment duration `p` | `fragment_duration` | exists | seconds | seconds | none | parser/player feedback | must be positive | use |
 | representation set | `rates` | exists | bitrate ladder | bytes_per_second_list | use client bytes/s values | MPD/client state | ladder must be positive and ordered | use |
-| segment size `S_m` | no direct per-level future size matrix | derivable | bytes | bytes | `S_m = rates[m] * fragment_duration` | `source_evidence.md` | approximation only; disclose VBR limitation | derive |
+| segment size `S_m` | optional `segment_sizes_B`, `segment_sizes_bytes`, `segment_size_bytes_by_level`, `representation_sizes_B`, `representation_sizes_bytes`, `size_bytes_by_level` | optional/derivable | bytes | bytes | use exact positive per-level sizes if supplied; otherwise `S_m = rates[m] * fragment_duration` | `source_evidence.md`, `implementation_spec.md` | current player path does not expose a canonical size matrix; disclose VBR limitation | use if present, otherwise derive |
 | utility `v_m` | controller utility table | derivable | dimensionless | dimensionless | `ln(rate_m / min_rate)` by default | BOLA spec | internal controller utility, not final QoE | derive |
-| `V` | config/controller parameter | derivable/configurable | control scale | controller scale | no conversion | implementation spec | must be explicit; no silent default in production docs | configure |
-| `gamma` | config/controller parameter | derivable/configurable | compatible score offset | compatible score offset | no conversion | implementation spec | must be explicit; no silent default in production docs | configure |
+| `V` | `bola_v`, `V`, or `v` controller parameter | configurable | control scale | controller scale | no conversion | implementation spec | invalid/non-positive values fall back to `5.0` | configure |
+| `gamma` | `bola_gamma` or `gamma` controller parameter | configurable | compatible score offset | compatible score offset | no conversion | implementation spec | invalid/non-positive values fall back to `0.2` | configure |
 | no-download/wait action | `getIdleDuration()` exists but not selected here | missing for first implementation | seconds/no action | seconds if later used | none in first version | baseline contract | first BOLA-basic does not implement wait | document limitation |
 | throughput prediction | `last_fragment_size / last_download_time` | derivable but not primary | bytes/s or bps | bytes_per_second | none if later used | dash.js practical evidence | not primary BOLA-basic signal | do not use initially |
 | BOLA-E placeholder segments | none | forbidden initially | player-specific | none | none | dash.js practical evidence | BOLA-E deferred | do not use |
@@ -29,9 +29,14 @@ The future `bola` controller uses the existing dict-based API and returns a targ
 | target rate | bytes_per_second | `calcControlAction()` | return `rates[best_level]` |
 | chosen quality | representation_index | `quantizeRate(target_rate)` | shared quantizer maps rate to level |
 
+## Unit Handling
+
+The runtime ladder is already bytes per second. The controller also accepts optional test/config ladder units through `rates_unit` and converts bits/s, kbps and Mbps to bytes/s before scoring. Target rates returned to the player remain bytes/s.
+
 ## API Restrictions
 
 - Do not implement no-download through ad hoc sleeps in this first spec.
 - Do not add dash.js scheduler concepts to the client.
 - Do not use BOLA utility as final benchmark QoE.
 - Do not read or write canonical artifacts inside the controller.
+- Do not use `bwe`, `last_fragment_size`, `last_download_time`, TCP RTT/loss/cwnd, server state, future bandwidth or RL/Pensieve fields for BOLA-basic decisions.
