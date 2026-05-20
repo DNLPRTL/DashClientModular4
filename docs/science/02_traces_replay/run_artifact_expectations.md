@@ -46,3 +46,17 @@ Do not commit:
 
 Manual Markdown summaries may be committed later only when they are authored documentation, not raw generated artifacts.
 
+## Phase 3.2A Source-Triage Update
+
+Future trace/replay runs must include at least:
+
+- `run_manifest.json`
+- `config.resolved.json`
+- `environment.json`
+- `run.log`
+- `segment_telemetry.csv`
+- `evaluation_segments.csv`
+- `trace_manifest.json` or equivalent trace provenance artifact
+- `split_manifest.json` or embedded split metadata
+
+No Phase 3.2A work creates these artifacts.

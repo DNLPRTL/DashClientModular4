@@ -41,3 +41,17 @@ A future runner is ready for real trace conversion only after synthetic tests pr
 4. output locations obey repository hygiene rules;
 5. no runtime controller/player/media/metric code was altered for a specific dataset.
 
+## Phase 3.2A Source-Triage Update
+
+Minimum synthetic traces for the first runner design:
+
+| id | purpose |
+| --- | --- |
+| `constant_high` | stable bandwidth above all representations; validates no artificial stalls |
+| `constant_low` | stable bandwidth below high representations; validates conservative behavior |
+| `step_down` | bandwidth collapse; validates buffer/rebuffer handling |
+| `step_up` | recovery; validates adaptation behavior |
+| `oscillating` | repeated variation; validates deterministic playback simulation |
+| `zero_gap` | temporary zero throughput; validates stall accounting |
+
+Synthetic traces are test fixtures only. They are not benchmark evidence.

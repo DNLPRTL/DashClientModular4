@@ -19,6 +19,8 @@
 | Dataset split and OOD boundary | 6 | Show train, validation, test and OOD separation | `02_traces_replay/train_validation_test_ood_policy.md` | planned |
 | Leakage prevention map | 6 | Show how trace, parameter, scenario and artifact leakage are avoided | `02_traces_replay/leakage_prevention_policy.md` | planned |
 | Run artifact lifecycle | 6 | Show raw data outside repo, generated artifacts outside repo and authored summaries in docs | `02_traces_replay/run_artifact_expectations.md` | planned |
+| Dataset domain ladder | 6 | Show synthetic, HSDPA, LTE, HAS, 4G KPI, 5G KPI, mmWave 5G, FCC and Puffer roles | `02_traces_replay/generalization_protocol.md`, `02_traces_replay/source_triage_decision.md` | planned |
+| Phase 3.2A evaluation pipeline | 6 | Show source pages/distilled notes -> cards -> matrix -> schema -> runner -> later metrics -> later comparison | `02_traces_replay/source_triage_decision.md`, `02_traces_replay/replay_runner_requirements.md` | planned |
 
 ## Figure Policy
 

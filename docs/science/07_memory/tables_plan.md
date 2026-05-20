@@ -32,6 +32,9 @@
 | Leakage prevention checklist | 6 | Show controls against trace, parameter, scenario and artifact leakage | `02_traces_replay/leakage_prevention_policy.md` |
 | Synthetic trace plan | 6 | Describe future runner validation traces before real datasets | `02_traces_replay/synthetic_trace_test_plan.md` |
 | Future run artifact contract | 6 | Define expected manifests, telemetry, summaries and repository exclusions | `02_traces_replay/run_artifact_expectations.md` |
+| Phase 3.2A source triage decisions | 6 | Show accepted mandatory/recommended cards, promoted sources and deferred sources | `02_traces_replay/source_triage_decision.md` |
+| Phase 3.2A leakage risks by dataset | 6 | Explain sliding-window, route, service/day, operator/device/app, trajectory and causal leakage risks | `02_traces_replay/leakage_prevention_policy.md` |
+| Phase 3.2A preliminary split policy | 6 | State first-integration, modern-mobile/OOD, reference-only and metadata-only roles without closing final splits | `02_traces_replay/train_validation_test_ood_policy.md` |
 
 ## Conversion Rule
 

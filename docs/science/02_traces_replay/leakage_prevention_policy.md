@@ -29,3 +29,25 @@ Leakage occurs when information from validation, test or OOD data influences imp
 
 Because Phase 3.1 downloads no datasets and runs no benchmark, there is no experimental leakage yet. The risk begins when later phases inspect, convert, tune or execute trace-driven runs.
 
+## Phase 3.2A Source-Triage Update
+
+### New Leakage Risks Recognized
+
+- Sliding-window leakage: windows from the same original trace must not cross train/validation/test/OOD boundaries.
+- Route leakage: repeated commute routes must be grouped.
+- Service/day leakage: Lancaster traces from a single service/day require careful grouping.
+- Operator/device/app leakage: Raca 4G/5G must be grouped by available metadata.
+- Trajectory leakage: Lumos5G repeated passes over same locations/trajectories must not be split naively.
+- Causal trace leakage: Puffer/log-derived traces may reflect choices of deployed ABR algorithms and are not automatically exogenous capacity traces.
+
+### Required Policy
+
+Every dataset conversion plan must produce a manifest with:
+
+- source dataset id;
+- original file id;
+- route/session/day/operator/app metadata when available;
+- split assignment;
+- reason for split assignment;
+- conversion version;
+- unit normalization.

@@ -34,3 +34,13 @@ Phase 3 exists because implemented ABR controllers cannot be compared scientific
 | How do you avoid overfitting traces? | Split policy, OOD separation, synthetic development traces and parameter freeze rules. |
 | When can controllers be ranked? | Only after trace/replay methodology, final QoE/reward and result interpretation are closed. |
 
+## Phase 3.2A Source-Triage Update
+
+Use these talking points after the source cards are added:
+
+- Phase 3.2A intentionally does not implement code because dataset and replay choices must be defensible first.
+- The first implementation should prioritize determinism and testability through a custom Python trace-driven fake/replay runner.
+- Mahimahi and `tc/netem` are considered, carded and kept as candidates, but are not forced prematurely.
+- CausalSim and Veritas are included as threats-to-validity references, not implementation targets.
+- Puffer warns against overclaiming from trace-driven tests because real deployment effects and causal bias matter.
+- No dataset becomes final benchmark material and no final split is closed in Phase 3.2A.

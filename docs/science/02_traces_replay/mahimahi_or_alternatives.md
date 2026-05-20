@@ -29,3 +29,12 @@ Phase 3.1 does not:
 - run GStreamer benchmarks;
 - rank controller performance.
 
+## Phase 3.2A Source-Triage Update
+
+| method | role | strengths | risks | Phase 3.2A decision |
+| --- | --- | --- | --- | --- |
+| Custom Python trace-driven runner | primary likely implementation | deterministic, unit-testable, Windows/Ubuntu, easy artifacts | less network-stack realism | design next, do not implement yet |
+| Mahimahi | secondary validation | HTTP replay and variable link emulation; used in prior work | Linux setup, integration cost, not default unit-test path | candidate only |
+| Linux `tc/netem` | fallback/alternative | simple impairment injection on Ubuntu | privileges, kernel/qdisc timing, interface safety | candidate only |
+| ns-3/Mininet | deferred | richer network simulation | too heavy for current phase | deferred |
+| Puffer/real deployment | methodology reference | real-world validity | out of scope, complex, causal issues | metadata/method only |

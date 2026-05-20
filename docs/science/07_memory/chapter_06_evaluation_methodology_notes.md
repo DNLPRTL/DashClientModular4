@@ -42,3 +42,25 @@ Use careful verbs: documented, scoped, classified, deferred, selected as candida
 
 Avoid: proved, outperformed, reproduced, optimized, trained, deployed, benchmarked.
 
+## Phase 3.2A Source-Triage Update
+
+Chapter 6 can now cite the Phase 3.2A card set and triage matrix as methodology evidence, not as experimental results.
+
+New material available:
+
+- dataset selection rationale table;
+- replay/emulation method comparison table;
+- threats to validity: exogenous trace assumption, log-derived trace bias, split leakage, storage risk and format risk;
+- OOD/generalization policy;
+- explanation that unit tests, smoke tests and fake traces are not benchmark evidence.
+
+Important wording:
+
+- first integration candidates: HSDPA Norway, Ghent 4G/LTE and Lancaster HAS traces;
+- modern mobile/OOD candidates: Raca 4G, Raca 5G and Lumos5G;
+- reference-only: FCC Measuring Broadband America;
+- metadata-only: Puffer data archive;
+- primary likely implementation path: custom Python trace-driven fake/replay runner, not implemented in Phase 3.2A;
+- secondary validation candidate: Mahimahi;
+- Linux fallback candidate: `tc/netem`;
+- threats-to-validity references: CausalSim and Veritas.

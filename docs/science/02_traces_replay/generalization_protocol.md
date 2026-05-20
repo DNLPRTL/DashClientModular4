@@ -45,3 +45,22 @@ Future reports must state:
 - replay/emulation method used;
 - limitations of the selected domains.
 
+## Phase 3.2A Source-Triage Update
+
+### Candidate Domain Ladder
+
+1. Synthetic traces: runner/unit-test validation only, not final benchmark.
+2. HSDPA Norway: legacy mobile, first integration candidate.
+3. Ghent 4G/LTE: LTE mobile, first integration candidate.
+4. Lancaster HAS: live/HAS/CDN throughput, broader benchmark-design candidate.
+5. Raca 4G: modern mobile with KPIs, OOD candidate.
+6. Raca 5G: modern 5G with KPIs and app patterns, OOD candidate.
+7. Lumos5G: high-variance mmWave 5G, strong OOD candidate.
+8. FCC: fixed broadband reference only until conversion plan.
+9. Puffer: real-world methodology/data archive only until causal and storage plans exist.
+
+### Claim Policy
+
+- In-domain trace replay may support controlled comparison claims only within the selected trace domains.
+- OOD claims require a dataset explicitly held out as OOD before any IA training or tuning.
+- Real-world deployment claims are forbidden unless real-world deployment or a carefully justified equivalent is performed.

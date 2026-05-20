@@ -21,6 +21,10 @@
 | `netravali2015mahimahi` | Mahimahi: Accurate Record-and-Replay for HTTP |
 | `riiser2013commutePath` | Commute Path Bandwidth Traces from 3G Networks: Analysis and Applications |
 | `yan2020puffer` | Learning in situ: a randomized experiment in video streaming |
+| `alomar2023causalsim` | CausalSim: A Causal Framework for Unbiased Trace-Driven Simulation |
+| `bothra2023veritas` | Veritas: Answering Causal Queries from Video Streaming Traces |
+| `wei2019traceBasedEmulation` | Evaluation of Throughput Prediction for Adaptive Bitrate Control Using Trace-Based Emulation |
+| `hoffman2025intoTheWildABR` | Into the Wild: Real-World Testing for ML-Based ABR |
 | `fccMeasuringBroadbandAmerica` | FCC Measuring Broadband America |
 | `linuxTcNetemManual` | Linux tc-netem manual |
 | `vanDerHooft2016ghent4g` | 4G/LTE Bandwidth Logs, Ghent, Belgium |
@@ -28,6 +32,7 @@
 | `raca2020beyondThroughput5g` | Beyond Throughput, the next Generation: a 5G Dataset with Channel and Context Metrics |
 | `narayanan2020lumos5g` | Lumos5G: Mapping and Predicting Commercial mmWave 5G Throughput |
 | `lancasterAbrThroughputTraces` | Lancaster ABR-Throughput-Traces |
+| `pufferDataArchive` | Puffer data archive / puffer-statistics |
 
 ## Later Work
 
@@ -36,3 +41,4 @@
 - Do not include bibliography entries for papers not cited in the final text.
 - Use Phase 2 closure docs to decide which optional/deferred methods deserve final bibliography entries. SODA and Pensieve are useful if discussed as future work or historical IA/RL context; RBC should not receive a final entry until its source identity is locked.
 - Use Phase 3 source cards to decide which trace/replay entries are cited in Chapter 6. Dataset candidates should not become final bibliography entries unless they are actually used or discussed.
+- CausalSim, Veritas, Wei 2019 and Into the Wild/ABR-Arena are Phase 3.2A methodology or threats-to-validity references, not implementation authorizations.

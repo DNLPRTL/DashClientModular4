@@ -68,3 +68,36 @@ A dataset may become selected only when:
 7. run artifact expectations are compatible with repository hygiene;
 8. no controller, player, media engine or metric changes are required.
 
+## Phase 3.2A Source-Triage Update
+
+No dataset is final benchmark material in Phase 3.2A. This update selects candidates and records risks only.
+
+### First-Real-Integration Candidates
+
+1. `hsdpa_norway_mmsys2013`
+2. `ghent_4g_lte`
+3. `lancaster_has`
+
+These are closer to direct throughput traces, more manageable than full deployment archives, and aligned with ABR/HAS evaluation.
+
+### Modern-Mobile And OOD Candidates
+
+1. `raca_4g_lte_channel_context`
+2. `raca_5g_channel_context`
+3. `lumos5g_mmwave`
+
+These are useful for generalization and modern cellular conditions, but their schema and context complexity make them second-wave candidates rather than first integration targets.
+
+### Reference-Only And Metadata-Only Sources
+
+1. `fcc_mba_reference`: reference-only until a conversion and download plan exists.
+2. `puffer_data_archive`: metadata-only until a conversion, storage and causal plan exists.
+
+### Not Authorized In Phase 3.2A
+
+- No dataset download into the repository.
+- No raw Puffer download.
+- No raw FCC download.
+- No final train/validation/test/OOD split.
+- No final QoE/reward.
+- No benchmark ranking.

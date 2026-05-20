@@ -36,3 +36,26 @@ The implemented Phase 2 controllers are not trained. If Phase 3 only evaluates f
 | Puffer raw daily data | deferred; no split role in Phase 3.1 |
 | FCC MBA | reference-only; no split role in Phase 3.1 |
 
+## Phase 3.2A Source-Triage Update
+
+No final split is closed in Phase 3.2A.
+
+| source | preliminary role |
+| --- | --- |
+| synthetic traces | unit tests only |
+| HSDPA Norway | first integration / possible legacy-mobile test |
+| Ghent 4G/LTE | first integration / possible LTE validation-test |
+| Lancaster HAS | possible large validation/test after grouping |
+| Raca 4G | possible modern-mobile validation/test/OOD |
+| Raca 5G | possible 5G OOD |
+| Lumos5G | possible high-variance 5G OOD |
+| FCC MBA | reference-only until conversion plan |
+| Puffer | metadata-only until conversion/storage/causal plan |
+
+Split rules:
+
+- group by original trace/session/route before windowing;
+- never put windows from the same original trace into different train/test roles;
+- preserve domain labels;
+- reserve OOD before any IA training;
+- document every split seed and file list.

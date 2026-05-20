@@ -41,3 +41,33 @@ Avoid saying:
 
 Phase 3.1 is a methodology scaffold. It should be cited in the thesis as planning and traceability evidence, not as experimental results.
 
+## Phase 3.2A Source-Triage Update
+
+### Chapter 6 Material Now Available
+
+- Dataset selection rationale table.
+- Replay/emulation method comparison table.
+- Threats to validity: exogenous trace assumption, log-derived trace bias, split leakage, storage/format risks.
+- OOD/generalization policy.
+- Explanation that smoke/fake tests are not benchmark evidence.
+
+### Planned Figures
+
+- Evaluation pipeline: source PDFs/source pages -> cards -> matrix -> trace schema -> runner -> Phase 3.5 metrics -> Phase 6 comparison.
+- Replay method decision tree: Python runner first, Mahimahi secondary, netem fallback.
+- Dataset domain ladder: synthetic, HSDPA, LTE, HAS, 4G KPI, 5G KPI, mmWave 5G, FCC/Puffer references.
+
+### Planned Tables
+
+- Source triage table.
+- Dataset matrix table.
+- Method comparison table.
+- Leakage risks by dataset.
+- Candidate split policy table.
+
+### Defense Talking Points
+
+- Phase 3.2A intentionally does not implement code because dataset/replay choices must be defensible first.
+- The first implementation will prioritize determinism and testability.
+- Mahimahi and netem are considered but not forced prematurely.
+- Puffer and CausalSim/Veritas prevent overclaiming trace-driven results.

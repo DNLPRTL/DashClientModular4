@@ -47,3 +47,20 @@ Before implementation, the selected method must have:
 6. platform and dependency notes;
 7. confirmation that controllers, player, media engines and metrics remain unchanged.
 
+## Phase 3.2A Source-Triage Update
+
+Primary path after this documentation block: custom Python trace-driven fake/replay runner.
+
+Reason: it is deterministic, can be covered by `unittest`, runs on Windows/Ubuntu, avoids privileged network setup, and can emit canonical run artifacts.
+
+Secondary path: Mahimahi on Ubuntu after the trace schema and Python runner are stable.
+
+Fallback path: Linux `tc/netem` for controlled impairment tests, only with an isolated runbook.
+
+### Causal Caveat
+
+CausalSim and Veritas require a strict distinction between exogenous capacity or availability traces and achieved-throughput logs influenced by ABR decisions. Final claims must not say that replaying an observed throughput trace proves real-world superiority under arbitrary alternate ABR algorithms.
+
+### Not Implemented Now
+
+No runner, converter, Mahimahi wrapper or netem wrapper is implemented in Phase 3.2A.

@@ -47,3 +47,15 @@ Before real traces are used, a future runner should have:
 5. documentation of unsupported trace features;
 6. client readiness check passing in strict mode.
 
+## Phase 3.2A Source-Triage Update
+
+The future runner must not be implemented in this block. Requirements now fixed:
+
+- accept an internal trace schema rather than raw dataset formats;
+- support deterministic synthetic traces;
+- emit canonical run artifacts;
+- record trace id, source dataset id, converter version and split label;
+- run with `unittest` without external network;
+- avoid requiring root/admin privileges;
+- keep Mahimahi/netem behind optional runbooks;
+- separate trace replay from final QoE/reward calculation until Phase 3.5.

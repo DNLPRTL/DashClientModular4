@@ -22,6 +22,7 @@ This register tracks candidate thesis visuals and tables before they are created
 | F14 | Train/validation/test/OOD boundary | `02_traces_replay/train_validation_test_ood_policy.md` | planned original diagram |
 | F15 | Leakage prevention map | `02_traces_replay/leakage_prevention_policy.md` | planned original diagram |
 | F16 | Run artifact lifecycle | `02_traces_replay/run_artifact_expectations.md` | planned original diagram |
+| F17 | Phase 3.2A dataset domain ladder | `02_traces_replay/generalization_protocol.md` and `source_triage_decision.md` | planned original diagram |
 
 ## Tables
 
@@ -51,3 +52,6 @@ This register tracks candidate thesis visuals and tables before they are created
 | T22 | Replay/emulation method comparison | `02_traces_replay/mahimahi_or_alternatives.md` | draft |
 | T23 | Synthetic trace test plan | `02_traces_replay/synthetic_trace_test_plan.md` | draft |
 | T24 | Future run artifact expectations | `02_traces_replay/run_artifact_expectations.md` | draft |
+| T25 | Phase 3.2A source triage decisions | `02_traces_replay/source_triage_decision.md` | draft |
+| T26 | Phase 3.2A leakage risks by dataset | `02_traces_replay/leakage_prevention_policy.md` | draft |
+| T27 | Phase 3.2A preliminary split policy | `02_traces_replay/train_validation_test_ood_policy.md` | draft |

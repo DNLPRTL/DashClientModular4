@@ -51,3 +51,25 @@ This inventory records Phase 3.1 source decisions. A row in this file is not per
 - Every promoted dataset must receive a dataset card before use.
 - Every promoted replay/emulation method must receive a method card before implementation.
 
+## Phase 3.2A Source-Triage Update
+
+Phase 3.2A locks the first source-triage pass from the distilled Markdown pack. This update adds cards and triage decisions only. It does not authorize PDF storage, dataset download, replay implementation, final QoE/reward, benchmark ranking, IA/RL, or runtime changes.
+
+| id | title/name | type | status | PDF required | dataset download now | target document | decision |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `netravali2015mahimahi` | Mahimahi: Accurate Record-and-Replay for HTTP | method/tool paper | mandatory | yes | no | `method_cards/mahimahi_record_replay_http.md` | candidate secondary validation path |
+| `mao2017pensieve_eval` | Neural Adaptive Video Streaming with Pensieve | methodology paper | mandatory | yes | no | `method_cards/pensieve_trace_driven_evaluation.md` | methodology only, no IA implementation |
+| `yan2020puffer` | Learning in situ: a randomized experiment in video streaming | method/deployment paper | mandatory | yes | no | `method_cards/puffer_learning_in_situ.md` | real-world methodology reference |
+| `linuxTcNetemManual` | Linux tc-netem manual | tool documentation | mandatory | no | no | `method_cards/tc_netem_network_emulation.md` | fallback/alternative |
+| `alomar2023causalsim` | CausalSim: A Causal Framework for Unbiased Trace-Driven Simulation | validity methodology paper | mandatory | yes | no | `method_cards/causalsim_trace_driven_bias.md` | trace-bias threat reference |
+| `bothra2023veritas` | Veritas: Answering Causal Queries from Video Streaming Traces | causal methodology paper | recommended | yes | no | `method_cards/veritas_causal_queries_video_streaming_traces.md` | optional/future methodology |
+| `wei2019traceBasedEmulation` | Evaluation of Throughput Prediction for Adaptive Bitrate Control Using Trace-Based Emulation | emulation methodology paper | recommended | yes | no | `method_cards/wei2019_trace_based_emulation_for_abr.md` | optional methodology support |
+| `hoffman2025intoTheWildABR` | Into the Wild: Real-World Testing for ML-Based ABR | generalization methodology paper | recommended | yes | no | `method_cards/into_the_wild_abrarena_real_world_testing.md` | future generalization reference |
+| `riiser2013commutePath` | Commute Path Bandwidth Traces from 3G Networks | dataset paper | mandatory | yes | no | `trace_dataset_cards/hsdpa_norway_mmsys2013.md` | first-real-integration candidate |
+| `vanDerHooft2016ghent4g` | 4G/LTE Bandwidth Logs / HTTP/2-based adaptive streaming over 4G/LTE | dataset/paper | mandatory | yes | no | `trace_dataset_cards/ghent_4g_lte_bandwidth_logs.md` | first-real-integration candidate |
+| `raca2018beyondThroughput4g` | Beyond Throughput: a 4G LTE Dataset with Channel and Context Metrics | dataset paper | mandatory | yes | no | `trace_dataset_cards/raca_4g_lte_channel_context.md` | modern-mobile/OOD candidate |
+| `raca2020beyondThroughput5g` | Beyond Throughput, The Next Generation: a 5G Dataset with Channel and Context Metrics | dataset paper | mandatory | yes | no | `trace_dataset_cards/raca_5g_channel_context.md` | 5G OOD candidate |
+| `narayanan2020lumos5g` | Lumos5G: Mapping and Predicting Commercial mmWave 5G Throughput | dataset/method paper | mandatory | yes | no | `trace_dataset_cards/lumos5g_mmwave_throughput.md` | high-variability 5G OOD candidate |
+| `lancasterAbrThroughputTraces` | Lancaster ABR-Throughput-Traces | dataset repository | mandatory | no | no | `trace_dataset_cards/lancaster_abr_throughput_traces.md` | HAS/live benchmark-design candidate |
+| `fccMeasuringBroadbandAmerica` | FCC Measuring Broadband America | data source | mandatory reference | no | no | `trace_dataset_cards/fcc_measuring_broadband_america_reference.md` | reference-only |
+| `pufferDataArchive` | Puffer data archive / puffer-statistics | data archive | mandatory metadata | no | no | `trace_dataset_cards/puffer_data_archive_metadata.md` | metadata-only |
