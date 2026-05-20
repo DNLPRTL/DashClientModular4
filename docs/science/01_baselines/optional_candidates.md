@@ -15,3 +15,7 @@ Optional candidates are documented to prevent scope drift. They must not enter t
 ## Rule
 
 Candidate cards are not implementation specs. A candidate must be promoted through an explicit scope decision before code starts.
+
+## Phase 2 Closure Status
+
+Phase 2 closes with SODA documented as the strongest modern optional non-neural candidate and RBC kept as backup optional. Neither is implemented or benchmarked.

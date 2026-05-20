@@ -20,6 +20,10 @@
 | Baseline smoke summary | 5/6 | Summarize fake smoke artifact expectations and benchmark boundary | `baseline_smoke_summary.md` |
 | Baseline limitations | 6 | Declare simplifications and deferred evaluation methodology | `baseline_limitations.md` |
 | Optional candidates | 7 | Show future-work candidates | `optional_candidates.md` |
+| Final Phase 2 controller inventory | 5/6 | Show final implemented, optional, historical and deferred controller status | `phase2_controller_inventory.md` |
+| Phase 2 academic validity | 5/6 | Define what Phase 2 implementation validity proves and does not prove | `phase2_academic_validity_statement.md` |
+| Phase 2 limitations and deferred work | 6/7 | Summarize missing QoE/reward, replay, emulation and benchmark claims | `phase2_open_limitations_and_deferred_work.md` |
+| Phase 3 transition | 6/7 | Introduce traces/replay/emulation as the next methodology phase | `phase2_transition_to_phase3.md` |
 
 ## Conversion Rule
 

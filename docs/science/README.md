@@ -1,8 +1,8 @@
 # Phase 2 Science Documentation
 
-This directory is the scientific documentation scaffold for Phase 2 of DashClientModular4.
+This directory is the scientific documentation scaffold and closure record for Phase 2 of DashClientModular4.
 
-Phase 1 closed with the client certified as ABR-neutral, reproducible, and testable. Phase 2 starts with literature intake and baseline selection only. This scaffold is documentation-only: it must not introduce ABR controllers, QoE reward definitions, replay traces, benchmark code, datasets, media files, generated artifacts, or runtime behavior changes.
+Phase 1 closed with the client certified as ABR-neutral, reproducible, and testable. Phase 2 selected, documented, implemented and validated the mandatory ABR baseline set. The formal closure remains documentation-only: it must not introduce new controllers, QoE reward definitions, replay traces, benchmark code, datasets, media files, generated artifacts, or runtime behavior changes.
 
 ## Methodology Gate
 
@@ -28,7 +28,9 @@ The paper card captures the scientific source. The implementation specification 
 
 ## Current Decisions
 
-- Implement later: sanity controllers, rate-based, BBA, BOLA, MPC, RobustMPC.
+- Phase 2 baseline closure: `01_baselines/phase2_baseline_closure.md`.
+- Implemented sanity controllers: `min_rate`, `fixed_rate`, `max_rate`.
+- Implemented academic baselines: `rate_based`, `bba`, `bola`, `mpc`, `robust_mpc`.
 - Do not implement initially: SODA, Pensieve, dash.js DYNAMIC, dash.js FAST SWITCHING.
 - Keep RBC only as a backup optional candidate.
 - Defer the final QoE/reward definition.

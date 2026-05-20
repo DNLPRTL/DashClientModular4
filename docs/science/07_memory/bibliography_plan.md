@@ -24,3 +24,4 @@
 - Verify final BibTeX entries against publisher pages before thesis submission.
 - Keep DOI URLs where available.
 - Do not include bibliography entries for papers not cited in the final text.
+- Use Phase 2 closure docs to decide which optional/deferred methods deserve final bibliography entries. SODA and Pensieve are useful if discussed as future work or historical IA/RL context; RBC should not receive a final entry until its source identity is locked.

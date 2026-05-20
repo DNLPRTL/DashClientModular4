@@ -9,3 +9,7 @@
 | RBC | backup optional | Not selected and source identity must be locked before use. | Revisit only if a documented comparison gap remains. |
 
 No discarded/deferred candidate may create runtime requirements in this block.
+
+## Phase 2 Closure Status
+
+Phase 2 closes with Pensieve as historical IA/RL reference only, DYNAMIC and FAST SWITCHING deferred as practical dash.js-derived methods, SODA optional/deferred and RBC backup optional. None of these methods is implemented or benchmarked in Phase 2.

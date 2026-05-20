@@ -46,3 +46,7 @@ No Phase 2.3 controller was silently renamed. The canonical academic names are l
 ## Boundary
 
 The registry audit proves controller availability and contract compatibility. It does not prove algorithm performance, trace robustness, final QoE validity, replay validity or real-network superiority.
+
+## Phase 2.4 Formal Closure Pointer
+
+Registry evidence is summarized in the formal Phase 2 closure package through `phase2_baseline_closure.md` and `phase2_controller_inventory.md`.

@@ -25,3 +25,16 @@ The implementation set above is closed by:
 - `baseline_phase2_3_closure_report.md`
 
 These documents aggregate existing paper/spec/code/test evidence and do not introduce new controllers, replay, QoE/reward, benchmark claims, generated artifacts or media assets.
+
+## Phase 2.4 Formal Closure
+
+The final Phase 2 closure package adds:
+
+- `phase2_baseline_closure.md`
+- `phase2_controller_inventory.md`
+- `phase2_test_validation_summary.md`
+- `phase2_academic_validity_statement.md`
+- `phase2_open_limitations_and_deferred_work.md`
+- `phase2_transition_to_phase3.md`
+
+These files close the baseline phase and define the transition to Phase 3 traces/replay/emulation without changing controller algorithms.

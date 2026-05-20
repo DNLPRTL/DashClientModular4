@@ -84,4 +84,6 @@ Required validation run in this closure audit:
 
 ## Next Phase Recommendation
 
-Proceed with Phase 2.4 closure documentation, then Phase 3 traces/replay/emulation. Comparative controller evaluation should wait until the replay/trace path and final QoE/reward methodology are defined.
+Phase 2.4 formal closure documentation is now represented by `phase2_baseline_closure.md`, `phase2_controller_inventory.md`, `phase2_test_validation_summary.md`, `phase2_academic_validity_statement.md`, `phase2_open_limitations_and_deferred_work.md` and `phase2_transition_to_phase3.md`.
+
+After Phase 2 closure, proceed to Phase 3 traces/replay/emulation. Comparative controller evaluation should wait until the replay/trace path and final QoE/reward methodology are defined.

@@ -1,0 +1,23 @@
+# Phase 2 Controller Inventory
+
+This is the final Phase 2 inventory of implemented, optional, historical and deferred ABR methods. Benchmark status is intentionally conservative: Phase 2 closes implementation readiness, not comparative evaluation.
+
+| controller | category | implementation module | registered name | test module | source docs | academic role | implemented? | benchmark status |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `min_rate` | technical control | `core/controller/sanity_rate.py` | `min_rate` | `tests/test_sanity_rate_controllers.py` | `sanity_controllers/min_rate_spec.md`, `sanity_controllers/acceptance_tests.md` | sanity/control only, not academic baseline | yes | integration/control evidence only, not benchmarked |
+| `fixed_rate` | technical control | `core/controller/sanity_rate.py` | `fixed_rate` | `tests/test_sanity_rate_controllers.py` | `sanity_controllers/fixed_rate_spec.md`, `sanity_controllers/acceptance_tests.md` | sanity/control only, not academic baseline | yes | integration/control evidence only, not benchmarked |
+| `max_rate` | technical control | `core/controller/sanity_rate.py` | `max_rate` | `tests/test_sanity_rate_controllers.py` | `sanity_controllers/max_rate_spec.md`, `sanity_controllers/acceptance_tests.md` | sanity/control only, not academic baseline | yes | integration/control evidence only, not benchmarked |
+| `rate_based` | implemented academic baseline | `core/controller/rate_based.py` | `rate_based` | `tests/test_rate_based_controller.py` | `rate_based/paper_card.md`, `rate_based/source_evidence.md`, `rate_based/implementation_spec.md`, `rate_based/controller_api_mapping.md`, `rate_based/acceptance_tests.md` | throughput-driven receiver-side ABR baseline | yes | unit/integration validated, not benchmarked |
+| `bba` | implemented academic baseline | `core/controller/bba.py` | `bba` | `tests/test_bba_controller.py` | `bba/paper_card.md`, `bba/source_evidence.md`, `bba/implementation_spec.md`, `bba/controller_api_mapping.md`, `bba/acceptance_tests.md` | buffer-occupancy ABR baseline | yes | unit/integration validated, not benchmarked |
+| `bola` | implemented academic baseline | `core/controller/bola.py` | `bola` | `tests/test_bola_controller.py` | `bola/paper_card.md`, `bola/source_evidence.md`, `bola/dashjs_practical_evidence.md`, `bola/implementation_spec.md`, `bola/controller_api_mapping.md`, `bola/acceptance_tests.md` | BOLA-basic utility/buffer baseline | yes | unit/integration validated, not benchmarked |
+| `mpc` | implemented academic baseline | `core/controller/mpc.py` | `mpc` | `tests/test_mpc_controller.py` | `mpc/paper_card.md`, `mpc/source_evidence.md`, `mpc/implementation_spec.md`, `mpc/controller_api_mapping.md`, `mpc/acceptance_tests.md` | small-horizon model predictive ABR baseline | yes | unit/integration validated, not benchmarked |
+| `robust_mpc` | implemented academic baseline | `core/controller/robust_mpc.py` | `robust_mpc` | `tests/test_robust_mpc_controller.py` | `robust_mpc/paper_card.md`, `robust_mpc/source_evidence.md`, `robust_mpc/pensieve_source_artifact_card.md`, `robust_mpc/implementation_spec.md`, `robust_mpc/controller_api_mapping.md`, `robust_mpc/acceptance_tests.md` | classical robust MPC comparison baseline, not Pensieve | yes | unit/integration validated, not benchmarked |
+| `soda` | optional/deferred | none | none | none | `optional_methods/soda/candidate_card.md`, `optional_methods/soda/source_evidence.md`, `optional_candidates.md` | modern non-neural optional candidate | no | not benchmarked |
+| `pensieve` | historical IA/RL reference | none | none | none | `discarded_candidates.md`, `robust_mpc/pensieve_source_artifact_card.md` | historical neural ABR and RobustMPC context | no | not benchmarked |
+| `dynamic` | deferred practical dash.js-derived method | none | none | none | `baseline_selection_matrix.md`, `discarded_candidates.md`, `bola/dashjs_practical_evidence.md` | practical hybrid production method, not initial academic baseline | no | not benchmarked |
+| `fast_switching` | deferred practical dash.js-derived method | none | none | none | `baseline_selection_matrix.md`, `discarded_candidates.md`, `bola/dashjs_practical_evidence.md` | practical dash.js replacement behavior, not initial academic baseline | no | not benchmarked |
+| `rbc` | optional/deferred backup | none | none | none | `optional_methods/rbc/candidate_card.md`, `optional_candidates.md`, `discarded_candidates.md` | backup optional candidate pending source lock | no | not benchmarked |
+
+## Inventory Boundary
+
+Only the first eight rows are implemented in the client. The remaining rows are documented to prevent scope drift and to preserve future research options without silently expanding Phase 2.

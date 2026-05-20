@@ -12,6 +12,8 @@
 | Python development timeline | 4/5 | Show incremental hardening before controller implementation | `python_development_narrative_plan.md` | planned |
 | Controller traceability flow | 5 | Show source evidence -> spec -> mapping -> tests -> code -> memory | `controller_traceability_matrix.md` | planned |
 | Phase 2.3 closure boundary | 5/6 | Show what implementation closure proves and what waits for replay/QoE | `baseline_phase2_3_closure_report.md`, `chapter_06_pre_evaluation_boundary.md` | planned |
+| Paper to implementation evidence chain | 5 | Show paper/source evidence -> spec -> mapping -> tests -> code -> smoke | `phase2_academic_validity_statement.md` | planned |
+| Phase 2 to Phase 3 transition | 6/7 | Show baseline closure feeding trace/replay/emulation methodology | `phase2_transition_to_phase3.md` | planned |
 
 ## Figure Policy
 

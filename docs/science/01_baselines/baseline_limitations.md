@@ -33,3 +33,7 @@ The project can now claim that the mandatory baseline controllers are implemente
 - generated CSVs are valid final training data.
 
 Comparisons and paper-level claims require Phase 3, Phase 3.5 and Phase 6 methodology.
+
+## Phase 2.4 Formal Closure Pointer
+
+The final Phase 2 limitations and deferred-work statement is `phase2_open_limitations_and_deferred_work.md`.

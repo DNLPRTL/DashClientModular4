@@ -23,3 +23,7 @@
 | stall_signal | seconds_or_boolean | no | no | evaluation only | evaluation only | evaluation only | no | partial | `stall_flag`, `stall_duration` | media event aggregation | final QoE interpretation not defined | do not use as final reward yet |
 | device_or_user_context | mixed | no | no | no | no | no | no | no | none | would require new data | out of initial scope | exclude |
 | content_complexity | mixed | no | no | no | no | no | no | no | none | would require media/content analysis | out of initial scope | exclude |
+
+## Phase 2.4 Closure Note
+
+The signal matrix remains an implementation-boundary artifact. It supports the formal Phase 2 closure by showing that the implemented controllers use available client signals and that final QoE/reward, trace replay and AI/RL signals remain outside Phase 2.

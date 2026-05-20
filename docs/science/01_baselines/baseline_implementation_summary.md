@@ -24,3 +24,7 @@ Phase 2.3 closes the mandatory baseline implementation set for DashClientModular
 ## Closure Meaning
 
 The implementation summary supports the claim that the mandatory controller set exists, is registered and has dedicated unit coverage. It does not support final QoE, replay, trace, real-network or benchmark superiority claims.
+
+## Phase 2.4 Formal Closure Pointer
+
+The formal Phase 2 closure is `phase2_baseline_closure.md`. The final controller inventory is `phase2_controller_inventory.md`.

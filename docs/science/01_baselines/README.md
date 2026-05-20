@@ -15,6 +15,17 @@ The Phase 2.3 closure audit is documented in:
 - `baseline_limitations.md`
 - `baseline_phase2_3_closure_report.md`
 
+## Phase 2.4 Formal Closure
+
+The formal Phase 2 closure and transition package is documented in:
+
+- `phase2_baseline_closure.md`
+- `phase2_controller_inventory.md`
+- `phase2_test_validation_summary.md`
+- `phase2_academic_validity_statement.md`
+- `phase2_open_limitations_and_deferred_work.md`
+- `phase2_transition_to_phase3.md`
+
 ## Initial Baseline Set
 
 | order | controller class | status |

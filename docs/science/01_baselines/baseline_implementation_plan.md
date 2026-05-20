@@ -36,3 +36,7 @@ The final closure audit is documented in:
 - `baseline_phase2_3_closure_report.md`
 
 The closure audit is documentation/test-only. It does not alter controller algorithms, player behavior, media engines, metric definitions, output contracts, replay/traces, QoE/reward, IA/RL, PDFs or generated artifacts.
+
+## Phase 2.4 Formal Closure
+
+The final closure package is documented in `phase2_baseline_closure.md`, `phase2_controller_inventory.md`, `phase2_test_validation_summary.md`, `phase2_academic_validity_statement.md`, `phase2_open_limitations_and_deferred_work.md` and `phase2_transition_to_phase3.md`.

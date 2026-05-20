@@ -71,7 +71,9 @@ Use this checklist before the implementation chapter and defense preparation.
 - Explain why this block does not open AI/RL, neural inference, training, ABR server, traces or datasets.
 - Explain how RobustMPC tests prove zero-error equivalence, high-error conservatism, bounded error windows and forbidden-signal independence.
 - Explain the Phase 2.3 closure audit: implementation summary, registry audit, testing summary, smoke summary and limitations.
+- Explain the Phase 2.4 formal closure: controller inventory, academic validity statement, open limitations and transition to Phase 3.
 - Explain why SODA, Pensieve, DYNAMIC and FAST SWITCHING are not implemented in Phase 2.3.
+- Explain why SODA, Pensieve, DYNAMIC, FAST SWITCHING and RBC remain not implemented after Phase 2 closure.
 
 ## Tests And Limitations
 
@@ -83,6 +85,7 @@ Use this checklist before the implementation chapter and defense preparation.
 - Explain no traces/replay/emulation yet.
 - Explain no AI/RL implementation yet.
 - Explain every simplification honestly.
+- Explain why Phase 3 must handle traces/replay/emulation before benchmark claims.
 
 ## Final Defense Check
 

@@ -26,3 +26,7 @@ The Phase 2.3 closure report accepts the mandatory implementation set only at th
 - all mandatory controller modules import and have dedicated unit tests;
 - fake smoke evidence remains integration/artifact evidence only;
 - no final QoE/reward, replay/traces, benchmark ranking or paper-level comparison is claimed.
+
+## Phase 2.4 Formal Closure
+
+The acceptance evidence is summarized for final Phase 2 closure in `phase2_test_validation_summary.md` and `phase2_academic_validity_statement.md`.

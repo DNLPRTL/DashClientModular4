@@ -30,3 +30,7 @@ Phase 2.3 unit tests validate controller decision logic, registry visibility, un
 - They do not make GStreamer playback benchmark-grade.
 
 Final comparative results wait for later replay/traces/QoE phases.
+
+## Phase 2.4 Formal Closure Pointer
+
+The final test interpretation for Phase 2 closure is `phase2_test_validation_summary.md`.

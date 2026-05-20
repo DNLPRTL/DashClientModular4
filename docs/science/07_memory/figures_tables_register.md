@@ -15,6 +15,8 @@ This register tracks candidate thesis visuals and tables before they are created
 | F7 | Controller validation ladder | Unit/fake/readiness/result interpretation protocols | planned original diagram |
 | F8 | Python development timeline | Python development narrative plan | planned original diagram |
 | F9 | Phase 2.3 closure boundary | `baseline_phase2_3_closure_report.md` and pre-evaluation notes | planned original diagram |
+| F10 | Phase 2 to Phase 3 transition | `phase2_transition_to_phase3.md` | planned original diagram |
+| F11 | Paper to implementation evidence chain | `phase2_academic_validity_statement.md` | planned original diagram |
 
 ## Tables
 
@@ -35,3 +37,6 @@ This register tracks candidate thesis visuals and tables before they are created
 | T13 | Baseline registry audit | `baseline_registry_audit.md` | draft |
 | T14 | Baseline testing summary | `baseline_testing_summary.md` | draft |
 | T15 | Baseline limitations | `baseline_limitations.md` | draft |
+| T16 | Final Phase 2 controller inventory | `phase2_controller_inventory.md` | draft |
+| T17 | Phase 2 academic validity statement | `phase2_academic_validity_statement.md` | draft |
+| T18 | Phase 2 limitations and deferred work | `phase2_open_limitations_and_deferred_work.md` | draft |

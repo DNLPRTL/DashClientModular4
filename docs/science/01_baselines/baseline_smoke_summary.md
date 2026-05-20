@@ -49,3 +49,7 @@ The following must not be committed or treated as Phase 2.3 outputs:
 - Smoke does not prove paper-level performance.
 - Smoke does not make GStreamer benchmark-grade.
 - GStreamer remains an integration/demo boundary.
+
+## Phase 2.4 Formal Closure Pointer
+
+Smoke evidence is carried into Phase 2 closure as integration validation only. See `phase2_test_validation_summary.md` and `phase2_academic_validity_statement.md`.

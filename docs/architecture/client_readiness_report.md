@@ -106,3 +106,7 @@ python scripts\check_client_readiness.py --strict
 ## Recomendacion final
 
 Cerrar Phase 1 tras validar Block 14. El cliente esta listo como base tecnica estable para volver a Phase 0. La implementacion de baselines debe esperar a decisiones documentadas de papers, metodologia, QoE/reward y entorno experimental.
+
+## Phase 2 Baseline Closure Pointer
+
+La implementacion obligatoria de baselines de Phase 2 queda cerrada formalmente en `docs/science/01_baselines/phase2_baseline_closure.md`. Ese cierre no cambia el veredicto arquitectonico de Phase 1: no define QoE/reward final, replay/traces, benchmark formal ni cambios de player/runtime/media engine.
