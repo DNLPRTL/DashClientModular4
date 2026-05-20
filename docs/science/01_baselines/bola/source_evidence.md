@@ -144,7 +144,7 @@ if no positive score:
 ```
 
 Potential issue:
-- The formula must be dimensionally consistent. Future implementation must choose whether it operates in seconds/bytes or segment-units and keep all formulas consistent.
+- The formula must be dimensionally consistent. Phase 2.3.4 resolves this for BOLA-basic by converting buffer seconds to segment units and normalizing candidate sizes by the minimum candidate size.
 
 ## Simplifications accepted
 

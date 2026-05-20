@@ -11,6 +11,7 @@
 | Validation ladder | 5/6 | Separate unit tests, fake smoke, readiness, future replay and final QoE claims | controller validation protocols | planned |
 | Python development timeline | 4/5 | Show incremental hardening before controller implementation | `python_development_narrative_plan.md` | planned |
 | Controller traceability flow | 5 | Show source evidence -> spec -> mapping -> tests -> code -> memory | `controller_traceability_matrix.md` | planned |
+| Phase 2.3 closure boundary | 5/6 | Show what implementation closure proves and what waits for replay/QoE | `baseline_phase2_3_closure_report.md`, `chapter_06_pre_evaluation_boundary.md` | planned |
 
 ## Figure Policy
 

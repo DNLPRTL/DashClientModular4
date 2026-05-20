@@ -12,3 +12,16 @@
 ## Traceability Rule
 
 Any future code module must cite its local Markdown spec in comments or developer notes. If implementation behavior diverges from this matrix, update the science docs before merging code.
+
+## Phase 2.3 Closure Audit
+
+The implementation set above is closed by:
+
+- `baseline_implementation_summary.md`
+- `baseline_registry_audit.md`
+- `baseline_testing_summary.md`
+- `baseline_smoke_summary.md`
+- `baseline_limitations.md`
+- `baseline_phase2_3_closure_report.md`
+
+These documents aggregate existing paper/spec/code/test evidence and do not introduce new controllers, replay, QoE/reward, benchmark claims, generated artifacts or media assets.

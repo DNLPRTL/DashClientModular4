@@ -70,11 +70,14 @@ Use this checklist before the implementation chapter and defense preparation.
 - Explain why Pensieve is cited but not implemented.
 - Explain why this block does not open AI/RL, neural inference, training, ABR server, traces or datasets.
 - Explain how RobustMPC tests prove zero-error equivalence, high-error conservatism, bounded error windows and forbidden-signal independence.
+- Explain the Phase 2.3 closure audit: implementation summary, registry audit, testing summary, smoke summary and limitations.
+- Explain why SODA, Pensieve, DYNAMIC and FAST SWITCHING are not implemented in Phase 2.3.
 
 ## Tests And Limitations
 
 - Explain each controller unit test category.
 - Explain sanity controller tests for min, fixed, max and target-rate unit conversion.
+- Explain the registry audit test and why it does not duplicate algorithm tests.
 - Explain fake smoke scenarios and why they are not benchmarks.
 - Explain no final QoE/reward in Phase 2.
 - Explain no traces/replay/emulation yet.

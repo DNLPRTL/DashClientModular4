@@ -17,3 +17,12 @@ Acceptance evidence must be interpreted through `baseline_result_interpretation_
 - fake smoke validates integration and artifact production;
 - readiness validates that client neutrality remains intact;
 - none of these alone validates paper-level performance, final QoE, real-network superiority or benchmark ranking.
+
+## Phase 2.3 Acceptance Closure
+
+The Phase 2.3 closure report accepts the mandatory implementation set only at the implementation-contract level:
+
+- all canonical controller names are registered;
+- all mandatory controller modules import and have dedicated unit tests;
+- fake smoke evidence remains integration/artifact evidence only;
+- no final QoE/reward, replay/traces, benchmark ranking or paper-level comparison is claimed.

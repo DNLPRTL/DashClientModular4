@@ -23,3 +23,16 @@ Before any row above moves into code, it must pass `controller_implementation_re
 - `controller_traceability_matrix.md`
 
 The closure criterion for Phase 2.3 implementation work is not "the controller runs once". It is: the controller matches its docs, passes unit tests, passes fake-engine smoke validation, preserves client readiness, and makes no final benchmark or QoE claim.
+
+## Phase 2.3 Closure Artifacts
+
+The final closure audit is documented in:
+
+- `baseline_implementation_summary.md`
+- `baseline_registry_audit.md`
+- `baseline_testing_summary.md`
+- `baseline_smoke_summary.md`
+- `baseline_limitations.md`
+- `baseline_phase2_3_closure_report.md`
+
+The closure audit is documentation/test-only. It does not alter controller algorithms, player behavior, media engines, metric definitions, output contracts, replay/traces, QoE/reward, IA/RL, PDFs or generated artifacts.

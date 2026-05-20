@@ -14,6 +14,7 @@ This register tracks candidate thesis visuals and tables before they are created
 | F6 | RobustMPC prediction-error adjustment | RobustMPC spec when created | deferred |
 | F7 | Controller validation ladder | Unit/fake/readiness/result interpretation protocols | planned original diagram |
 | F8 | Python development timeline | Python development narrative plan | planned original diagram |
+| F9 | Phase 2.3 closure boundary | `baseline_phase2_3_closure_report.md` and pre-evaluation notes | planned original diagram |
 
 ## Tables
 
@@ -30,3 +31,7 @@ This register tracks candidate thesis visuals and tables before they are created
 | T9 | Fake smoke scenario matrix | `fake_smoke_validation_protocol.md` | draft |
 | T10 | Metric validity classification | `metric_validity_for_baselines.md` | draft |
 | T11 | Controller code review checklist | `controller_code_review_checklist.md` | draft |
+| T12 | Phase 2.3 implementation summary | `baseline_implementation_summary.md` | draft |
+| T13 | Baseline registry audit | `baseline_registry_audit.md` | draft |
+| T14 | Baseline testing summary | `baseline_testing_summary.md` | draft |
+| T15 | Baseline limitations | `baseline_limitations.md` | draft |

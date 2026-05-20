@@ -11,6 +11,7 @@ This document maps future implementation evidence to the TFG memory. It is a pla
 | Baseline implementation method | Documentation-first gate before coding. | `controller_implementation_readiness_gate.md`, `controller_academic_validation_protocol.md`. | Implementation gate figure. |
 | Sanity controllers | Deterministic `min_rate`, `fixed_rate`, and `max_rate` behavior for registry, unit, contract and fake-engine validation. | `sanity_controllers/*.md`, `core/controller/sanity_rate.py`, `tests/test_sanity_rate_controllers.py`. | Sanity controller table. |
 | Academic baselines | `rate_based` implemented first, `bba` implemented second, `bola` implemented third as BOLA-basic, `mpc` implemented fourth as small-horizon enumerative MPC, and `robust_mpc` implemented fifth as MPC with conservative prediction correction. | implementation specs, controller mappings, `tests/test_rate_based_controller.py`, `tests/test_bba_controller.py`, `tests/test_bola_controller.py`, `tests/test_mpc_controller.py`, and `tests/test_robust_mpc_controller.py`. | Baseline traceability matrix. |
+| Phase 2.3 closure audit | Final documentation/test-only audit of implemented baselines, registry, testing, smoke boundaries and limitations. | `baseline_implementation_summary.md`, `baseline_registry_audit.md`, `baseline_testing_summary.md`, `baseline_smoke_summary.md`, `baseline_limitations.md`, `baseline_phase2_3_closure_report.md`, `tests/test_baseline_registry_audit.py`. | Closure summary table and registry audit table. |
 | Testing strategy | Unit tests, fake smoke tests, readiness checks. | unit and fake smoke protocols. | Test pyramid or validation ladder figure. |
 | Reproducibility | Canonical artifacts and environment/config capture. | output artifact contract and fake smoke protocol. | Artifact flow figure. |
 | Limitations | No final QoE, no benchmark claims, no replay/traces, no AI/RL. | metric validity and result interpretation policy. | Limitations table. |
@@ -42,6 +43,8 @@ This document maps future implementation evidence to the TFG memory. It is a pla
 - Smoke scenario matrix.
 - Metric validity classification.
 - Limitations and deferred methodology.
+- Phase 2.3 implementation closure summary.
+- Registry audit by controller name.
 
 ## Traceability Rule
 
