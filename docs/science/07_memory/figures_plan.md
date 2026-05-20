@@ -14,6 +14,11 @@
 | Phase 2.3 closure boundary | 5/6 | Show what implementation closure proves and what waits for replay/QoE | `baseline_phase2_3_closure_report.md`, `chapter_06_pre_evaluation_boundary.md` | planned |
 | Paper to implementation evidence chain | 5 | Show paper/source evidence -> spec -> mapping -> tests -> code -> smoke | `phase2_academic_validity_statement.md` | planned |
 | Phase 2 to Phase 3 transition | 6/7 | Show baseline closure feeding trace/replay/emulation methodology | `phase2_transition_to_phase3.md` | planned |
+| Trace methodology pipeline | 6 | Show search -> inventory -> cards -> selection -> conversion -> future evaluation gates | `02_traces_replay/search_protocol.md`, `trace_dataset_selection.md` | planned |
+| Replay/emulation decision flow | 6 | Show Mahimahi, `tc/netem`, custom fake runner and hybrid decision criteria | `02_traces_replay/replay_emulation_decision.md` | planned |
+| Dataset split and OOD boundary | 6 | Show train, validation, test and OOD separation | `02_traces_replay/train_validation_test_ood_policy.md` | planned |
+| Leakage prevention map | 6 | Show how trace, parameter, scenario and artifact leakage are avoided | `02_traces_replay/leakage_prevention_policy.md` | planned |
+| Run artifact lifecycle | 6 | Show raw data outside repo, generated artifacts outside repo and authored summaries in docs | `02_traces_replay/run_artifact_expectations.md` | planned |
 
 ## Figure Policy
 

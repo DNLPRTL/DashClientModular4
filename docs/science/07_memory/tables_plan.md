@@ -24,6 +24,14 @@
 | Phase 2 academic validity | 5/6 | Define what Phase 2 implementation validity proves and does not prove | `phase2_academic_validity_statement.md` |
 | Phase 2 limitations and deferred work | 6/7 | Summarize missing QoE/reward, replay, emulation and benchmark claims | `phase2_open_limitations_and_deferred_work.md` |
 | Phase 3 transition | 6/7 | Introduce traces/replay/emulation as the next methodology phase | `phase2_transition_to_phase3.md` |
+| Phase 3 trace/replay source inventory | 6 | Classify mandatory, recommended, optional and deferred trace/replay sources | `02_traces_replay/source_inventory.md` |
+| Dataset candidate matrix | 6 | Compare trace candidates by source, format, split role, risks and provisional decision | `02_traces_replay/trace_dataset_matrix.md` |
+| Dataset selection criteria | 6 | Explain why datasets are not final until provenance, terms and conversion are documented | `02_traces_replay/trace_dataset_selection.md` |
+| Replay/emulation comparison | 6 | Compare Mahimahi, `tc/netem` and custom fake trace-driven runner criteria | `02_traces_replay/mahimahi_or_alternatives.md` |
+| Split and OOD policy | 6 | Define train, validation, test and OOD roles for later phases | `02_traces_replay/train_validation_test_ood_policy.md` |
+| Leakage prevention checklist | 6 | Show controls against trace, parameter, scenario and artifact leakage | `02_traces_replay/leakage_prevention_policy.md` |
+| Synthetic trace plan | 6 | Describe future runner validation traces before real datasets | `02_traces_replay/synthetic_trace_test_plan.md` |
+| Future run artifact contract | 6 | Define expected manifests, telemetry, summaries and repository exclusions | `02_traces_replay/run_artifact_expectations.md` |
 
 ## Conversion Rule
 

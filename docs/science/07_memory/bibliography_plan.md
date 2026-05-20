@@ -18,6 +18,16 @@
 | `mao2017pensieve` | Neural Adaptive Video Streaming with Pensieve |
 | `spiteri2019dashjs` | From Theory to Practice: Improving Bitrate Adaptation in the DASH Reference Player |
 | `chen2024soda` | SODA: An Adaptive Bitrate Controller for Consistent High-Quality Video Streaming |
+| `netravali2015mahimahi` | Mahimahi: Accurate Record-and-Replay for HTTP |
+| `riiser2013commutePath` | Commute Path Bandwidth Traces from 3G Networks: Analysis and Applications |
+| `yan2020puffer` | Learning in situ: a randomized experiment in video streaming |
+| `fccMeasuringBroadbandAmerica` | FCC Measuring Broadband America |
+| `linuxTcNetemManual` | Linux tc-netem manual |
+| `vanDerHooft2016ghent4g` | 4G/LTE Bandwidth Logs, Ghent, Belgium |
+| `raca2018beyondThroughput4g` | Beyond Throughput: a 4G LTE Dataset with Channel and Context Metrics |
+| `raca2020beyondThroughput5g` | Beyond Throughput, the next Generation: a 5G Dataset with Channel and Context Metrics |
+| `narayanan2020lumos5g` | Lumos5G: Mapping and Predicting Commercial mmWave 5G Throughput |
+| `lancasterAbrThroughputTraces` | Lancaster ABR-Throughput-Traces |
 
 ## Later Work
 
@@ -25,3 +35,4 @@
 - Keep DOI URLs where available.
 - Do not include bibliography entries for papers not cited in the final text.
 - Use Phase 2 closure docs to decide which optional/deferred methods deserve final bibliography entries. SODA and Pensieve are useful if discussed as future work or historical IA/RL context; RBC should not receive a final entry until its source identity is locked.
+- Use Phase 3 source cards to decide which trace/replay entries are cited in Chapter 6. Dataset candidates should not become final bibliography entries unless they are actually used or discussed.

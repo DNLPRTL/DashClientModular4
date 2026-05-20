@@ -17,6 +17,11 @@ This register tracks candidate thesis visuals and tables before they are created
 | F9 | Phase 2.3 closure boundary | `baseline_phase2_3_closure_report.md` and pre-evaluation notes | planned original diagram |
 | F10 | Phase 2 to Phase 3 transition | `phase2_transition_to_phase3.md` | planned original diagram |
 | F11 | Paper to implementation evidence chain | `phase2_academic_validity_statement.md` | planned original diagram |
+| F12 | Trace methodology pipeline | `02_traces_replay/search_protocol.md` and `trace_dataset_selection.md` | planned original diagram |
+| F13 | Replay/emulation decision flow | `02_traces_replay/replay_emulation_decision.md` | planned original diagram |
+| F14 | Train/validation/test/OOD boundary | `02_traces_replay/train_validation_test_ood_policy.md` | planned original diagram |
+| F15 | Leakage prevention map | `02_traces_replay/leakage_prevention_policy.md` | planned original diagram |
+| F16 | Run artifact lifecycle | `02_traces_replay/run_artifact_expectations.md` | planned original diagram |
 
 ## Tables
 
@@ -40,3 +45,9 @@ This register tracks candidate thesis visuals and tables before they are created
 | T16 | Final Phase 2 controller inventory | `phase2_controller_inventory.md` | draft |
 | T17 | Phase 2 academic validity statement | `phase2_academic_validity_statement.md` | draft |
 | T18 | Phase 2 limitations and deferred work | `phase2_open_limitations_and_deferred_work.md` | draft |
+| T19 | Phase 3 trace/replay source inventory | `02_traces_replay/source_inventory.md` | draft |
+| T20 | Phase 3 dataset candidate matrix | `02_traces_replay/trace_dataset_matrix.md` | draft |
+| T21 | Phase 3 dataset selection criteria | `02_traces_replay/trace_dataset_selection.md` | draft |
+| T22 | Replay/emulation method comparison | `02_traces_replay/mahimahi_or_alternatives.md` | draft |
+| T23 | Synthetic trace test plan | `02_traces_replay/synthetic_trace_test_plan.md` | draft |
+| T24 | Future run artifact expectations | `02_traces_replay/run_artifact_expectations.md` | draft |

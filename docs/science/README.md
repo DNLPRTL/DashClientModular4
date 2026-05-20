@@ -1,8 +1,8 @@
-# Phase 2 Science Documentation
+# Science Documentation
 
-This directory is the scientific documentation scaffold and closure record for Phase 2 of DashClientModular4.
+This directory is the scientific documentation scaffold and closure record for DashClientModular4.
 
-Phase 1 closed with the client certified as ABR-neutral, reproducible, and testable. Phase 2 selected, documented, implemented and validated the mandatory ABR baseline set. The formal closure remains documentation-only: it must not introduce new controllers, QoE reward definitions, replay traces, benchmark code, datasets, media files, generated artifacts, or runtime behavior changes.
+Phase 1 closed with the client certified as ABR-neutral, reproducible, and testable. Phase 2 selected, documented, implemented and validated the mandatory ABR baseline set. Phase 3 now documents trace, dataset, replay and emulation methodology before any final benchmark or QoE/reward is attempted.
 
 ## Methodology Gate
 
@@ -24,6 +24,7 @@ The paper card captures the scientific source. The implementation specification 
 | --- | --- |
 | `00_field_map/` | DASH background, survey map, local related work, scope decisions, and source cards. |
 | `01_baselines/` | Baseline selection matrices, signal analysis, implementation order, templates, and baseline cards. |
+| `02_traces_replay/` | Phase 3 trace/dataset/replay/emulation methodology scaffold and decision gates. |
 | `07_memory/` | Thesis-memory integration notes for the UGR/ETSIIT LaTeX template, citations, figures, tables, annexes, and defense constraints. |
 
 ## Current Decisions
@@ -38,6 +39,12 @@ The paper card captures the scientific source. The implementation specification 
 - Defer any AI/RL controller.
 - Keep GStreamer as integration/demo, not benchmark-grade.
 - Use the fake engine as the controlled path for future tests, replay, and benchmarking.
+- Phase 3.1 records trace/replay source candidates, dataset selection criteria, replay/emulation criteria, split policy, leakage prevention, synthetic trace test planning and artifact expectations.
+- No Phase 3.1 dataset is final and no dataset is downloaded into the repository.
+- Full Puffer raw data is metadata-only in Phase 3.1.
+- FCC Measuring Broadband America raw data is reference-only until a conversion/download plan exists.
+- Mahimahi is a method candidate, not mandatory implementation.
+- A custom fake trace-driven runner is the primary likely implementation candidate for reproducible Python tests, but is not implemented in Phase 3.1.
 
 ## Source Handling Rules
 
