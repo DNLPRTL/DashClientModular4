@@ -21,6 +21,7 @@ REQUIRED_IMPORTS = [
     "core.controller.max_quality_controller",
     "core.controller.mpc",
     "core.controller.rate_based",
+    "core.controller.robust_mpc",
     "core.controller.sanity_rate",
     "core.controller.scripted_quality",
 ]
@@ -43,6 +44,7 @@ class ImportSmokeTest(unittest.TestCase):
             "bba",
             "bola",
             "mpc",
+            "robust_mpc",
             "fixed_quality",
             "scripted_quality",
             "max_quality",

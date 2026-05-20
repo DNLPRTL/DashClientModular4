@@ -16,8 +16,8 @@
 | what it does NOT justify | Does not justify implementing Pensieve, training models, creating RL datasets, defining final reward, or adding an AI controller in Phase 2. |
 | use in thesis memory | Chapter 2 neural ABR history and Chapter 6 limitations/future work. |
 | provisional BibTeX key | `mao2017pensieve` |
-| decision | Source artifact only for this block; do not implement Pensieve. |
+| decision | Source artifact only for RobustMPC context; RobustMPC is implemented, but Pensieve is not implemented. |
 
 ## RobustMPC Note
 
-RobustMPC should be documented as using the same general MPC approach while adjusting throughput estimates according to recent prediction errors. The exact formula must be specified in `implementation_spec.md` before any code is written.
+RobustMPC is documented and implemented as the same general MPC approach while adjusting throughput estimates according to recent prediction errors. This artifact remains historical/comparison evidence only and does not introduce Pensieve state, model loading, neural inference, training, traces, datasets, ABR server logic or final reward.

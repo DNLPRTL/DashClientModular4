@@ -12,8 +12,8 @@
 | key contribution | Uses the MPC approach while accounting for prediction errors by normalizing throughput estimates using the maximum error observed in the past 5 chunks. |
 | algorithm family if applicable | Robust model predictive control. |
 | required signals if applicable | MPC signals plus recent throughput prediction error history, especially a 5-chunk error window. |
-| implementation relevance | Future implementation should be layered after MPC and must document how prediction error is computed and applied. |
-| what it does NOT justify | Does not justify implementing Pensieve, training RL models, or adding AI infrastructure in Phase 2. |
+| implementation relevance | Implemented in Phase 2.3.6 as MPC plus conservative prediction correction using recent absolute percentage prediction error. |
+| what it does NOT justify | Does not justify implementing Pensieve, training RL models, adding AI infrastructure, defining final reward, or making benchmark claims in Phase 2. |
 | use in thesis memory | Chapter 2 robust MPC context; Chapter 5 implementation; Chapter 6 comparison against MPC. |
 | provisional BibTeX key | `yin2015mpc` and `mao2017pensieve` |
-| decision | Mandatory later baseline after MPC; implementation blocked until full docs and QoE dependency are resolved. |
+| decision | Mandatory baseline implemented as the fifth academic ABR controller; Pensieve/RL remains excluded. |

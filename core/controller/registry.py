@@ -8,6 +8,7 @@ from .fixed_quality import FixedQualityController
 from .max_quality_controller import MaxQualityController
 from .mpc import MpcController
 from .rate_based import RateBasedController
+from .robust_mpc import RobustMpcController
 from .sanity_rate import FixedRateController, MaxRateController, MinRateController
 from .scripted_quality import ScriptedQualityController
 
@@ -54,6 +55,11 @@ CONTROLLER_REGISTRY = {
         key="mpc",
         label="MPC hybrid planning baseline",
         factory=MpcController,
+    ),
+    "robust_mpc": ControllerSpec(
+        key="robust_mpc",
+        label="RobustMPC conservative planning baseline",
+        factory=RobustMpcController,
     ),
     "fixed_quality": ControllerSpec(
         key="fixed_quality",

@@ -60,9 +60,16 @@ Use this checklist before the implementation chapter and defense preparation.
 - Explain how simulated download time, rebuffering and buffer refill are computed for each candidate sequence.
 - Explain that rebuffer and switching penalties are controller-internal decision terms, not final TFG QoE.
 - Explain why FastMPC table compression is deferred in the first implementation.
-- Explain why RobustMPC is deferred to the next block.
 - Explain how MPC tests prove first-action behavior, edge-case fallback, combinatorial safety and forbidden-signal independence.
 - Explain RobustMPC prediction-error correction and why it is not Pensieve.
+- Explain why RobustMPC follows MPC as the fifth academic ABR baseline.
+- Explain how RobustMPC differs from MPC: same planner, conservative throughput prediction.
+- Explain how RobustMPC computes `abs(predicted - actual) / max(actual, epsilon)`.
+- Explain how `robust_prediction = base_prediction / (1 + max_error)` is derived.
+- Explain why `startup_safety_factor` is used before prediction-error history exists.
+- Explain why Pensieve is cited but not implemented.
+- Explain why this block does not open AI/RL, neural inference, training, ABR server, traces or datasets.
+- Explain how RobustMPC tests prove zero-error equivalence, high-error conservatism, bounded error windows and forbidden-signal independence.
 
 ## Tests And Limitations
 
