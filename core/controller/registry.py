@@ -6,6 +6,7 @@ from .bola import BolaController
 from .bba import BbaController
 from .fixed_quality import FixedQualityController
 from .max_quality_controller import MaxQualityController
+from .mpc import MpcController
 from .rate_based import RateBasedController
 from .sanity_rate import FixedRateController, MaxRateController, MinRateController
 from .scripted_quality import ScriptedQualityController
@@ -48,6 +49,11 @@ CONTROLLER_REGISTRY = {
         key="bola",
         label="BOLA-basic utility/buffer baseline",
         factory=BolaController,
+    ),
+    "mpc": ControllerSpec(
+        key="mpc",
+        label="MPC hybrid planning baseline",
+        factory=MpcController,
     ),
     "fixed_quality": ControllerSpec(
         key="fixed_quality",

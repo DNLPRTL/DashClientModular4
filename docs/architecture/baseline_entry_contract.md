@@ -42,6 +42,7 @@ El registro actual esta en `core/controller/registry.py`:
 | `rate_based` | academic baseline | Primer baseline ABR academico implementado; selecciona la representacion mas alta bajo una estimacion conservadora de throughput de aplicacion. |
 | `bba` | academic baseline | Segundo baseline ABR academico implementado; selecciona representacion mediante mapa de buffer reservoir/cushion. |
 | `bola` | academic baseline | Tercer baseline ABR academico implementado; selecciona representacion mediante score BOLA-basic de buffer, utilidad y tamano de segmento. |
+| `mpc` | academic baseline | Cuarto baseline ABR academico implementado; enumera secuencias de horizonte corto con prediccion de throughput, simulacion de buffer y objetivo interno provisional. |
 | `fixed_quality` | test/debug | Smoke tests, invariantes de ruta, validacion determinista. |
 | `scripted_quality` | test/debug | Trazas deterministas de cambio de nivel. |
 | `max_quality` | legacy/debug/stress | Estresar la ruta de seleccion maxima; no comparar academicamente. |
@@ -53,6 +54,8 @@ El registro actual esta en `core/controller/registry.py`:
 `bba` se registra despues de cerrar su paper card, source evidence, implementation spec, API mapping, acceptance tests y notes for memory. Usa `queued_time` como senal primaria de buffer y los parametros `reservoir_s` y `cushion_s` para mapear el buffer a una representacion. No usa throughput como regla primaria, ni TCP RTT, packet loss, congestion window, estado de servidor, oraculos externos, consola ni QoE final.
 
 `bola` se registra despues de cerrar su paper card, source evidence, implementation spec, API mapping, acceptance tests y notes for memory. Usa `queued_time`, `fragment_duration`, `rates`, utilidad logaritmica interna y tamano de segmento exacto si se proporciona o aproximado como `rate * fragment_duration`. No requiere prediccion explicita de throughput, no implementa DYNAMIC, FAST SWITCHING, BOLA-E ni comportamiento completo de dash.js, y no define QoE final.
+
+`mpc` se registra despues de cerrar su paper card, source evidence, implementation spec, API mapping, acceptance tests y notes for memory. Usa `rates`, `queued_time`, `fragment_duration`, `level`, historial o mediciones de throughput de capa de aplicacion, y tamanos de segmento exactos si se proporcionan o aproximados como `rate * fragment_duration`. Enumera secuencias con horizonte pequeno y devuelve solo la primera accion de la mejor secuencia. Su objetivo interno no es QoE/reward final, no usa oraculos de futuro, no implementa FastMPC, RobustMPC, Pensieve, IA/RL ni benchmark.
 
 Futuros baselines academicos deben registrarse aqui cuando sus papers, evidencias, especificaciones, mappings y tests esten cerrados. El nombre del controlador en el manifest identifica la ejecucion, pero no convierte al controlador en baseline academico por si mismo.
 
@@ -138,4 +141,4 @@ Un baseline futuro:
 
 ## Estado de entrada
 
-Con Block 14, la entrada tecnica para baselines queda preparada como contrato. La implementacion de baselines sigue bloqueada hasta Phase 0, porque faltan decisiones de literatura, metodologia, QoE/reward y entorno experimental.
+Con Phase 2.3.5, el contrato ya fue usado para implementar y validar los controladores de cordura, `rate_based`, `bba`, `bola` y `mpc`. Los baselines siguientes siguen sujetos a sus specs, tests y limites de metodologia: no hay QoE/reward final, replay/traces ni benchmark formal en este contrato.

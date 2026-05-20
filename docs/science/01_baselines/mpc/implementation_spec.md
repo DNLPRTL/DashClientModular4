@@ -7,11 +7,13 @@
 | controller name | `mpc` |
 | family | hybrid / model predictive control |
 | primary source | Yin et al. 2015, `paper_card.md`, `source_evidence.md` |
-| implementation status | future implementation spec; no code in this block |
+| implementation status | implemented in Phase 2.3.5 as the fourth academic ABR baseline |
+| code module | `core/controller/mpc.py` |
+| test module | `tests/test_mpc_controller.py` |
 
 ## Objective
 
-Implement a small-horizon enumerative MPC controller. The controller predicts future throughput from recent segment measurements, enumerates candidate bitrate sequences, simulates buffer evolution, scores each sequence with an internal provisional objective, and returns the first action of the best sequence.
+`mpc` implements a small-horizon enumerative MPC controller. It predicts future throughput from recent segment measurements, enumerates candidate bitrate sequences, simulates buffer evolution, scores each sequence with an internal provisional objective, and returns the first action of the best sequence.
 
 The objective is controller-internal only. It is not the final TFG QoE/reward and must not be used as benchmark scoring.
 
@@ -20,12 +22,15 @@ The objective is controller-internal only. It is not the final TFG QoE/reward an
 | input | client key | unit | role | required |
 | --- | --- | --- | --- | --- |
 | bitrate ladder | `rates` | bytes_per_second_list | candidate actions | yes |
-| buffer level | `queued_time` | seconds | initial simulated buffer | yes |
+| buffer level | `queued_time` | seconds | initial simulated buffer | yes, safe `0` fallback when invalid |
 | segment duration | `fragment_duration` | seconds | future buffer increment and size approximation | yes |
-| last segment size | `last_fragment_size` | bytes | throughput sample numerator | yes for history update |
-| last download time | `last_download_time` | seconds | throughput sample denominator | yes for history update |
-| current/last quality | `level` | representation_index | switching penalty reference | yes |
-| segment index | `segment_index` | index | deterministic context and end-of-video cap if later known | optional |
+| last segment size | `last_fragment_size` | bytes | throughput sample numerator | optional history update |
+| last download time | `last_download_time` | seconds | throughput sample denominator | optional history update |
+| explicit throughput history | `throughput_history_Bps` or compatible aliases | bytes_per_second_list | predictor input | optional |
+| explicit measured throughput | `measured_throughput_Bps` or compatible aliases | bytes_per_second | predictor input | optional |
+| current/last quality | `level` | representation_index | switching penalty reference | optional, clamped |
+| exact segment sizes | `segment_sizes_B` or compatible aliases | bytes_list | download-time simulation | optional |
+| remaining segments | `remaining_segments` or compatible aliases | chunks | cap horizon near end | optional |
 
 ## Output To DashClientModular4
 
@@ -33,38 +38,42 @@ Return the first representation of the best sequence as `target_rate` in bytes p
 
 ## Parameters
 
-| parameter | unit | suggested default | reason/configurability |
+| parameter | unit | default | behavior |
 | --- | --- | --- | --- |
-| `horizon` | chunks | `3` | tractable first implementation; paper-aligned `5` can be configured later |
-| `throughput_history_window` | chunks | `5` | paper evidence uses recent chunks for harmonic mean |
-| `quality_reward_mode` | enum | `log_rate_ratio` | dimensionless reward independent of absolute units |
-| `rebuffer_penalty` | utility_per_second | `4.3` | common MPC/Pensieve-style internal penalty; not final QoE |
-| `switch_penalty` | utility_per_utility_delta | `1.0` | discourages avoidable quality jumps |
-| `startup_level` | representation_index | `0` | safe fallback with no valid throughput |
-| `max_enumerated_sequences` | count | `4096` | prevents combinatorial blow-up |
+| `horizon` | chunks | `3` | default receding-horizon depth; invalid values fall back to default |
+| `throughput_history_window` | chunks | `5` | recent positive samples used by harmonic mean |
+| `quality_reward_mode` | enum | `log_rate_ratio` | `ln(rate / min_rate)` dimensionless reward |
+| `rebuffer_penalty` | utility_per_second | `4.3` | internal cost for simulated rebuffering; negative values fall back to default |
+| `switch_penalty` | utility_per_utility_delta | `1.0` | internal cost for quality variation; negative values fall back to default |
+| `startup_level` | representation_index | `0` | safe fallback with no valid prediction |
+| `max_enumerated_sequences` | count | `4096` | reduces effective horizon to avoid combinatorial blow-up |
 | `min_valid_throughput_Bps` | bytes_per_second | `0.001` | avoids invalid prediction |
+| `min_segment_duration_s` | seconds | `0.001` | validates duration before simulation |
+| `size_mode` | enum | `exact_or_bitrate_duration` | exact per-level sizes when present, otherwise approximation |
 
 ## Formulas
 
-Throughput sample:
+Rates and throughput are normalized to bytes per second internally. Explicit `Bps`/`bytes_per_second` stays bytes/s, `bps` is divided by `8`, `kbps` by `8/1000`, and `Mbps` by `8/1000000`. Exact segment sizes are normalized to bytes; `B` stays bytes and `b` is divided by `8`.
+
+Throughput sample from the last completed segment:
 
 ```text
 throughput_Bps = last_fragment_size_bytes / last_download_time_s
 ```
 
-Harmonic mean predictor over positive samples:
+Harmonic mean predictor over recent positive samples:
 
 ```text
 predicted_Bps = n / sum(1 / throughput_Bps_i for i in recent_positive_samples)
 ```
 
-Segment-size approximation:
+Segment-size approximation when exact sizes are unavailable:
 
 ```text
 segment_size_bytes(level) = rates[level] * segment_duration_s
 ```
 
-Buffer simulation:
+Buffer simulation for each candidate action:
 
 ```text
 download_time_s = segment_size_bytes(level) / predicted_Bps
@@ -98,7 +107,8 @@ if buffer_level_s is missing, negative or non-finite:
 if segment_duration_s <= 0:
     return rates[startup_level clamped to ladder]
 
-update throughput history from last_fragment_size / last_download_time when valid
+collect positive throughput samples from explicit history, explicit measured throughput,
+and last_fragment_size / last_download_time
 if no positive throughput sample exists:
     return rates[startup_level clamped to ladder]
 
@@ -106,9 +116,9 @@ predicted = harmonic_mean(last throughput_history_window positive samples)
 if predicted < min_valid_throughput_Bps:
     return rates[startup_level clamped to ladder]
 
-H = configured horizon
-if len(rates) ** H > max_enumerated_sequences:
-    reduce H until the limit is satisfied or fail configuration validation
+H = configured horizon, capped by remaining_segments when available
+while len(rates) ** H > max_enumerated_sequences and H > 1:
+    reduce H
 
 best_score = -infinity
 best_first_level = startup_level
@@ -117,7 +127,7 @@ for each sequence in product(levels, repeat=H):
     previous_level = current level
     score = 0
     for level in sequence:
-        size = rates[level] * segment_duration_s
+        size = exact_size[level] if present else rates[level] * segment_duration_s
         download_time = size / predicted
         rebuffer = max(download_time - simulated_buffer, 0)
         simulated_buffer = max(simulated_buffer - download_time, 0) + segment_duration_s
@@ -134,16 +144,18 @@ return rates[best_first_level]
 
 ## Edge Cases
 
-| case | required behavior |
+| case | implemented behavior |
 | --- | --- |
-| empty ladder | validation failure through shared controller contract |
+| empty/missing/malformed ladder | safe `0.0` fallback through controller-local validation |
 | one-level ladder | return the only rate |
 | no throughput history | return startup/min representation |
 | zero or negative throughput | ignore sample |
-| missing buffer | simulate from `0` seconds |
+| missing/invalid buffer | simulate from `0` seconds |
 | missing/non-positive segment duration | startup/min representation |
-| horizon too large | reduce horizon within sequence limit or fail config |
+| horizon too large | reduce effective horizon within `max_enumerated_sequences` |
 | current level invalid | clamp to valid range for switch penalty |
+| invalid penalties | negative values fall back to defaults; zero is allowed |
+| exact segment sizes missing | approximate as `rate * fragment_duration` |
 | unknown buffer capacity | do not cap simulated buffer in first implementation |
 
 ## Simplifications Accepted
@@ -151,8 +163,8 @@ return rates[best_first_level]
 - Online enumeration instead of FastMPC table compression.
 - Horizon `3` by default for tractability.
 - Harmonic mean throughput prediction.
-- Segment-size approximation from bitrate and duration.
-- Internal provisional QoE objective for controller decision only.
+- Segment-size approximation from bitrate and duration when exact sizes are absent.
+- Internal provisional objective for controller decision only.
 
 ## Simplifications Prohibited
 
@@ -162,10 +174,11 @@ return rates[best_first_level]
 - No fairness or multi-client behavior.
 - No final QoE/reward or benchmark scoring.
 - No neural/RL implementation.
+- No RobustMPC prediction-error correction in this block.
 
-## Telemetry And Logging Expectations
+## Diagnostics
 
-Future code may expose controller-local debug fields such as `mpc_predicted_throughput_Bps`, `mpc_horizon`, `mpc_best_score`, and `mpc_best_first_level` after provenance is documented. These fields are diagnostic and not benchmark metrics.
+The controller stores controller-local `last_metrics` for tests and debugging, including predicted throughput, effective horizon, sequence count, selected sequence, score components and the `internal_objective_only` flag. These diagnostics are not canonical telemetry columns and are not benchmark metrics.
 
 ## Compatibility With `baseline_entry_contract.md`
 
@@ -177,11 +190,11 @@ Future code may expose controller-local debug fields such as `mpc_predicted_thro
 
 ## Acceptance Criteria
 
-The future implementation must pass `acceptance_tests.md`, keep the internal objective clearly labeled as provisional, and remain deterministic for identical feedback and controller state.
+The implementation must pass `acceptance_tests.md`, keep the internal objective clearly labeled as provisional, and remain deterministic for identical feedback and controller state.
 
 ## Risks
 
-- Horizon enumeration can grow quickly with ladder size.
+- Horizon enumeration can grow quickly with ladder size, so the controller caps effective horizon.
 - Segment-size approximation may differ from VBR content.
 - Internal objective weights affect behavior and are not final benchmark QoE.
 - Prediction from short histories can be unstable during startup.

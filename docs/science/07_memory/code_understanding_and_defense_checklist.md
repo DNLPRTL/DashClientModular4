@@ -54,6 +54,14 @@ Use this checklist before the implementation chapter and defense preparation.
 - Explain that all non-positive BOLA scores fall back to minimum rate because no-download/wait is not expressible in the current controller contract.
 - Explain why DYNAMIC, FAST SWITCHING and BOLA-E are deferred.
 - Explain MPC harmonic mean, horizon enumeration, buffer simulation and internal objective.
+- Explain why MPC follows BOLA as the fourth academic ABR baseline.
+- Explain how MPC differs from `rate_based`, BBA and BOLA.
+- Explain that MPC uses recent positive throughput samples and harmonic mean prediction, not future bandwidth oracle values.
+- Explain how simulated download time, rebuffering and buffer refill are computed for each candidate sequence.
+- Explain that rebuffer and switching penalties are controller-internal decision terms, not final TFG QoE.
+- Explain why FastMPC table compression is deferred in the first implementation.
+- Explain why RobustMPC is deferred to the next block.
+- Explain how MPC tests prove first-action behavior, edge-case fallback, combinatorial safety and forbidden-signal independence.
 - Explain RobustMPC prediction-error correction and why it is not Pensieve.
 
 ## Tests And Limitations

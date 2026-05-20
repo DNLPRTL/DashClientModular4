@@ -14,6 +14,7 @@ from core.client_config import (
 from core.controller.bba import BbaController
 from core.controller.bola import BolaController
 from core.controller.max_quality_controller import MaxQualityController
+from core.controller.mpc import MpcController
 from core.controller.rate_based import RateBasedController
 from core.controller.registry import create_controller
 from core.controller.sanity_rate import FixedRateController
@@ -193,6 +194,21 @@ class ControllerConfigLookupTest(unittest.TestCase):
         controller = create_controller(config.controller.name, config.controller.params)
 
         self.assertIsInstance(controller, BolaController)
+
+    def test_registry_creates_mpc_controller(self):
+        config = ClientConfig.from_dict(
+            {
+                "mpd_url": "http://example.invalid/video.mpd",
+                "controller": {
+                    "name": "mpc",
+                    "params": {"horizon": 3, "rebuffer_penalty": 4.3},
+                },
+            }
+        )
+
+        controller = create_controller(config.controller.name, config.controller.params)
+
+        self.assertIsInstance(controller, MpcController)
 
     def test_unknown_controller_name_fails(self):
         with self.assertRaises(ValueError):
