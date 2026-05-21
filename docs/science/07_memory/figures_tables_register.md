@@ -23,6 +23,8 @@ This register tracks candidate thesis visuals and tables before they are created
 | F15 | Leakage prevention map | `02_traces_replay/leakage_prevention_policy.md` | planned original diagram |
 | F16 | Run artifact lifecycle | `02_traces_replay/run_artifact_expectations.md` | planned original diagram |
 | F17 | Phase 3.2A dataset domain ladder | `02_traces_replay/generalization_protocol.md` and `source_triage_decision.md` | planned original diagram |
+| F18 | Phase 3.2B trace schema boundary | `02_traces_replay/common_trace_schema.md` and `trace_manifest_schema.md` | planned original diagram |
+| F19 | Phase 3.2B external storage layout | `02_traces_replay/trace_directory_layout.md` | planned original diagram |
 
 ## Tables
 
@@ -55,3 +57,7 @@ This register tracks candidate thesis visuals and tables before they are created
 | T25 | Phase 3.2A source triage decisions | `02_traces_replay/source_triage_decision.md` | draft |
 | T26 | Phase 3.2A leakage risks by dataset | `02_traces_replay/leakage_prevention_policy.md` | draft |
 | T27 | Phase 3.2A preliminary split policy | `02_traces_replay/train_validation_test_ood_policy.md` | draft |
+| T28 | Phase 3.2B normalized trace schema | `02_traces_replay/common_trace_schema.md` | draft |
+| T29 | Phase 3.2B unit normalization | `02_traces_replay/trace_units_and_normalization.md` | draft |
+| T30 | Phase 3.2B conversion priority | `02_traces_replay/trace_conversion_plan.md` | draft |
+| T31 | Phase 3.2B manifest schemas | `02_traces_replay/trace_manifest_schema.md` and `trace_split_manifest_policy.md` | draft |

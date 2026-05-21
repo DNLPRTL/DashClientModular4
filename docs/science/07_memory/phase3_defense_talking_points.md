@@ -44,3 +44,15 @@ Use these talking points after the source cards are added:
 - CausalSim and Veritas are included as threats-to-validity references, not implementation targets.
 - Puffer warns against overclaiming from trace-driven tests because real deployment effects and causal bias matter.
 - No dataset becomes final benchmark material and no final split is closed in Phase 3.2A.
+
+## Phase 3.2B Schema Update
+
+Use these talking points after the common schema is defined:
+
+- The common schema uses `timestamp_s`, `duration_s` and `throughput_kbps` so every dataset must pass through the same unit boundary.
+- `throughput_kbps = 0` is allowed for outage/no-delivery intervals, but missing throughput is not silently treated as zero.
+- The future runner must not expose future trace samples directly to controllers.
+- Raw and normalized real traces stay outside the repository.
+- HSDPA, Ghent and Lancaster are conversion priorities, not final benchmark material.
+- Raca 5G and Lumos5G are held as OOD candidates for future generalization work.
+- Phase 3.2B prepares trace inputs; Phase 3.5 still has to close QoE/reward.

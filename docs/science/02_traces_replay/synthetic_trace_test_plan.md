@@ -55,3 +55,22 @@ Minimum synthetic traces for the first runner design:
 | `zero_gap` | temporary zero throughput; validates stall accounting |
 
 Synthetic traces are test fixtures only. They are not benchmark evidence.
+
+## Phase 3.2B Schema Update
+
+Future synthetic fixtures must use `normalized_trace_schema_v1`:
+
+- `timestamp_s`
+- `duration_s`
+- `throughput_kbps`
+
+Minimum invalid cases:
+
+- missing required column;
+- nonnumeric timestamp;
+- decreasing timestamp;
+- zero or negative duration;
+- negative throughput;
+- missing throughput without an explicit converter policy.
+
+Future tests must use `unittest`. Phase 3.2B does not add fixtures or tests.

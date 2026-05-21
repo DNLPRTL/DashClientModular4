@@ -83,3 +83,17 @@ Fallback/alternative path: Linux `tc/netem`, only with isolated runbook and no d
 ## What this unlocks
 
 Phase 3.2B can now design the common internal trace schema, conversion plan and synthetic trace requirements before any code is written.
+
+## Phase 3.2B Schema Update
+
+Phase 3.2B uses the triage decisions above to define the internal trace schema and conversion plan:
+
+- first real integration candidates remain HSDPA Norway, Ghent 4G/LTE and Lancaster;
+- modern/OOD candidates remain Raca 4G, Raca 5G and Lumos5G;
+- FCC remains reference-only;
+- Puffer remains metadata-only;
+- no dataset becomes final benchmark material;
+- no final split is closed;
+- no download, converter or runner is implemented.
+
+The active input contract is `normalized_trace_schema_v1`, documented in `common_trace_schema.md`.

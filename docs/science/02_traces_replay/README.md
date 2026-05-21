@@ -61,6 +61,17 @@ The methodology must preserve the existing separation between parser, segment do
 | `synthetic_trace_test_plan.md` | Synthetic trace plan for future runner validation. |
 | `run_artifact_expectations.md` | Expected future run artifacts and repository hygiene. |
 | `phase3_memory_notes.md` | Thesis memory and defense usage notes. |
+| `common_trace_schema.md` | Phase 3.2B normalized trace schema v1. |
+| `trace_units_and_normalization.md` | Unit conversion and normalization policy. |
+| `trace_manifest_schema.md` | `trace_manifest_v1` metadata schema. |
+| `trace_directory_layout.md` | External raw/normalized/manifest storage policy. |
+| `trace_conversion_plan.md` | Conversion priority and implementation readiness gate. |
+| `dataset_download_plan.md` | Future external download policy; no downloads in Phase 3.2B. |
+| `trace_source_to_internal_mapping.md` | Dataset/source card mapping to the internal schema. |
+| `trace_split_manifest_policy.md` | `split_manifest_v1` schema and split leakage rules. |
+| `trace_schema_acceptance_tests.md` | Future `unittest` acceptance plan for schema validation. |
+| `trace_schema_risks_and_open_decisions.md` | Remaining schema and conversion risks. |
+| `phase3_2b_closure_report.md` | Phase 3.2B closure record. |
 | `trace_dataset_cards/` | Placeholder for later dataset cards. |
 | `method_cards/` | Placeholder for later method cards. |
 
@@ -68,3 +79,8 @@ The methodology must preserve the existing separation between parser, segment do
 
 No dataset is final until `trace_dataset_selection.md` is completed. No dataset is downloaded into the repository. Full Puffer raw data remains metadata-only in Phase 3.1. FCC raw data remains reference-only until a conversion and storage plan exists. Mahimahi is a method candidate, not a mandatory implementation. `tc/netem` is a fallback or complementary method candidate. A custom fake trace-driven runner is the primary likely implementation candidate for reproducible Python tests, but this phase only documents requirements.
 
+## Phase 3.2B Trace Schema Update
+
+Phase 3.2B defines `normalized_trace_schema_v1` as a CSV-like time series with required columns `timestamp_s`, `duration_s` and `throughput_kbps`. It also defines `trace_manifest_v1`, `split_manifest_v1`, external storage paths and the conversion priority.
+
+This update still does not implement replay or converters, download datasets, define final QoE/reward, run benchmarks, rank controllers, open IA/RL, or change runtime code.

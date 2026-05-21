@@ -64,3 +64,19 @@ CausalSim and Veritas require a strict distinction between exogenous capacity or
 ### Not Implemented Now
 
 No runner, converter, Mahimahi wrapper or netem wrapper is implemented in Phase 3.2A.
+
+## Phase 3.2B Schema Update
+
+The likely primary runner remains a custom Python trace-driven fake/replay runner. Its future input contract is `normalized_trace_schema_v1`, not raw dataset files.
+
+Reasons:
+
+- deterministic execution;
+- `unittest` coverage without external networking;
+- Windows/Ubuntu compatibility;
+- compatibility with future IA training loops;
+- canonical artifact and manifest generation.
+
+Mahimahi remains a secondary Ubuntu validation candidate after the Python runner and trace schema are stable. Linux `tc/netem` remains a Linux fallback or isolated runbook candidate. Phase 3.2B does not implement or select either as the final benchmark path.
+
+QoE/reward remains deferred to Phase 3.5.

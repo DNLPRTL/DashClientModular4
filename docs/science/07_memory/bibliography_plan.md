@@ -42,3 +42,4 @@
 - Use Phase 2 closure docs to decide which optional/deferred methods deserve final bibliography entries. SODA and Pensieve are useful if discussed as future work or historical IA/RL context; RBC should not receive a final entry until its source identity is locked.
 - Use Phase 3 source cards to decide which trace/replay entries are cited in Chapter 6. Dataset candidates should not become final bibliography entries unless they are actually used or discussed.
 - CausalSim, Veritas, Wei 2019 and Into the Wild/ABR-Arena are Phase 3.2A methodology or threats-to-validity references, not implementation authorizations.
+- Phase 3.2B adds no new bibliography sources. It defines local schema, manifest, storage and conversion planning documents derived from the Phase 3.2A source cards.

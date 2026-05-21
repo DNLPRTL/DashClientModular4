@@ -101,3 +101,19 @@ These are useful for generalization and modern cellular conditions, but their sc
 - No final train/validation/test/OOD split.
 - No final QoE/reward.
 - No benchmark ranking.
+
+## Phase 3.2B Schema And Conversion Update
+
+Dataset selection now has an additional schema gate: a dataset cannot move from candidate to integration input until it has a documented mapping to `normalized_trace_schema_v1`.
+
+The minimum conversion evidence is:
+
+1. source raw format is identified;
+2. unit conversion to `throughput_kbps` is documented;
+3. time conversion to `timestamp_s` and `duration_s` is documented;
+4. `trace_manifest_v1` fields can be populated;
+5. `leakage_group` can be assigned;
+6. external raw and normalized storage locations are used;
+7. no real dataset file enters the repository.
+
+Phase 3.2B does not select final benchmark material. It only prepares trace inputs and reproducible network conditions for later phases.

@@ -64,3 +64,16 @@ Future reports must state:
 - In-domain trace replay may support controlled comparison claims only within the selected trace domains.
 - OOD claims require a dataset explicitly held out as OOD before any IA training or tuning.
 - Real-world deployment claims are forbidden unless real-world deployment or a carefully justified equivalent is performed.
+
+## Phase 3.2B Schema Update
+
+The common schema lets different domains share the same runner input while preserving domain labels in optional columns and manifests.
+
+Generalization policy now depends on:
+
+- `network_tags` in `trace_manifest_v1`;
+- `mobility_tags` in `trace_manifest_v1`;
+- `domain_label` in `split_manifest_v1`;
+- preserved optional context fields that remain unavailable to baseline controllers.
+
+Schema uniformity does not make domains equivalent. HSDPA, LTE, live/HAS, 5G/mmWave, FCC reference data and Puffer deployment logs must remain separately labeled.

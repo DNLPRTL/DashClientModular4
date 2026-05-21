@@ -51,3 +51,16 @@ Every dataset conversion plan must produce a manifest with:
 - reason for split assignment;
 - conversion version;
 - unit normalization.
+
+## Phase 3.2B Schema Update
+
+`trace_manifest_v1` and `split_manifest_v1` make leakage controls explicit.
+
+Required additions:
+
+- every trace has a `leakage_group`;
+- every split entry records `trace_id`, `dataset_id`, `source_file`, `domain_label` and reason;
+- optional context/KPI fields may be preserved but must not become baseline-controller inputs;
+- runner tests must ensure controllers never receive future trace samples directly.
+
+Phase 3.2B does not create final split files or inspect real traces.

@@ -17,7 +17,7 @@ This file defines requirements for a future trace-driven runner. It does not imp
 
 ## Candidate Normalized Trace Schema
 
-This schema is only a requirement draft, not an implemented format.
+The Phase 3.1/3.2A draft below is superseded by the Phase 3.2B decision in `common_trace_schema.md`.
 
 | field | meaning |
 | --- | --- |
@@ -59,3 +59,24 @@ The future runner must not be implemented in this block. Requirements now fixed:
 - avoid requiring root/admin privileges;
 - keep Mahimahi/netem behind optional runbooks;
 - separate trace replay from final QoE/reward calculation until Phase 3.5.
+
+## Phase 3.2B Schema Update
+
+The active runner input contract is now `normalized_trace_schema_v1`.
+
+Required columns:
+
+| column | unit | requirement |
+| --- | --- | --- |
+| `timestamp_s` | seconds | Numeric seconds from trace start; monotonically non-decreasing. |
+| `duration_s` | seconds | Numeric interval duration; strictly positive. |
+| `throughput_kbps` | kbps | Numeric available/application-level downlink throughput; greater than or equal to 0. |
+
+Future runner requirements:
+
+- consume normalized traces rather than raw dataset formats;
+- use `trace_manifest_v1` to record provenance and statistics;
+- use `split_manifest_v1` to prevent leakage;
+- never expose future trace samples directly to controllers;
+- never require optional context/KPI columns for Phase 2 baseline controllers;
+- keep final QoE/reward outside runner scope until Phase 3.5.

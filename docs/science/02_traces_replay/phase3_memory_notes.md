@@ -71,3 +71,17 @@ Phase 3.1 is a methodology scaffold. It should be cited in the thesis as plannin
 - The first implementation will prioritize determinism and testability.
 - Mahimahi and netem are considered but not forced prematurely.
 - Puffer and CausalSim/Veritas prevent overclaiming trace-driven results.
+
+## Phase 3.2B Schema Update
+
+Chapter 6 can now describe the trace input contract:
+
+- `normalized_trace_schema_v1` uses `timestamp_s`, `duration_s` and `throughput_kbps`;
+- canonical throughput is `kbps`;
+- trace provenance uses `trace_manifest_v1`;
+- split provenance uses `split_manifest_v1`;
+- raw and normalized real traces stay outside the repository;
+- QoE/reward remains deferred to Phase 3.5;
+- IA/RL remains deferred, but the schema and split policies protect future IA work from leakage.
+
+Suggested defense sentence: Phase 3.2B prepares reproducible network inputs without implementing replay or claiming performance.

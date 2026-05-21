@@ -60,3 +60,14 @@ Future trace/replay runs must include at least:
 - `split_manifest.json` or embedded split metadata
 
 No Phase 3.2A work creates these artifacts.
+
+## Phase 3.2B Schema Update
+
+Future trace/replay artifacts must include schema provenance:
+
+- normalized traces follow `normalized_trace_schema_v1`;
+- trace provenance follows `trace_manifest_v1`;
+- split provenance follows `split_manifest_v1`;
+- run manifests should include trace id, dataset id, converter version/commit, checksum and split label.
+
+Raw traces, normalized real traces and generated manifests remain outside the repository unless a later block explicitly converts a tiny synthetic fixture for tests.

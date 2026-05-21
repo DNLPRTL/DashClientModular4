@@ -28,3 +28,18 @@ The following rows preserve the Phase 3.2A card IDs from the distilled Markdown 
 | `lumos5g_mmwave` | Lumos5G | Narayanan et al. | 2020 | trace dataset / method | commercial mmWave 5G | public/project TBD | Unknown/TBD | throughput + features TBD | Mbps/Gbps in paper | 1 sample/s | 563840 samples / 6 months | yes | no initially | possible later | possible later | high-variance-5G-OOD | yes after schema | no initially | medium-high | medium-high | medium | candidate-high-variability-5g-OOD | not first converter; repeated trajectory leakage risk |
 | `fcc_mba_reference` | FCC Measuring Broadband America | FCC | multiple | broadband source | fixed broadband | public raw releases | Unknown/TBD | raw releases | TBD | TBD; Pensieve used derived 5 s traces | TBD | yes via Pensieve-style methodology | possible later | possible later | possible later | broadband reference | TBD | no initially | high | medium-high | high | reference-only-until-conversion-plan | no raw download in Phase 3.2A |
 | `puffer_data_archive` | Puffer data archive | Stanford Puffer | 2019+ | real-world streaming logs | live streaming / Internet | public anonymized archive | Unknown/TBD | daily raw/archive | chunk/log-derived | chunk/session | ongoing/daily | yes | possible later | possible later | possible later | real-world | TBD | no initially | high | high | high | metadata-only-until-conversion-storage-causal-plan | not exogenous throughput traces by default |
+
+## Phase 3.2B Schema And Conversion Update
+
+All future converted trace candidates must target `normalized_trace_schema_v1` with required columns `timestamp_s`, `duration_s` and `throughput_kbps`.
+
+| id | schema target | conversion priority | download now | future external download candidate | notes |
+| --- | --- | --- | --- | --- | --- |
+| `hsdpa_norway_mmsys2013` | `normalized_trace_schema_v1` | 1 | no | yes | First real integration candidate; preserve route/trace leakage group. |
+| `ghent_4g_lte` | `normalized_trace_schema_v1` | 2 | no | yes | First real integration candidate; preserve trace/mobility labels where available. |
+| `lancaster_has` | `normalized_trace_schema_v1` | 3 | no | yes, after terms review | First benchmark-design candidate; group by service/day/source trace. |
+| `raca_4g_lte_channel_context` | `normalized_trace_schema_v1` | 4 | no | later | Modern/OOD candidate; preserve KPI context only as optional metadata. |
+| `raca_5g_channel_context` | `normalized_trace_schema_v1` | 5 | no | later | 5G OOD candidate; license/schema review remains required. |
+| `lumos5g_mmwave` | `normalized_trace_schema_v1` | 6 | no | later | High-variability 5G OOD candidate; trajectory leakage risk. |
+| `fcc_mba_reference` | none in Phase 3.2B | 7 | no | no | Reference-only until conversion/download plan exists. |
+| `puffer_data_archive` | none in Phase 3.2B | 8 | no | no | Metadata-only until conversion, storage and causal plans exist. |

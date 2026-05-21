@@ -64,3 +64,18 @@ Important wording:
 - secondary validation candidate: Mahimahi;
 - Linux fallback candidate: `tc/netem`;
 - threats-to-validity references: CausalSim and Veritas.
+
+## Phase 3.2B Schema Update
+
+Chapter 6 can now introduce the common trace input contract:
+
+- normalized traces are CSV-like time series;
+- required columns are `timestamp_s`, `duration_s` and `throughput_kbps`;
+- throughput is normalized to `kbps`;
+- time is normalized to seconds;
+- trace provenance is recorded by `trace_manifest_v1`;
+- split provenance is recorded by `split_manifest_v1`;
+- raw datasets, normalized datasets and local manifests are stored outside the repository;
+- replay/converter implementation, final QoE/reward and benchmark ranking remain deferred.
+
+This supports the methodological claim that the project has prepared reproducible trace inputs. It does not support a performance claim.

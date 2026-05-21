@@ -59,3 +59,16 @@ Split rules:
 - preserve domain labels;
 - reserve OOD before any IA training;
 - document every split seed and file list.
+
+## Phase 3.2B Split Manifest Update
+
+`split_manifest_v1` is the future split contract. No final split is closed in Phase 3.2B.
+
+Rules now fixed:
+
+- a `trace_id` must not appear in more than one split;
+- dataset-level and route/session-level leakage must be prevented;
+- windows from the same original trace must not cross split boundaries;
+- future IA train/validation/test/OOD splits must be separated before training starts;
+- OOD candidates must include modern mobile/5G traces such as Raca 5G and Lumos5G;
+- HSDPA, Ghent and Lancaster are first integration candidates, not final benchmark material by default.

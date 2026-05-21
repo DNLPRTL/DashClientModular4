@@ -35,6 +35,11 @@
 | Phase 3.2A source triage decisions | 6 | Show accepted mandatory/recommended cards, promoted sources and deferred sources | `02_traces_replay/source_triage_decision.md` |
 | Phase 3.2A leakage risks by dataset | 6 | Explain sliding-window, route, service/day, operator/device/app, trajectory and causal leakage risks | `02_traces_replay/leakage_prevention_policy.md` |
 | Phase 3.2A preliminary split policy | 6 | State first-integration, modern-mobile/OOD, reference-only and metadata-only roles without closing final splits | `02_traces_replay/train_validation_test_ood_policy.md` |
+| Phase 3.2B normalized trace schema | 6 | Define `timestamp_s`, `duration_s`, `throughput_kbps` and optional metadata columns | `02_traces_replay/common_trace_schema.md` |
+| Phase 3.2B unit normalization | 6 | Show conversion from Mbps, bytes per period and other units to `kbps` | `02_traces_replay/trace_units_and_normalization.md` |
+| Phase 3.2B conversion priority | 6 | Show first real integration, modern/OOD and reference-only groups | `02_traces_replay/trace_conversion_plan.md` |
+| Phase 3.2B manifest schemas | 6 | Summarize `trace_manifest_v1` and `split_manifest_v1` fields | `02_traces_replay/trace_manifest_schema.md`, `02_traces_replay/trace_split_manifest_policy.md` |
+| Phase 3.2B storage policy | 6 | Show raw, normalized and manifest directories outside the repository | `02_traces_replay/trace_directory_layout.md` |
 
 ## Conversion Rule
 

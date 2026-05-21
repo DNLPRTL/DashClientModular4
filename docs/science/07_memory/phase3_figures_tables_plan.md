@@ -12,6 +12,8 @@ This plan tracks figures and tables that may support the Phase 3 methodology sec
 | P3-F4 | Leakage prevention map | Show how trace, parameter, scenario and artifact leakage are blocked. | `leakage_prevention_policy.md` |
 | P3-F5 | Run artifact lifecycle | Show raw traces outside repo, generated outputs outside repo and authored summaries in docs. | `run_artifact_expectations.md` |
 | P3-F6 | Dataset domain ladder | Show synthetic, HSDPA, LTE, HAS, 4G KPI, 5G KPI, mmWave 5G, FCC and Puffer roles. | `generalization_protocol.md`, `source_triage_decision.md` |
+| P3-F7 | Trace schema contract | Show raw source -> normalized schema v1 -> manifest -> runner boundary. | `common_trace_schema.md`, `trace_manifest_schema.md` |
+| P3-F8 | External trace storage layout | Show repo docs separated from raw, normalized and manifest directories outside git. | `trace_directory_layout.md` |
 
 ## Candidate Tables
 
@@ -26,6 +28,10 @@ This plan tracks figures and tables that may support the Phase 3 methodology sec
 | P3-T7 | Source triage decisions | Show mandatory, recommended, reference-only and metadata-only source decisions. | `source_triage_decision.md` |
 | P3-T8 | Leakage risks by dataset | Summarize route, service/day, operator/device/app, trajectory and causal leakage risks. | `leakage_prevention_policy.md` |
 | P3-T9 | Candidate split policy | Summarize preliminary roles without closing a final split. | `train_validation_test_ood_policy.md` |
+| P3-T10 | Normalized trace schema v1 | Define required and optional trace columns. | `common_trace_schema.md` |
+| P3-T11 | Unit normalization policy | Show throughput and time conversion rules. | `trace_units_and_normalization.md` |
+| P3-T12 | Conversion priority | Show first integration, OOD and reference-only groups. | `trace_conversion_plan.md` |
+| P3-T13 | Manifest schemas | Summarize `trace_manifest_v1` and `split_manifest_v1`. | `trace_manifest_schema.md`, `trace_split_manifest_policy.md` |
 
 ## Policy
 
@@ -38,3 +44,5 @@ The preferred Chapter 6 visual sequence is:
 1. evaluation pipeline: source pages and distilled notes -> cards -> matrix -> trace schema -> runner -> Phase 3.5 metrics -> Phase 6 comparison;
 2. replay method decision tree: Python runner first, Mahimahi secondary, netem fallback;
 3. dataset domain ladder from synthetic traces to real-world references.
+
+Phase 3.2B adds two more useful visuals: the schema contract boundary and the external storage layout.
