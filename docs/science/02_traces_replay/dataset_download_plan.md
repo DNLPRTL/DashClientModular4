@@ -51,3 +51,16 @@ C:\Users\danie\Documents\TFG\_datasets\phase3_traces_replay\_manifests
 
 No real raw trace, normalized trace, generated manifest, log, CSV, ZIP, PDF or media file is added to the repository by the download process.
 
+## Phase 3.2C Local Acquisition Update
+
+The Phase 3.2C audit records local raw acquisition outside the repository:
+
+| source | acquired | file_count | total_size_mb | status |
+| --- | ---: | ---: | ---: | --- |
+| HSDPA Norway / Riiser MMSys 2013 | true | 98 | 4.494 | first local raw candidate |
+| Ghent 4G/LTE Bandwidth Logs | true | 9 | 0.773 | second local raw candidate |
+| Lancaster ABR-Throughput-Traces | true | 2 | 2.13 | third local raw candidate |
+
+These files remain raw local datasets outside git. They are not normalized, not benchmark artifacts, and not assigned to final splits.
+
+Raca 4G, Raca 5G and Lumos5G remain deferred/OOD acquisition candidates. FCC MBA remains reference-only. Puffer remains metadata-only.

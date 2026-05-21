@@ -72,6 +72,9 @@ The methodology must preserve the existing separation between parser, segment do
 | `trace_schema_acceptance_tests.md` | Future `unittest` acceptance plan for schema validation. |
 | `trace_schema_risks_and_open_decisions.md` | Remaining schema and conversion risks. |
 | `phase3_2b_closure_report.md` | Phase 3.2B closure record. |
+| `phase3_2c_local_dataset_acquisition.md` | Local raw acquisition status for first real trace candidates. |
+| `phase3_2c_dataset_audit_summary.md` | Audit summary and risks from local acquisition. |
+| `phase3_2c_closure_report.md` | Phase 3.2C closure record. |
 | `trace_dataset_cards/` | Placeholder for later dataset cards. |
 | `method_cards/` | Placeholder for later method cards. |
 
@@ -84,3 +87,13 @@ No dataset is final until `trace_dataset_selection.md` is completed. No dataset 
 Phase 3.2B defines `normalized_trace_schema_v1` as a CSV-like time series with required columns `timestamp_s`, `duration_s` and `throughput_kbps`. It also defines `trace_manifest_v1`, `split_manifest_v1`, external storage paths and the conversion priority.
 
 This update still does not implement replay or converters, download datasets, define final QoE/reward, run benchmarks, rank controllers, open IA/RL, or change runtime code.
+
+## Phase 3.2C Local Acquisition Update
+
+Phase 3.2C records that the first three real trace candidates are locally acquired outside the repository:
+
+1. HSDPA Norway / Riiser MMSys 2013;
+2. Ghent 4G/LTE Bandwidth Logs;
+3. Lancaster ABR-Throughput-Traces.
+
+The local raw files are not normalized traces, final split inputs, benchmark artifacts or QoE evidence. The next recommended implementation block is Phase 3.3A synthetic trace fixtures and schema validation, not full replay.

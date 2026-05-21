@@ -48,3 +48,10 @@ Replay implementation should not begin until future tests cover:
 5. no future-sample exposure to controllers;
 6. no optional context dependency for Phase 2 baselines.
 
+## Phase 3.2C Local Acquisition Update
+
+The next implementation block should be Phase 3.3A synthetic trace fixtures and schema validation.
+
+Phase 3.3A should validate the schema using tiny synthetic fixtures before any real HSDPA, Ghent or Lancaster raw files are normalized.
+
+Real acquired raw datasets are not test fixtures and must not be committed. Tests must use `unittest`, not `pytest`.

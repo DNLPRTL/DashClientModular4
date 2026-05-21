@@ -69,3 +69,24 @@ _datasets\phase3_traces_replay\
 - Thesis/repository documentation should reference dataset ids and trace ids rather than fragile absolute paths when possible.
 - Absolute local paths are acceptable in local run manifests, but generated manifests remain outside git unless a later documentation block explicitly summarizes them.
 
+## Phase 3.2C Local Acquisition Update
+
+The audit confirms that the first raw candidates are stored under:
+
+```text
+C:\Users\danie\Documents\TFG\_datasets\phase3_traces_replay\_raw_candidates
+```
+
+Observed local raw candidate subfolders:
+
+- `hsdpa_norway_mmsys2013`
+- `ghent_4g_lte_bandwidth_logs`
+- `lancaster_abr_throughput_traces`
+
+The local audit inventory remains outside the repository under:
+
+```text
+C:\Users\danie\Documents\TFG\_datasets\phase3_traces_replay\_audit\phase3_2c_local_dataset_acquisition
+```
+
+Do not commit the local JSON inventory, raw logs, ZIP archives, CSVs, media or generated files.

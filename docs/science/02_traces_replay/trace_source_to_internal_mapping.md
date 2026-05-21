@@ -31,3 +31,14 @@ Converters may preserve optional columns when available, but future Phase 3 runn
 
 `yes` in the final column means a future block may authorize external download outside the repository. It does not authorize any download in Phase 3.2B and never authorizes committing data to git.
 
+## Phase 3.2C Local Acquisition Update
+
+The audit changes the first three rows from future external candidates to local raw candidates outside the repository:
+
+| dataset/source | local raw status | immediate mapping consequence |
+| --- | --- | --- |
+| HSDPA Norway / Riiser MMSys 2013 | acquired outside repo | Ready for later raw inspection and converter design after synthetic schema validation. |
+| Ghent 4G/LTE Bandwidth Logs | acquired outside repo | Archive contents must be inspected outside repo before converter design. |
+| Lancaster ABR-Throughput-Traces | acquired outside repo | Archive/README must be inspected outside repo before converter design. |
+
+No normalized columns are produced in Phase 3.2C. No raw file is copied into the repository.

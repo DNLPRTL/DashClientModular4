@@ -117,3 +117,15 @@ The minimum conversion evidence is:
 7. no real dataset file enters the repository.
 
 Phase 3.2B does not select final benchmark material. It only prepares trace inputs and reproducible network conditions for later phases.
+
+## Phase 3.2C Local Acquisition Update
+
+The first three candidate datasets are now recorded as local raw candidates because the audit reports `acquired=true`:
+
+1. `hsdpa_norway_mmsys2013`
+2. `ghent_4g_lte_bandwidth_logs`
+3. `lancaster_abr_throughput_traces`
+
+This does not promote them to final benchmark material. Selection remains blocked on normalization, schema validation, manifest creation, split policy and later QoE/reward definition.
+
+No final train/validation/test/OOD split is closed in Phase 3.2C.

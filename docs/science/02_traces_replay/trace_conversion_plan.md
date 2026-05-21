@@ -66,3 +66,14 @@ Converter implementation is also not authorized by this document. A later implem
 | FCC MBA | Do not convert until a raw-download and derived-throughput plan exists. |
 | Puffer archive | Do not convert until storage, schema and causal plans distinguish achieved throughput logs from exogenous capacity traces. |
 
+## Phase 3.2C Local Acquisition Update
+
+Local raw availability is now documented for the first three conversion priorities:
+
+1. HSDPA Norway / Riiser MMSys 2013: acquired outside repo, 98 files, 4.494 MB.
+2. Ghent 4G/LTE Bandwidth Logs: acquired outside repo, 9 files, 0.773 MB.
+3. Lancaster ABR-Throughput-Traces: acquired outside repo, 2 files, 2.13 MB.
+
+This does not implement converters and does not normalize traces. Converter implementation remains blocked until Phase 3.2C closes and Phase 3.3A synthetic trace fixtures/schema validation establishes the first validation layer.
+
+Raca 4G, Raca 5G and Lumos5G remain second-wave/OOD acquisition candidates. FCC and Puffer remain non-conversion sources in this phase.

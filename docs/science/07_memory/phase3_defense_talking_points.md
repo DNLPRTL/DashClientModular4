@@ -56,3 +56,14 @@ Use these talking points after the common schema is defined:
 - HSDPA, Ghent and Lancaster are conversion priorities, not final benchmark material.
 - Raca 5G and Lumos5G are held as OOD candidates for future generalization work.
 - Phase 3.2B prepares trace inputs; Phase 3.5 still has to close QoE/reward.
+
+## Phase 3.2C Local Acquisition Update
+
+Use these talking points:
+
+- The first three real trace candidates are now locally present outside the repository.
+- HSDPA Norway, Ghent 4G/LTE and Lancaster are raw candidates, not normalized traces.
+- Raw local availability is necessary but not sufficient for evaluation.
+- No local JSON inventory, raw logs, ZIPs or generated artifacts are committed.
+- The next step should be synthetic schema validation, not full replay.
+- Final QoE/reward and controller ranking remain out of scope.

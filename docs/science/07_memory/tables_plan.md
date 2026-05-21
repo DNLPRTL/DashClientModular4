@@ -40,6 +40,7 @@
 | Phase 3.2B conversion priority | 6 | Show first real integration, modern/OOD and reference-only groups | `02_traces_replay/trace_conversion_plan.md` |
 | Phase 3.2B manifest schemas | 6 | Summarize `trace_manifest_v1` and `split_manifest_v1` fields | `02_traces_replay/trace_manifest_schema.md`, `02_traces_replay/trace_split_manifest_policy.md` |
 | Phase 3.2B storage policy | 6 | Show raw, normalized and manifest directories outside the repository | `02_traces_replay/trace_directory_layout.md` |
+| Phase 3.2C local acquisition audit | 6 | Show acquired raw candidate datasets, file counts, sizes and raw-vs-normalized boundary | `02_traces_replay/phase3_2c_dataset_audit_summary.md` |
 
 ## Conversion Rule
 

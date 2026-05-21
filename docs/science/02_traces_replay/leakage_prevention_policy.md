@@ -64,3 +64,13 @@ Required additions:
 - runner tests must ensure controllers never receive future trace samples directly.
 
 Phase 3.2B does not create final split files or inspect real traces.
+
+## Phase 3.2C Local Acquisition Update
+
+Acquired raw files introduce concrete grouping concerns:
+
+- HSDPA route folders require route/report-level leakage grouping.
+- Ghent mobility-mode archives require grouping by original archive, trace and mode.
+- Lancaster archive contents require grouping by original trace and any service/day metadata discovered later.
+
+The local acquisition audit does not create split manifests. No acquired raw file may be windowed or assigned to train/validation/test/OOD before a split policy is produced.

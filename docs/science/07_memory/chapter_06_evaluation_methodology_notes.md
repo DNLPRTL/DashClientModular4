@@ -79,3 +79,15 @@ Chapter 6 can now introduce the common trace input contract:
 - replay/converter implementation, final QoE/reward and benchmark ranking remain deferred.
 
 This supports the methodological claim that the project has prepared reproducible trace inputs. It does not support a performance claim.
+
+## Phase 3.2C Local Acquisition Update
+
+Chapter 6 can now distinguish three states:
+
+1. source triage and cards are closed;
+2. common schema and conversion plan are closed;
+3. first raw candidates are locally acquired outside the repository.
+
+The acquired candidates are HSDPA Norway, Ghent 4G/LTE and Lancaster ABR traces. They are raw local files only. They are not normalized, not split, not replayed and not benchmark evidence.
+
+Use this phase to explain storage hygiene and the next gate: Phase 3.3A synthetic trace fixtures and schema validation before converter or replay work.

@@ -85,3 +85,15 @@ Chapter 6 can now describe the trace input contract:
 - IA/RL remains deferred, but the schema and split policies protect future IA work from leakage.
 
 Suggested defense sentence: Phase 3.2B prepares reproducible network inputs without implementing replay or claiming performance.
+
+## Phase 3.2C Local Acquisition Update
+
+Chapter 6 can now state that the first real trace candidates were acquired locally outside the repository:
+
+- HSDPA Norway: 98 files, 4.494 MB;
+- Ghent 4G/LTE: 9 files, 0.773 MB;
+- Lancaster ABR traces: 2 files, 2.13 MB.
+
+Defense boundary: these are raw local candidates only. They are not normalized traces, benchmark artifacts, split assignments or QoE evidence.
+
+Recommended next-phase statement: Phase 3.3A should validate the schema with synthetic fixtures before touching real raw datasets.

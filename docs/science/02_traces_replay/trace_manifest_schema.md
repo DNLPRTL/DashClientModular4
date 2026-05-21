@@ -80,3 +80,17 @@ This example is illustrative schema prose, not a generated artifact:
 }
 ```
 
+## Phase 3.2C Local Acquisition Update
+
+Phase 3.2C does not create `trace_manifest_v1` files. The audit only records raw local acquisition status.
+
+Future manifests for HSDPA Norway, Ghent 4G/LTE and Lancaster must record:
+
+- external raw path policy;
+- dataset id;
+- source file or archive token;
+- converter name and version once a converter exists;
+- checksum of the normalized trace once normalization exists;
+- sample count and throughput statistics only after normalization.
+
+The local audit JSON inventory is not a trace manifest and must not be committed.

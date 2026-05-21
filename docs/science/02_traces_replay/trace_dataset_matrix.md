@@ -43,3 +43,16 @@ All future converted trace candidates must target `normalized_trace_schema_v1` w
 | `lumos5g_mmwave` | `normalized_trace_schema_v1` | 6 | no | later | High-variability 5G OOD candidate; trajectory leakage risk. |
 | `fcc_mba_reference` | none in Phase 3.2B | 7 | no | no | Reference-only until conversion/download plan exists. |
 | `puffer_data_archive` | none in Phase 3.2B | 8 | no | no | Metadata-only until conversion, storage and causal plans exist. |
+
+## Phase 3.2C Local Acquisition Update
+
+| id | local_raw_acquired | file_count | total_size_mb | local status | normalized | final split | benchmark material |
+| --- | --- | ---: | ---: | --- | --- | --- | --- |
+| `hsdpa_norway_mmsys2013` | true | 98 | 4.494 | first local raw candidate | no | no | no |
+| `ghent_4g_lte_bandwidth_logs` | true | 9 | 0.773 | second local raw candidate | no | no | no |
+| `lancaster_abr_throughput_traces` | true | 2 | 2.13 | third local raw candidate | no | no | no |
+| `raca_4g_lte_channel_context` | false in Phase 3.2C | TBD | TBD | deferred/OOD acquisition candidate | no | no | no |
+| `raca_5g_channel_context` | false in Phase 3.2C | TBD | TBD | deferred/OOD acquisition candidate | no | no | no |
+| `lumos5g_mmwave` | false in Phase 3.2C | TBD | TBD | deferred/OOD acquisition candidate | no | no | no |
+| `fcc_mba_reference` | no raw download | TBD | TBD | reference-only | no | no | no |
+| `puffer_data_archive` | no raw daily download | TBD | TBD | metadata-only | no | no | no |

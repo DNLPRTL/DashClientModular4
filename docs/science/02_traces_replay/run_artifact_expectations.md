@@ -71,3 +71,19 @@ Future trace/replay artifacts must include schema provenance:
 - run manifests should include trace id, dataset id, converter version/commit, checksum and split label.
 
 Raw traces, normalized real traces and generated manifests remain outside the repository unless a later block explicitly converts a tiny synthetic fixture for tests.
+
+## Phase 3.2C Local Acquisition Update
+
+The local raw acquisition audit is not a run artifact and not a benchmark artifact.
+
+Do not commit:
+
+- local JSON inventories;
+- raw logs;
+- ZIP archives;
+- normalized trace files;
+- generated manifests;
+- benchmark telemetry;
+- plots or run summaries produced by tools.
+
+Authored Markdown summaries such as `phase3_2c_dataset_audit_summary.md` are allowed.

@@ -72,3 +72,17 @@ Rules now fixed:
 - future IA train/validation/test/OOD splits must be separated before training starts;
 - OOD candidates must include modern mobile/5G traces such as Raca 5G and Lumos5G;
 - HSDPA, Ghent and Lancaster are first integration candidates, not final benchmark material by default.
+
+## Phase 3.2C Local Acquisition Update
+
+No final split is closed by local acquisition.
+
+Preliminary local raw roles:
+
+| dataset | Phase 3.2C role |
+| --- | --- |
+| HSDPA Norway | local raw first integration candidate |
+| Ghent 4G/LTE | local raw first integration candidate |
+| Lancaster ABR traces | local raw first integration/benchmark-design candidate |
+
+Raca 4G, Raca 5G and Lumos5G remain deferred/OOD acquisition candidates. They are still important for future OOD policy, but they are not locally acquired in this audit.

@@ -23,6 +23,7 @@
 | Phase 3.2A evaluation pipeline | 6 | Show source pages/distilled notes -> cards -> matrix -> schema -> runner -> later metrics -> later comparison | `02_traces_replay/source_triage_decision.md`, `02_traces_replay/replay_runner_requirements.md` | planned |
 | Trace schema boundary | 6 | Show raw source -> converter -> normalized schema v1 -> manifest -> future runner | `02_traces_replay/common_trace_schema.md`, `02_traces_replay/trace_manifest_schema.md` | planned |
 | External trace storage layout | 6 | Show repository docs separated from raw, normalized and manifest directories outside git | `02_traces_replay/trace_directory_layout.md` | planned |
+| Local acquisition boundary | 6 | Show HSDPA/Ghent/Lancaster as raw local candidates outside repo, with normalization and replay still gated | `02_traces_replay/phase3_2c_local_dataset_acquisition.md` | planned |
 
 ## Figure Policy
 

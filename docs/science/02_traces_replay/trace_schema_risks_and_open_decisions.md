@@ -39,3 +39,15 @@ These risks must be revisited before:
 - final QoE/reward definition;
 - benchmark ranking.
 
+## Phase 3.2C Local Acquisition Update
+
+New risks from the acquisition audit:
+
+| dataset | observed risk | required follow-up |
+| --- | --- | --- |
+| HSDPA Norway | Many route/report log files | Define route and report-level grouping before any split. |
+| Ghent 4G/LTE | Mobility-mode ZIP archives | Inspect/extract outside repo and define archive handling policy. |
+| Lancaster | ZIP archive plus README | Inspect archive contents and terms outside repo before conversion. |
+| all acquired datasets | Raw file names include logs/ZIPs | Keep raw files outside repo and commit only authored Markdown summaries. |
+
+Open decisions now include exact archive inspection procedure, converter implementation order and whether any raw source pages should be represented only by dataset-card prose.

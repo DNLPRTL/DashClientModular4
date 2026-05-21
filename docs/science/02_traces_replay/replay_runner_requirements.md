@@ -80,3 +80,17 @@ Future runner requirements:
 - never expose future trace samples directly to controllers;
 - never require optional context/KPI columns for Phase 2 baseline controllers;
 - keep final QoE/reward outside runner scope until Phase 3.5.
+
+## Phase 3.2C Local Acquisition Update
+
+Local raw acquisition does not authorize runner implementation.
+
+Before replay runner implementation:
+
+1. Phase 3.2C documentation must close;
+2. Phase 3.3A must validate schema behavior with synthetic fixtures;
+3. converter or loader boundaries must be documented separately;
+4. no future-sample leakage must be covered by tests;
+5. final QoE/reward must remain deferred to Phase 3.5.
+
+The acquired HSDPA, Ghent and Lancaster files are raw candidates only. The future runner must consume normalized traces, not raw logs or archives.

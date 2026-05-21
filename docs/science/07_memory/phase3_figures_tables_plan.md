@@ -14,6 +14,7 @@ This plan tracks figures and tables that may support the Phase 3 methodology sec
 | P3-F6 | Dataset domain ladder | Show synthetic, HSDPA, LTE, HAS, 4G KPI, 5G KPI, mmWave 5G, FCC and Puffer roles. | `generalization_protocol.md`, `source_triage_decision.md` |
 | P3-F7 | Trace schema contract | Show raw source -> normalized schema v1 -> manifest -> runner boundary. | `common_trace_schema.md`, `trace_manifest_schema.md` |
 | P3-F8 | External trace storage layout | Show repo docs separated from raw, normalized and manifest directories outside git. | `trace_directory_layout.md` |
+| P3-F9 | Local acquisition boundary | Show raw local candidates outside repo and blocked paths to normalization/replay. | `phase3_2c_local_dataset_acquisition.md` |
 
 ## Candidate Tables
 
@@ -32,6 +33,7 @@ This plan tracks figures and tables that may support the Phase 3 methodology sec
 | P3-T11 | Unit normalization policy | Show throughput and time conversion rules. | `trace_units_and_normalization.md` |
 | P3-T12 | Conversion priority | Show first integration, OOD and reference-only groups. | `trace_conversion_plan.md` |
 | P3-T13 | Manifest schemas | Summarize `trace_manifest_v1` and `split_manifest_v1`. | `trace_manifest_schema.md`, `trace_split_manifest_policy.md` |
+| P3-T14 | Local acquisition audit | Summarize acquired raw candidate counts and sizes. | `phase3_2c_dataset_audit_summary.md` |
 
 ## Policy
 
@@ -46,3 +48,7 @@ The preferred Chapter 6 visual sequence is:
 3. dataset domain ladder from synthetic traces to real-world references.
 
 Phase 3.2B adds two more useful visuals: the schema contract boundary and the external storage layout.
+
+## Phase 3.2C Local Acquisition Update
+
+Add a compact table for local acquisition status and a boundary figure that separates raw local candidates from normalized traces, manifests, synthetic fixtures, converters and replay.

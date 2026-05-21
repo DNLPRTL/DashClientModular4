@@ -74,3 +74,9 @@ Minimum invalid cases:
 - missing throughput without an explicit converter policy.
 
 Future tests must use `unittest`. Phase 3.2B does not add fixtures or tests.
+
+## Phase 3.2C Local Acquisition Update
+
+Phase 3.2C makes the next recommended implementation block clearer: Phase 3.3A synthetic trace fixtures and schema validation.
+
+Synthetic fixtures should be created before any converter touches the acquired HSDPA, Ghent or Lancaster raw files. The real raw datasets must not be used as committed test fixtures.

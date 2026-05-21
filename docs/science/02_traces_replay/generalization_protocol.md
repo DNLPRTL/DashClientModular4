@@ -77,3 +77,19 @@ Generalization policy now depends on:
 - preserved optional context fields that remain unavailable to baseline controllers.
 
 Schema uniformity does not make domains equivalent. HSDPA, LTE, live/HAS, 5G/mmWave, FCC reference data and Puffer deployment logs must remain separately labeled.
+
+## Phase 3.2C Local Acquisition Update
+
+Local acquisition currently covers three domains:
+
+- legacy mobile HSDPA;
+- LTE mobile;
+- live/HAS-derived throughput traces.
+
+Modern/OOD domains remain deferred for acquisition:
+
+- Raca 4G;
+- Raca 5G;
+- Lumos5G.
+
+This means Phase 3.2C improves readiness for first integration, but it does not close generalization or OOD evaluation.
